@@ -11,6 +11,7 @@ Platform sosial media fullstack dibangun dengan **SvelteKit**, menggunakan **Cle
 | Framework | SvelteKit 2 + Svelte 5 |
 | Language | TypeScript |
 | Styling | Tailwind CSS v4 |
+| Database | PostgreSQL + Drizzle ORM |
 | Linting | ESLint + Prettier |
 | Build Tool | Vite 8 |
 
@@ -68,6 +69,7 @@ routes → presentation → application → domain ← infrastructure
 
 - Node.js >= 20
 - npm >= 10
+- PostgreSQL >= 15 (running di port 6543)
 
 ### Instalasi
 
@@ -78,6 +80,10 @@ cd "k-social 1.2"
 
 # install dependencies
 npm install
+
+# salin environment variables
+cp .env.example .env
+# lalu isi DATABASE_URL di file .env
 ```
 
 ### Menjalankan Dev Server
@@ -110,6 +116,56 @@ npm run preview
 | `npm run check` | TypeScript type checking |
 | `npm run lint` | Jalankan ESLint + Prettier check |
 | `npm run format` | Format semua file dengan Prettier |
+| `npm run db:generate` | Generate migration files dari schema |
+| `npm run db:migrate` | Jalankan pending migrations ke database |
+| `npm run db:push` | Push schema langsung ke DB (tanpa migration file) |
+| `npm run db:studio` | Buka Drizzle Studio (DB GUI di browser) |
+| `npm run db:pull` | Introspect DB yang ada menjadi schema |
+
+---
+
+## Database
+
+Project ini menggunakan **PostgreSQL** dengan **Drizzle ORM**.
+
+### Konfigurasi
+
+Isi file `.env` dengan connection string PostgreSQL:
+
+```env
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
+```
+
+Default development:
+
+```env
+DATABASE_URL="postgresql://postgres:postgres@localhost:6543/ksocial2.0"
+```
+
+### Workflow Database
+
+```bash
+# 1. Setelah menambah/mengubah schema di src/lib/infrastructure/database/schema/
+npm run db:generate   # generate migration SQL
+
+# 2. Jalankan migration ke database
+npm run db:migrate
+
+# 3. (Opsional) Lihat data via GUI
+npm run db:studio
+```
+
+### Struktur Database Files
+
+```
+src/lib/infrastructure/database/
+├── client.ts          ← Drizzle client (singleton)
+├── schema/
+│   ├── index.ts       ← Barrel export semua schema
+│   ├── users.ts       ← (tambahkan schema baru di sini)
+│   └── ...
+└── migrations/        ← Auto-generated oleh drizzle-kit
+```
 
 ---
 
