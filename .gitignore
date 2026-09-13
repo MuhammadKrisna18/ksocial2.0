@@ -1,0 +1,85 @@
+# ===========================
+# Dependencies
+# ===========================
+node_modules/
+.pnp
+.pnp.js
+
+# ===========================
+# SvelteKit Output
+# ===========================
+/.svelte-kit
+/build
+.output
+.vercel
+.netlify
+.wrangler
+/dist
+
+# ===========================
+# Environment Variables
+# ===========================
+.env
+.env.*
+!.env.example
+!.env.test
+
+# ===========================
+# Vite
+# ===========================
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# ===========================
+# Database
+# ===========================
+*.db
+*.sqlite
+*.sqlite3
+/drizzle
+/prisma/migrations/*.sql
+*.db-journal
+
+# ===========================
+# Logs
+# ===========================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ===========================
+# OS
+# ===========================
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ===========================
+# IDE & Editor
+# ===========================
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ===========================
+# Testing
+# ===========================
+/coverage
+/test-results
+/playwright-report
+/blob-report
+
+# ===========================
+# Misc
+# ===========================
+*.tsbuildinfo
+.cache/
