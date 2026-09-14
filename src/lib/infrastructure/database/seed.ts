@@ -5,41 +5,38 @@ import postgres from 'postgres';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { eq } from 'drizzle-orm';
 import * as schema from './schema/index';
-import { ROLE_NAMES, type RoleNameType } from '$lib/domain/value-objects/RoleName';
+import type { RoleNameType } from '$lib/domain/value-objects/RoleName';
 import { BCRYPT_SALT_ROUNDS, ADMIN_ROLE } from '$lib/infrastructure/config/constants';
 
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) throw new Error('Missing DATABASE_URL');
 
-const ADMIN_EMAIL =
-	process.env.SEED_ADMIN_EMAIL ?? 'admin.ksocial.sveltekit@admin.co.id';
-const ADMIN_USERNAME =
-	process.env.SEED_ADMIN_USERNAME ?? 'admin';
-const ADMIN_PASSWORD =
-	process.env.SEED_ADMIN_PASSWORD ?? 'admin.ksocial.sveltekit';
+const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL ?? 'admin.ksocial.sveltekit@admin.co.id';
+const ADMIN_USERNAME = process.env.SEED_ADMIN_USERNAME ?? 'admin';
+const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD ?? 'admin.ksocial.sveltekit';
 
 const queryClient = postgres(DATABASE_URL);
 const db = drizzle(queryClient, { schema });
 
-async function seedRoles(): Promise<void> {
-	console.log('Seeding roles...');
+async function seedAdminRole(): Promise<string> {
+	const existing = await db
+		.select()
+		.from(schema.roles)
+		.where(eq(schema.roles.name, ADMIN_ROLE as RoleNameType))
+		.limit(1);
 
-	const existingRoles = await db.select().from(schema.roles);
-	const existingNames = new Set(existingRoles.map((r) => r.name));
-
-	for (const name of ROLE_NAMES) {
-		if (existingNames.has(name)) {
-			console.log(`  Role "${name}" already exists, skipping.`);
-			continue;
-		}
-		await db.insert(schema.roles).values({ id: randomUUID(), name });
-		console.log(`  Role "${name}" created.`);
+	if (existing.length > 0) {
+		console.log('  Admin role already exists, skipping.');
+		return existing[0].id;
 	}
+
+	const id = randomUUID();
+	await db.insert(schema.roles).values({ id, name: ADMIN_ROLE as RoleNameType });
+	console.log('  Admin role created.');
+	return id;
 }
 
-async function seedAdminUser(): Promise<void> {
-	console.log('Seeding admin user...');
-
+async function seedAdminUser(adminRoleId: string): Promise<void> {
 	const existing = await db
 		.select()
 		.from(schema.users)
@@ -49,16 +46,6 @@ async function seedAdminUser(): Promise<void> {
 	if (existing.length > 0) {
 		console.log('  Admin user already exists, skipping.');
 		return;
-	}
-
-	const adminRole = await db
-		.select()
-		.from(schema.roles)
-		.where(eq(schema.roles.name, ADMIN_ROLE as RoleNameType))
-		.limit(1);
-
-	if (!adminRole.length) {
-		throw new Error('Admin role not found. Roles must be seeded first.');
 	}
 
 	const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, BCRYPT_SALT_ROUNDS);
@@ -71,10 +58,7 @@ async function seedAdminUser(): Promise<void> {
 		passwordHash
 	});
 
-	await db.insert(schema.userRoles).values({
-		userId,
-		roleId: adminRole[0].id
-	});
+	await db.insert(schema.userRoles).values({ userId, roleId: adminRoleId });
 
 	console.log(`  Admin user created: ${ADMIN_EMAIL}`);
 }
@@ -82,8 +66,10 @@ async function seedAdminUser(): Promise<void> {
 async function main(): Promise<void> {
 	try {
 		console.log('Starting seed...\n');
-		await seedRoles();
-		await seedAdminUser();
+		console.log('Seeding admin role...');
+		const adminRoleId = await seedAdminRole();
+		console.log('Seeding admin user...');
+		await seedAdminUser(adminRoleId);
 		console.log('\nSeed completed successfully.');
 	} catch (err) {
 		console.error('Seed failed:', err);
