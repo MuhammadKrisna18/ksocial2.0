@@ -66,9 +66,9 @@
 
 				<div>
 					<label for="emailPrefix" class="block text-sm font-medium leading-6 text-slate-900">Email</label>
-					<div class="mt-2 flex rounded-xl shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-600 sm:max-w-md">
-						<input type="text" name="emailPrefix" id="emailPrefix" class="block flex-1 border-0 bg-transparent py-2.5 pl-3.5 text-slate-900 placeholder:text-slate-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="johndoe" required value={form?.values?.emailPrefix ?? ''} />
-						<span class="flex select-none items-center pr-3.5 text-slate-500 sm:text-sm">@user.sveltekit.co.id</span>
+					<div class="mt-2 flex w-full overflow-hidden rounded-xl shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-600">
+						<input type="text" name="emailPrefix" id="emailPrefix" class="block flex-1 border-0 bg-transparent py-2.5 px-3.5 text-slate-900 placeholder:text-slate-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="johndoe" required value={form?.values?.emailPrefix ?? ''} />
+						<span class="flex select-none items-center bg-slate-50 border-l border-slate-200 px-3.5 text-slate-500 sm:text-sm whitespace-nowrap">@user.sveltekit.co.id</span>
 					</div>
 				</div>
 

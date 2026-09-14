@@ -25,7 +25,7 @@
 				<table class="min-w-full divide-y divide-slate-300">
 					<thead>
 						<tr>
-							<th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-slate-900 sm:pl-6">Username</th>
+							<th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-slate-900 sm:pl-6">Nama Pengguna</th>
 							<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-slate-900">Email</th>
 							<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-slate-900">Roles</th>
 						</tr>
@@ -41,7 +41,8 @@
 											</span>
 										</div>
 										<div class="ml-4">
-											<div class="font-semibold">{user.username}</div>
+											<div class="font-semibold">{user.fullName || user.username}</div>
+											<div class="text-xs text-slate-500">@{user.username}</div>
 										</div>
 									</div>
 								</td>

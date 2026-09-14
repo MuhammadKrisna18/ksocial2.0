@@ -2,9 +2,11 @@ import type { IUserRepository } from '$lib/domain/repositories/IUserRepository';
 
 export interface UserDTO {
 	id: string;
+	fullName: string;
 	username: string;
 	email: string;
 	roles: string[];
+	dateOfBirth: Date;
 }
 
 export class GetUsersUseCase {
@@ -15,9 +17,11 @@ export class GetUsersUseCase {
 		
 		return users.map(user => ({
 			id: user.id,
+			fullName: user.fullName,
 			username: user.username,
 			email: user.email,
-			roles: user.roles
+			roles: user.roles,
+			dateOfBirth: user.dateOfBirth
 		}));
 	}
 }

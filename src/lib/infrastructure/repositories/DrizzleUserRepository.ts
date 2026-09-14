@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { db } from '$lib/infrastructure/database/client';
 import { users, roles, userRoles } from '$lib/infrastructure/database/schema/index';
 import { User } from '$lib/domain/entities/User';
@@ -137,13 +137,30 @@ export class DrizzleUserRepository implements IUserRepository {
 	async findAll(): Promise<User[]> {
 		const rows = await db.select().from(users);
 		
-		const mappedUsers = await Promise.all(
-			rows.map(async (row) => {
-				const roleNames = await this.getRolesForUser(row.id);
-				return this.mapToEntity(row, roleNames);
-			})
-		);
+		if (!rows.length) return [];
 
-		return mappedUsers;
+		const userIds = rows.map((r) => r.id);
+
+		const allRoles = await db
+			.select({
+				userId: userRoles.userId,
+				name: roles.name
+			})
+			.from(userRoles)
+			.innerJoin(roles, eq(userRoles.roleId, roles.id))
+			.where(inArray(userRoles.userId, userIds));
+
+		const rolesByUserId = allRoles.reduce((acc, curr) => {
+			if (!acc[curr.userId]) {
+				acc[curr.userId] = [];
+			}
+			acc[curr.userId].push(curr.name as RoleNameType);
+			return acc;
+		}, {} as Record<string, RoleNameType[]>);
+
+		return rows.map((row) => {
+			const roleNames = rolesByUserId[row.id] || [];
+			return this.mapToEntity(row, roleNames);
+		});
 	}
 }
