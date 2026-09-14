@@ -8,9 +8,6 @@ export class Password {
 	}
 
 	static createRaw(raw: string): Password {
-		if (raw.length < 8) {
-			throw new Error('Password must be at least 8 characters long');
-		}
 		return new Password(raw, false);
 	}
 

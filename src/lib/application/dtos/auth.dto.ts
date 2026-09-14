@@ -1,9 +1,11 @@
 import type { RoleNameType } from '$lib/domain/value-objects/RoleName';
 
 export interface RegisterDTO {
-	email: string;
+	fullName: string;
 	username: string;
+	email: string;
 	password: string;
+	dateOfBirth: Date;
 }
 
 export interface LoginDTO {

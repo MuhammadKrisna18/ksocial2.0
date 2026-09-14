@@ -2,29 +2,35 @@ import type { RoleNameType } from '$lib/domain/value-objects/RoleName';
 
 export interface UserProps {
 	id: string;
+	fullName: string;
 	email: string;
 	passwordHash: string;
 	username: string;
 	roles: RoleNameType[];
+	dateOfBirth: Date;
 	createdAt: Date;
 	updatedAt: Date;
 }
 
 export class User {
 	readonly id: string;
+	readonly fullName: string;
 	readonly email: string;
 	readonly passwordHash: string;
 	readonly username: string;
 	readonly roles: RoleNameType[];
+	readonly dateOfBirth: Date;
 	readonly createdAt: Date;
 	readonly updatedAt: Date;
 
 	constructor(props: UserProps) {
 		this.id = props.id;
+		this.fullName = props.fullName;
 		this.email = props.email;
 		this.passwordHash = props.passwordHash;
 		this.username = props.username;
 		this.roles = props.roles;
+		this.dateOfBirth = props.dateOfBirth;
 		this.createdAt = props.createdAt;
 		this.updatedAt = props.updatedAt;
 	}

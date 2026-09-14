@@ -39,9 +39,11 @@ export class RegisterUseCase {
 
 		const user = await this.userRepo.create({
 			id: randomUUID(),
+			fullName: dto.fullName,
 			email: email.toString(),
 			username: username.toString(),
 			passwordHash,
+			dateOfBirth: dto.dateOfBirth,
 			roleIds: [defaultRole.id]
 		});
 

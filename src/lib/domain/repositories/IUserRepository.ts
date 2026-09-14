@@ -2,9 +2,11 @@ import type { User } from '$lib/domain/entities/User';
 
 export interface CreateUserData {
 	id: string;
+	fullName: string;
 	email: string;
 	username: string;
 	passwordHash: string;
+	dateOfBirth: Date;
 	roleIds: string[];
 }
 

@@ -7,9 +7,11 @@ import type { RoleNameType } from '$lib/domain/value-objects/RoleName';
 
 export interface CreateUserData {
 	id: string;
+	fullName: string;
 	email: string;
 	username: string;
 	passwordHash: string;
+	dateOfBirth: Date;
 	roleIds: string[];
 }
 
@@ -17,10 +19,12 @@ export class DrizzleUserRepository implements IUserRepository {
 	private mapToEntity(row: typeof users.$inferSelect, roleNames: RoleNameType[]): User {
 		return new User({
 			id: row.id,
+			fullName: row.fullName,
 			email: row.email,
 			username: row.username,
 			passwordHash: row.passwordHash,
 			roles: roleNames,
+			dateOfBirth: row.dateOfBirth,
 			createdAt: row.createdAt,
 			updatedAt: row.updatedAt
 		});
@@ -65,9 +69,11 @@ export class DrizzleUserRepository implements IUserRepository {
 			.insert(users)
 			.values({
 				id: data.id,
+				fullName: data.fullName,
 				email: data.email,
 				username: data.username,
-				passwordHash: data.passwordHash
+				passwordHash: data.passwordHash,
+				dateOfBirth: data.dateOfBirth
 			})
 			.returning();
 
@@ -105,9 +111,11 @@ export class DrizzleUserRepository implements IUserRepository {
 		const [row] = await db
 			.update(users)
 			.set({
+				...(data.fullName && { fullName: data.fullName }),
 				...(data.email && { email: data.email }),
 				...(data.username && { username: data.username }),
 				...(data.passwordHash && { passwordHash: data.passwordHash }),
+				...(data.dateOfBirth && { dateOfBirth: data.dateOfBirth }),
 				updatedAt: new Date()
 			})
 			.where(eq(users.id, id))
