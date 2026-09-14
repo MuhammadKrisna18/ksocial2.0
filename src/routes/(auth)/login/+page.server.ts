@@ -5,7 +5,7 @@ import { ACCESS_TOKEN_COOKIE, getAuthCookieOptions } from '$lib/presentation/uti
 import { dev } from '$app/environment';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	// If already logged in, redirect away from login
+
 	if (locals.user) {
 		const roles = locals.user.roles ?? [];
 		if (roles.includes('admin')) {

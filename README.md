@@ -35,11 +35,20 @@ npm run dev -- --open
 
 ## 🛠️ Tech Stack & Arsitektur
 
-- **Frontend & Backend**: SvelteKit 2 + Svelte 5
-- **Styling**: Tailwind CSS v4 (Glassmorphism & Modern UI)
-- **Database**: PostgreSQL dengan Drizzle ORM
-- **Autentikasi**: Custom JWT dengan cookie HTTP-only (RBAC Protected)
-- **Arsitektur**: Clean Architecture (`domain` → `application` → `infrastructure` → `presentation`)
+## 🛠️ Tech Stack & Arsitektur
+
+### 🖥️ Arsitektur Frontend
+- **Framework**: SvelteKit 2 dengan Svelte 5 (Client-Side & Server-Side Rendering Hybrid).
+- **Styling**: Tailwind CSS v4 dengan pendekatan UI Modern (Glassmorphism, animasi interaktif, *responsive design*).
+- **Struktur**: Pemisahan tata letak (Layout) secara modular (contoh: *routing* terpisah untuk `/user`, `/admin`, dan `/(auth)`).
+
+### ⚙️ Arsitektur Backend
+- **Platform**: Node.js (dijalankan via SvelteKit Server Endpoints & Hooks).
+- **Pola Arsitektur**: **Clean Architecture** (Solid Principles).
+  - **Domain Layer**: Logika inti, *Entities* (ex: `User`), dan *Value Objects* (ex: `Email`, `Username`, `RoleName`).
+  - **Application Layer**: Penanganan *Use Case* (ex: `LoginUseCase`, `RegisterUseCase`) dan *Interfaces* kontrak.
+  - **Infrastructure Layer**: Interaksi dengan dunia luar. Menggunakan **Drizzle ORM** untuk **PostgreSQL**, kriptografi, JWT, dan *Dependency Injection (DI) Container* manual.
+  - **Presentation Layer**: Menangani antarmuka sistem (HTTP Request, Cookie, Router) yang diintegrasikan langsung pada SvelteKit Server.
 
 ---
 

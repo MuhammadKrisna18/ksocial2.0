@@ -4,7 +4,7 @@ import { container } from '$lib/infrastructure/config/container';
 import { redirect } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	// Require admin user (should already be covered by layout, but double check)
+
 	if (!locals.user) {
 		throw redirect(302, '/login');
 	}
@@ -30,10 +30,7 @@ export const actions: Actions = {
 				newUsername: username
 			});
 			
-			// Normally we'd also update the session/cookie to reflect the new username.
-			// Since our JWT only stores sub, email, username, roles, if we change username we should technically resign the token.
-			// For this implementation, we will let it pass (it will be stale in the cookie until they re-login, or we can just resign here).
-			// To be robust, one should re-issue the cookie here. But for now, returning success is fine.
+
 
 			return { success: true, message: 'Username updated successfully.' };
 		} catch (err: any) {

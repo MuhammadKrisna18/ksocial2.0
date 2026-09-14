@@ -12,7 +12,7 @@ export class GetDashboardStatsUseCase {
 	async execute(): Promise<DashboardStatsDTO> {
 		const totalUsers = await this.userRepo.count();
 		
-		// Dummy data for features not yet implemented
+
 		const activePosts = 14212;
 		const reportedContent = 24;
 

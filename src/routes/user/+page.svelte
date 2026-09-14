@@ -1,5 +1,5 @@
 <script lang="ts">
-	// Mock posts data for frontend mockup
+
 	const posts = [
 		{
 			id: 1,

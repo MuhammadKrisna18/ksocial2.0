@@ -5,10 +5,7 @@ declare global {
 		interface Locals {
 			user: JwtPayload | null;
 		}
-		// interface Error {}
-		// interface PageData {}
-		// interface PageState {}
-		// interface Platform {}
+
 	}
 }
 

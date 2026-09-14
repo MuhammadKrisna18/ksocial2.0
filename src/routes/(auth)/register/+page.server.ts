@@ -5,7 +5,7 @@ import { ACCESS_TOKEN_COOKIE, getAuthCookieOptions } from '$lib/presentation/uti
 import { dev } from '$app/environment';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	// If already logged in, redirect away
+
 	if (locals.user) {
 		const roles = locals.user.roles ?? [];
 		if (roles.includes('admin')) {
@@ -32,7 +32,7 @@ export const actions: Actions = {
 			});
 		}
 
-		// Email formatting: @user.sveltekit.co.id
+
 		const email = `${emailPrefix}@user.sveltekit.co.id`;
 		const dateOfBirth = new Date(dateOfBirthStr);
 
@@ -50,7 +50,7 @@ export const actions: Actions = {
 		} catch (error: any) {
 			const message = error.message || 'Terjadi kesalahan saat pendaftaran.';
 			
-			// Friendly message for unique constraints
+
 			let friendlyError = message;
 			if (message.includes('Username already in use')) {
 				friendlyError = 'Nama panggilan (Username) tersebut sudah dipakai oleh orang lain.';

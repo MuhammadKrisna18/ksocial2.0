@@ -36,13 +36,13 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	const { pathname } = event.url;
 
-	// Skip authentication checks for static assets and Vite internals
+
 	if (pathname.startsWith('/_') || pathname.startsWith('/@') || pathname.includes('.')) {
 		return resolve(event);
 	}
 
 	if (!PUBLIC_ROUTES.has(pathname)) {
-		// 1. Require authentication for ALL non-public routes
+
 		if (!event.locals.user) {
 			if (isApiRoute(pathname)) {
 				return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -53,7 +53,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			return new Response(null, { status: 302, headers: { location: '/login' } });
 		}
 
-		// 2. Check role permissions if the route is explicitly protected
+
 		const matchedRoute = PROTECTED_ROUTES.find(({ pattern }) => pattern.test(pathname));
 		if (matchedRoute) {
 			const userRoles = event.locals.user.roles ?? [];
@@ -73,5 +73,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	}
 
-	return resolve(event);
+	const response = await resolve(event);
+
+
+	if (!PUBLIC_ROUTES.has(pathname)) {
+		response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+		response.headers.set('Pragma', 'no-cache');
+		response.headers.set('Expires', '0');
+	}
+
+	return response;
 };
