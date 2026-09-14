@@ -9,6 +9,7 @@
 
 <form
 	method="POST"
+	action="?/login"
 	use:enhance={() => {
 		isLoading = true;
 		return async ({ update }) => {

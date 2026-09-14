@@ -5,7 +5,8 @@ import type { RoleNameType } from '$lib/domain/value-objects/RoleName';
 const PUBLIC_ROUTES = new Set(['/', '/login', '/register']);
 
 const PROTECTED_ROUTES: Array<{ pattern: RegExp; roles: RoleNameType[] }> = [
-	{ pattern: /^\/admin/, roles: ['admin'] }
+	{ pattern: /^\/admin/, roles: ['admin'] },
+	{ pattern: /^\/user/, roles: ['user', 'admin'] }
 ];
 
 function extractToken(event: Parameters<Handle>[0]['event']): string | undefined {
@@ -35,20 +36,26 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	const { pathname } = event.url;
 
+	// Skip authentication checks for static assets and Vite internals
+	if (pathname.startsWith('/_') || pathname.startsWith('/@') || pathname.includes('.')) {
+		return resolve(event);
+	}
+
 	if (!PUBLIC_ROUTES.has(pathname)) {
-		const matchedRoute = PROTECTED_ROUTES.find(({ pattern }) => pattern.test(pathname));
-
-		if (matchedRoute) {
-			if (!event.locals.user) {
-				if (isApiRoute(pathname)) {
-					return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-						status: 401,
-						headers: { 'Content-Type': 'application/json' }
-					});
-				}
-				return new Response(null, { status: 302, headers: { location: '/login' } });
+		// 1. Require authentication for ALL non-public routes
+		if (!event.locals.user) {
+			if (isApiRoute(pathname)) {
+				return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+					status: 401,
+					headers: { 'Content-Type': 'application/json' }
+				});
 			}
+			return new Response(null, { status: 302, headers: { location: '/login' } });
+		}
 
+		// 2. Check role permissions if the route is explicitly protected
+		const matchedRoute = PROTECTED_ROUTES.find(({ pattern }) => pattern.test(pathname));
+		if (matchedRoute) {
 			const userRoles = event.locals.user.roles ?? [];
 			const hasAccess = matchedRoute.roles.some((r) => userRoles.includes(r));
 
@@ -59,7 +66,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 						headers: { 'Content-Type': 'application/json' }
 					});
 				}
-				return new Response(null, { status: 302, headers: { location: '/' } });
+				
+				const fallbackPath = userRoles.includes('admin') ? '/admin' : '/user';
+				return new Response(null, { status: 302, headers: { location: fallbackPath } });
 			}
 		}
 	}

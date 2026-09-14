@@ -43,6 +43,29 @@ npm run dev -- --open
 
 ---
 
+## ✨ Fitur yang Sudah Selesai
+
+### 🖥️ Frontend (UI/UX)
+- **Desain Premium**: Menggunakan estetika modern seperti *Glassmorphism*, gradien halus, bayangan, dan animasi interaktif.
+- **Halaman Autentikasi**: 
+  - Halaman **Login** dengan penanganan *error* responsif.
+  - Halaman **Register** dengan layout yang rapi dan penanda input visual.
+- **Dashboard Admin**: Halaman khusus admin dengan navigasi dan tata letak eksklusif.
+- **Dashboard User**: Halaman utama pengguna dengan *sidebar*, *header*, tombol *create post*, dan susunan *feed* postingan sosial media yang interaktif (efek *hover* pada *Like*, *Comment*, *Share*).
+
+### ⚙️ Backend & Keamanan
+- **Arsitektur Rapi (Clean Architecture)**: Implementasi pemisahan tugas secara terstruktur (Entity, Value Object, Repository, Use Case) dengan *Dependency Injection* (DI) manual.
+- **Autentikasi & Otorisasi**:
+  - Sistem Login dan Pendaftaran aman berbasis JWT & HTTP-Only Cookie.
+  - **Role-Based Access Control (RBAC)**: Sistem hanya memiliki dua peran pasti: `admin` dan `user` (Peran moderator telah dihapus).
+- **Proteksi Router (Deny-by-Default)**: 
+  - Hanya rute yang secara eksplisit didaftarkan sebagai publik (`/login`, `/register`) yang bisa diakses bebas.
+  - *Fallback* rute statis untuk CSS/JS dilindungi agar tidak menyebabkan celah keamanan.
+  - Otomatis mengalihkan *(redirect)* pengguna berdasarkan role-nya ketika login atau mengakses halaman terlarang.
+- **Optimasi Database**: Solusi penanganan masalah *N+1 Query* pada pengambilan data banyak pengguna menggunakan fitur `inArray` dari Drizzle ORM.
+
+---
+
 ## 📦 Scripts Penting
 
 | Perintah | Fungsi |

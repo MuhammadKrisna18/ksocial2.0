@@ -11,12 +11,12 @@ export const load: PageServerLoad = async ({ locals }) => {
 		if (roles.includes('admin')) {
 			throw redirect(302, '/admin');
 		}
-		throw redirect(302, '/');
+		throw redirect(302, '/user');
 	}
 };
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
+	login: async ({ request, cookies }) => {
 		const data = await request.formData();
 		const email = data.get('email');
 		const password = data.get('password');
@@ -25,7 +25,7 @@ export const actions: Actions = {
 			return fail(400, { email, missing: true, message: 'Email and password are required' });
 		}
 
-		let redirectUrl = '/';
+		let redirectUrl = '/user';
 
 		try {
 			const result = await container.loginUseCase.execute({ email, password });
@@ -44,5 +44,9 @@ export const actions: Actions = {
 		}
 
 		throw redirect(302, redirectUrl);
+	},
+	logout: async ({ cookies }) => {
+		cookies.delete(ACCESS_TOKEN_COOKIE, getAuthCookieOptions(!dev));
+		throw redirect(302, '/login');
 	}
 };

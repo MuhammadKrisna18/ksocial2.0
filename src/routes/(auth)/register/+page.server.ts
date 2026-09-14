@@ -1,11 +1,17 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { container } from '$lib/infrastructure/config/container';
+import { ACCESS_TOKEN_COOKIE, getAuthCookieOptions } from '$lib/presentation/utils/cookie';
+import { dev } from '$app/environment';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	// If already logged in, redirect to admin
+	// If already logged in, redirect away
 	if (locals.user) {
-		throw redirect(302, '/admin');
+		const roles = locals.user.roles ?? [];
+		if (roles.includes('admin')) {
+			throw redirect(302, '/admin');
+		}
+		throw redirect(302, '/user');
 	}
 	return {};
 };
@@ -39,13 +45,7 @@ export const actions: Actions = {
 				dateOfBirth
 			});
 
-			cookies.set('session', result.accessToken, {
-				path: '/',
-				httpOnly: true,
-				sameSite: 'strict',
-				secure: process.env.NODE_ENV === 'production',
-				maxAge: 60 * 60 * 24 * 7 // 1 week
-			});
+			cookies.set(ACCESS_TOKEN_COOKIE, result.accessToken, getAuthCookieOptions(!dev));
 			
 		} catch (error: any) {
 			const message = error.message || 'Terjadi kesalahan saat pendaftaran.';
@@ -64,7 +64,6 @@ export const actions: Actions = {
 			});
 		}
 		
-		// Redirect outside try-catch to avoid SvelteKit breaking
-		throw redirect(302, '/admin');
+		throw redirect(302, '/user');
 	}
 };
