@@ -5,6 +5,7 @@ import { DrizzleRoleRepository } from '$lib/infrastructure/repositories/DrizzleR
 import { LoginUseCase } from '$lib/application/use-cases/LoginUseCase';
 import { RegisterUseCase } from '$lib/application/use-cases/RegisterUseCase';
 import { ValidateTokenUseCase } from '$lib/application/use-cases/ValidateTokenUseCase';
+import { UpdateUserUseCase } from '$lib/application/use-cases/UpdateUserUseCase';
 
 const hashService = new HashService();
 const tokenService = new TokenService();
@@ -18,5 +19,6 @@ export const container = {
 	roleRepository,
 	loginUseCase: new LoginUseCase(userRepository, hashService, tokenService),
 	registerUseCase: new RegisterUseCase(userRepository, roleRepository, hashService, tokenService),
-	validateTokenUseCase: new ValidateTokenUseCase(tokenService)
+	validateTokenUseCase: new ValidateTokenUseCase(tokenService),
+	updateUserUseCase: new UpdateUserUseCase(userRepository, hashService)
 };

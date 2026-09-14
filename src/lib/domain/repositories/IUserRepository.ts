@@ -15,4 +15,5 @@ export interface IUserRepository {
 	create(data: CreateUserData): Promise<User>;
 	existsByEmail(email: string): Promise<boolean>;
 	existsByUsername(username: string): Promise<boolean>;
+	update(id: string, data: Partial<Omit<CreateUserData, 'id' | 'roleIds'>>): Promise<User>;
 }

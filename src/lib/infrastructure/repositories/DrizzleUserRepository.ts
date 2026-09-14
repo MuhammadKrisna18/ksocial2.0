@@ -100,4 +100,24 @@ export class DrizzleUserRepository implements IUserRepository {
 
 		return rows.length > 0;
 	}
+
+	async update(id: string, data: Partial<Omit<CreateUserData, 'id' | 'roleIds'>>): Promise<User> {
+		const [row] = await db
+			.update(users)
+			.set({
+				...(data.email && { email: data.email }),
+				...(data.username && { username: data.username }),
+				...(data.passwordHash && { passwordHash: data.passwordHash }),
+				updatedAt: new Date()
+			})
+			.where(eq(users.id, id))
+			.returning();
+
+		if (!row) {
+			throw new Error('User not found');
+		}
+
+		const roleNames = await this.getRolesForUser(id);
+		return this.mapToEntity(row, roleNames);
+	}
 }
