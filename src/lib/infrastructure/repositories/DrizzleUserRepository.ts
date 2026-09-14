@@ -120,4 +120,22 @@ export class DrizzleUserRepository implements IUserRepository {
 		const roleNames = await this.getRolesForUser(id);
 		return this.mapToEntity(row, roleNames);
 	}
+
+	async count(): Promise<number> {
+		const result = await db.select({ count: users.id }).from(users);
+		return result.length;
+	}
+
+	async findAll(): Promise<User[]> {
+		const rows = await db.select().from(users);
+		
+		const mappedUsers = await Promise.all(
+			rows.map(async (row) => {
+				const roleNames = await this.getRolesForUser(row.id);
+				return this.mapToEntity(row, roleNames);
+			})
+		);
+
+		return mappedUsers;
+	}
 }

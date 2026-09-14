@@ -3,12 +3,12 @@
 
 	let { data }: { data: PageData } = $props();
 
-	// Dummy data for presentation
-	const stats = [
-		{ title: 'Total Users', value: '2,845', change: '+12.5%', isPositive: true, icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' },
-		{ title: 'Active Posts', value: '14,212', change: '+5.2%', isPositive: true, icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15M9 11l3 3L22 4' },
-		{ title: 'Reported Content', value: '24', change: '-2.1%', isPositive: true, icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z' },
-	];
+	// Map backend stats to presentation format
+	const stats = $derived([
+		{ title: 'Total Users', value: data.dashboardStats.totalUsers.toLocaleString(), change: '+12.5%', isPositive: true, icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' },
+		{ title: 'Active Posts', value: data.dashboardStats.activePosts.toLocaleString(), change: '+5.2%', isPositive: true, icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15M9 11l3 3L22 4' },
+		{ title: 'Reported Content', value: data.dashboardStats.reportedContent.toLocaleString(), change: '-2.1%', isPositive: true, icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z' },
+	]);
 
 	const recentActivities = [
 		{ id: 1, user: 'alex_dev', action: 'Created a new post', time: '2 minutes ago', avatar: 'bg-blue-100 text-blue-600' },

@@ -6,6 +6,8 @@ import { LoginUseCase } from '$lib/application/use-cases/LoginUseCase';
 import { RegisterUseCase } from '$lib/application/use-cases/RegisterUseCase';
 import { ValidateTokenUseCase } from '$lib/application/use-cases/ValidateTokenUseCase';
 import { UpdateUserUseCase } from '$lib/application/use-cases/UpdateUserUseCase';
+import { GetDashboardStatsUseCase } from '$lib/application/use-cases/GetDashboardStatsUseCase';
+import { GetUsersUseCase } from '$lib/application/use-cases/GetUsersUseCase';
 
 const hashService = new HashService();
 const tokenService = new TokenService();
@@ -20,5 +22,7 @@ export const container = {
 	loginUseCase: new LoginUseCase(userRepository, hashService, tokenService),
 	registerUseCase: new RegisterUseCase(userRepository, roleRepository, hashService, tokenService),
 	validateTokenUseCase: new ValidateTokenUseCase(tokenService),
-	updateUserUseCase: new UpdateUserUseCase(userRepository, hashService)
+	updateUserUseCase: new UpdateUserUseCase(userRepository, hashService),
+	getDashboardStatsUseCase: new GetDashboardStatsUseCase(userRepository),
+	getUsersUseCase: new GetUsersUseCase(userRepository)
 };

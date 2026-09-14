@@ -3,8 +3,15 @@ import type { Actions, PageServerLoad } from './$types';
 import { ACCESS_TOKEN_COOKIE, getAuthCookieOptions } from '$lib/presentation/utils/cookie';
 import { dev } from '$app/environment';
 
+import { container } from '$lib/infrastructure/config/container';
+
 export const load: PageServerLoad = async ({ locals }) => {
-	return { user: locals.user };
+	const stats = await container.getDashboardStatsUseCase.execute();
+	
+	return { 
+		user: locals.user,
+		dashboardStats: stats
+	};
 };
 
 export const actions: Actions = {
