@@ -2,6 +2,7 @@ import type { PageServerLoad, Actions } from './$types';
 import { container } from '$lib/infrastructure/config/container';
 import { fail } from '@sveltejs/kit';
 import { handleActionError } from '$lib/presentation/utils/response';
+import { postFileStorage } from '$lib/infrastructure/storage/LocalFileStorage';
 
 export const load: PageServerLoad = async () => {
 	const posts = await container.getFeedUseCase.execute();
@@ -21,15 +22,29 @@ export const actions: Actions = {
 
 		const data = await request.formData();
 		const content = data.get('content')?.toString() || '';
+		const files = data.getAll('media') as File[];
 
-		if (!content.trim()) {
+		if (!content.trim() && (!files.length || files[0].size === 0)) {
 			return fail(400, { error: 'Post content cannot be empty', content });
+		}
+
+		let media: { url: string; type: 'image' | 'video' }[] = [];
+
+		if (files.length > 0 && files[0].size > 0) {
+			for (const file of files) {
+				const ext = file.name.split('.').pop() || '';
+				const filename = `post_${userId}_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
+				const url = await postFileStorage.saveFile(file, filename);
+				const type = file.type.startsWith('video/') ? 'video' : 'image';
+				media.push({ url, type });
+			}
 		}
 
 		try {
 			await container.createPostUseCase.execute({
 				userId,
-				content
+				content,
+				media: media.length > 0 ? media : undefined
 			});
 			return { success: true };
 		} catch (error) {

@@ -4,6 +4,7 @@ export interface CreatePostData {
 	id: string;
 	userId: string;
 	content: string;
+	media?: { url: string; type: 'image' | 'video' }[];
 }
 
 export interface IPostRepository {

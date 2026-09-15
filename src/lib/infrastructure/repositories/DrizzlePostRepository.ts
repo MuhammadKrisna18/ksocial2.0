@@ -12,7 +12,8 @@ export class DrizzlePostRepository implements IPostRepository {
 			.values({
 				id: data.id,
 				userId: data.userId,
-				content: data.content
+				content: data.content,
+				media: data.media || null
 			})
 			.returning();
 
@@ -30,6 +31,7 @@ export class DrizzlePostRepository implements IPostRepository {
 			content: postRow.content,
 			likesCount: postRow.likesCount,
 			commentsCount: postRow.commentsCount,
+			media: postRow.media as any,
 			createdAt: postRow.createdAt,
 			updatedAt: postRow.updatedAt
 		});
@@ -57,6 +59,7 @@ export class DrizzlePostRepository implements IPostRepository {
 				content: row.post.content,
 				likesCount: row.post.likesCount,
 				commentsCount: row.post.commentsCount,
+				media: row.post.media as any,
 				createdAt: row.post.createdAt,
 				updatedAt: row.post.updatedAt
 			});

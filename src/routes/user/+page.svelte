@@ -4,6 +4,32 @@
 	let { data, form } = $props();
 	
 	let isPosting = $state(false);
+	let mediaPreviews = $state<{ url: string, type: 'image' | 'video' }[]>([]);
+	let fileInput = $state<HTMLInputElement | null>(null);
+
+	function onFileSelected(e: Event) {
+		const input = e.target as HTMLInputElement;
+		if (input.files && input.files.length > 0) {
+			const newPreviews = Array.from(input.files).map(file => ({
+				url: URL.createObjectURL(file),
+				type: file.type.startsWith('video/') ? 'video' as const : 'image' as const
+			}));
+			mediaPreviews = [...mediaPreviews, ...newPreviews];
+		}
+	}
+
+	function removePreview(index: number) {
+		if (fileInput && fileInput.files) {
+			const dt = new DataTransfer();
+			const files = Array.from(fileInput.files);
+			files.splice(index, 1);
+			files.forEach(f => dt.items.add(f));
+			fileInput.files = dt.files;
+		}
+		URL.revokeObjectURL(mediaPreviews[index].url);
+		mediaPreviews.splice(index, 1);
+		mediaPreviews = [...mediaPreviews];
+	}
 
 	// Function to format time differences nicely
 	function formatTimeAgo(dateString: Date) {
@@ -34,6 +60,7 @@
 		<form 
 			method="POST" 
 			action="?/createPost"
+			enctype="multipart/form-data"
 			class="flex gap-4"
 			use:enhance={() => {
 				isPosting = true;
@@ -41,6 +68,8 @@
 					await update();
 					isPosting = false;
 					formElement.reset();
+					mediaPreviews.forEach(p => URL.revokeObjectURL(p.url));
+					mediaPreviews = [];
 				};
 			}}
 		>
@@ -56,17 +85,38 @@
 					required
 				></textarea>
 				
+				{#if mediaPreviews.length > 0}
+					<div class="mt-3 flex flex-wrap gap-2">
+						{#each mediaPreviews as preview, i}
+							<div class="relative w-24 h-24 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
+								{#if preview.type === 'image'}
+									<img src={preview.url} alt="Preview" class="w-full h-full object-cover" />
+								{:else}
+									<video src={preview.url} class="w-full h-full object-cover"></video>
+									<div class="absolute inset-0 flex items-center justify-center bg-black/20">
+										<svg class="w-8 h-8 text-white opacity-80" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+									</div>
+								{/if}
+								<button type="button" onclick={() => removePreview(i)} class="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-red-500 transition-colors">
+									<svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+								</button>
+							</div>
+						{/each}
+					</div>
+				{/if}
+
 				{#if form?.error}
 					<p class="text-sm text-red-500 mt-2">{form.error}</p>
 				{/if}
 
 				<div class="mt-3 flex items-center justify-between">
 					<div class="flex gap-2">
-						<button type="button" class="p-2 text-slate-400 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg transition-colors cursor-not-allowed" title="Attach image (Coming soon)">
+						<button type="button" onclick={() => fileInput?.click()} class="p-2 text-slate-400 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg transition-colors" title="Attach image or video">
 							<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
 							</svg>
 						</button>
+						<input type="file" bind:this={fileInput} name="media" accept="image/*,video/*" multiple class="hidden" onchange={onFileSelected} />
 						<button type="button" class="p-2 text-slate-400 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg transition-colors cursor-not-allowed" title="Add emoji (Coming soon)">
 							<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -126,6 +176,19 @@
 					<!-- Post Content -->
 					<div class="mt-4">
 						<p class="text-slate-700 dark:text-slate-300 leading-relaxed text-sm whitespace-pre-wrap">{post.content}</p>
+						{#if post.media && post.media.length > 0}
+							<div class="mt-3 grid gap-2 {post.media.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}">
+								{#each post.media as m}
+									<div class="rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+										{#if m.type === 'image'}
+											<img src={m.url} alt="Post media" class="w-full h-auto max-h-96 object-cover" loading="lazy" />
+										{:else}
+											<video src={m.url} controls class="w-full h-auto max-h-96 object-cover"></video>
+										{/if}
+									</div>
+								{/each}
+							</div>
+						{/if}
 					</div>
 
 				<!-- Post Actions -->

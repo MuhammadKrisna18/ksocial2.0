@@ -6,6 +6,7 @@ import { randomUUID } from 'crypto';
 export interface CreatePostRequest {
 	userId: string;
 	content: string;
+	media?: { url: string; type: 'image' | 'video' }[];
 }
 
 export class CreatePostUseCase {
@@ -19,7 +20,8 @@ export class CreatePostUseCase {
 		return this.postRepository.create({
 			id: randomUUID(),
 			userId: request.userId,
-			content: request.content.trim()
+			content: request.content.trim(),
+			media: request.media
 		});
 	}
 }

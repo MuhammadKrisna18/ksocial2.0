@@ -3,8 +3,10 @@ import path from 'path';
 
 export class LocalFileStorage {
 	private readonly uploadDir: string;
+	private readonly publicUrlPrefix: string;
 
-	constructor(baseDir: string = 'static/uploads/users') {
+	constructor(baseDir: string = 'static/uploads/users', publicUrlPrefix: string = '/uploads/users') {
+		this.publicUrlPrefix = publicUrlPrefix;
 		this.uploadDir = path.resolve(process.cwd(), baseDir);
 		if (!fs.existsSync(this.uploadDir)) {
 			fs.mkdirSync(this.uploadDir, { recursive: true });
@@ -18,7 +20,7 @@ export class LocalFileStorage {
 		await fs.promises.writeFile(filePath, buffer);
 		
 		// Return the public URL path
-		return `/uploads/users/${filename}`;
+		return `${this.publicUrlPrefix}/${filename}`;
 	}
 
 	async deleteFileByUrl(url: string): Promise<void> {
@@ -32,3 +34,4 @@ export class LocalFileStorage {
 }
 
 export const localFileStorage = new LocalFileStorage();
+export const postFileStorage = new LocalFileStorage('static/uploads/posts', '/uploads/posts');

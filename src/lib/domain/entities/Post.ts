@@ -6,6 +6,7 @@ export interface PostProps {
 	content: string;
 	likesCount: number;
 	commentsCount: number;
+	media?: { url: string; type: 'image' | 'video' }[];
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -45,6 +46,10 @@ export class Post {
 		return this.props.commentsCount;
 	}
 
+	get media(): { url: string; type: 'image' | 'video' }[] | undefined {
+		return this.props.media;
+	}
+
 	get createdAt(): Date {
 		return this.props.createdAt;
 	}
@@ -62,6 +67,7 @@ export class Post {
 			content: this.content,
 			likesCount: this.likesCount,
 			commentsCount: this.commentsCount,
+			media: this.media,
 			createdAt: this.createdAt,
 			updatedAt: this.updatedAt
 		};

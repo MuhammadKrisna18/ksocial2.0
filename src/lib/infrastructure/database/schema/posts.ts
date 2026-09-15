@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, integer, jsonb } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { users } from './users';
 
@@ -8,6 +8,7 @@ export const posts = pgTable('posts', {
 		.notNull()
 		.references(() => users.id, { onDelete: 'cascade' }),
 	content: text('content').notNull(),
+	media: jsonb('media').$type<{ url: string, type: 'image' | 'video' }[]>(),
 	likesCount: integer('likes_count').notNull().default(0),
 	commentsCount: integer('comments_count').notNull().default(0),
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
