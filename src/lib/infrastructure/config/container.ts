@@ -3,6 +3,8 @@ import { TokenService } from '$lib/infrastructure/external-services/TokenService
 import { DrizzleUserRepository } from '$lib/infrastructure/repositories/DrizzleUserRepository';
 import { DrizzleRoleRepository } from '$lib/infrastructure/repositories/DrizzleRoleRepository';
 import { DrizzlePostRepository } from '$lib/infrastructure/repositories/DrizzlePostRepository';
+import { DrizzleFollowRepository } from '$lib/infrastructure/repositories/DrizzleFollowRepository';
+import { DrizzleNotificationRepository } from '$lib/infrastructure/repositories/DrizzleNotificationRepository';
 import { LoginUseCase } from '$lib/application/use-cases/LoginUseCase';
 import { RegisterUseCase } from '$lib/application/use-cases/RegisterUseCase';
 import { ValidateTokenUseCase } from '$lib/application/use-cases/ValidateTokenUseCase';
@@ -16,6 +18,11 @@ import { ToggleSavePostUseCase } from '$lib/application/use-cases/ToggleSavePost
 import { GetSavedPostsUseCase } from '$lib/application/use-cases/GetSavedPostsUseCase';
 import { DeletePostUseCase } from '$lib/application/use-cases/DeletePostUseCase';
 import { GetUserPostsUseCase } from '$lib/application/use-cases/GetUserPostsUseCase';
+import { FollowUserUseCase } from '$lib/application/use-cases/FollowUserUseCase';
+import { AcceptFollowUseCase } from '$lib/application/use-cases/AcceptFollowUseCase';
+import { RejectFollowUseCase } from '$lib/application/use-cases/RejectFollowUseCase';
+import { GetFollowStatusUseCase } from '$lib/application/use-cases/GetFollowStatusUseCase';
+import { GetNotificationsUseCase } from '$lib/application/use-cases/GetNotificationsUseCase';
 
 class Container {
 	// --- Services & Repositories (Singletons) ---
@@ -47,6 +54,18 @@ class Container {
 	get postRepository(): DrizzlePostRepository {
 		if (!this._postRepository) this._postRepository = new DrizzlePostRepository();
 		return this._postRepository;
+	}
+
+	private _followRepository?: DrizzleFollowRepository;
+	get followRepository(): DrizzleFollowRepository {
+		if (!this._followRepository) this._followRepository = new DrizzleFollowRepository();
+		return this._followRepository;
+	}
+
+	private _notificationRepository?: DrizzleNotificationRepository;
+	get notificationRepository(): DrizzleNotificationRepository {
+		if (!this._notificationRepository) this._notificationRepository = new DrizzleNotificationRepository();
+		return this._notificationRepository;
 	}
 
 	// --- Use Cases (Lazy instantiated) ---
@@ -100,6 +119,26 @@ class Container {
 
 	get getUserPostsUseCase(): GetUserPostsUseCase {
 		return new GetUserPostsUseCase(this.postRepository);
+	}
+
+	get followUserUseCase(): FollowUserUseCase {
+		return new FollowUserUseCase(this.followRepository, this.notificationRepository, this.userRepository);
+	}
+
+	get acceptFollowUseCase(): AcceptFollowUseCase {
+		return new AcceptFollowUseCase(this.followRepository, this.notificationRepository);
+	}
+
+	get rejectFollowUseCase(): RejectFollowUseCase {
+		return new RejectFollowUseCase(this.followRepository, this.notificationRepository);
+	}
+
+	get getFollowStatusUseCase(): GetFollowStatusUseCase {
+		return new GetFollowStatusUseCase(this.followRepository);
+	}
+
+	get getNotificationsUseCase(): GetNotificationsUseCase {
+		return new GetNotificationsUseCase(this.notificationRepository);
 	}
 }
 

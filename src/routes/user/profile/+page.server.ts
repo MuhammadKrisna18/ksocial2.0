@@ -1,6 +1,6 @@
 import type { PageServerLoad, Actions } from './$types';
 import { container } from '$lib/infrastructure/config/container';
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { handleActionError } from '$lib/presentation/utils/response';
 import { localFileStorage, postFileStorage } from '$lib/infrastructure/storage/LocalFileStorage';
 import crypto from 'crypto';
@@ -11,25 +11,46 @@ export const load: PageServerLoad = async ({ locals }) => {
 	
 	if (!user) {
 		// Edge case: token is valid but user deleted from DB
-		return {
-			profile: null
-		};
+		throw redirect(302, '/auth/login');
 	}
 
 	const posts = await container.getUserPostsUseCase.execute(locals.user!.sub, locals.user!.sub);
 
+	// Load notifications
+	const rawNotifications = await container.getNotificationsUseCase.execute(user.id);
+	
+	// Map sender names for follow requests
+	const notifications = await Promise.all(
+		rawNotifications.map(async (n) => {
+			const sender = await container.userRepository.findById(n.senderId);
+			return {
+				id: n.id,
+				type: n.type,
+				senderId: n.senderId,
+				senderUsername: sender?.username,
+				senderName: sender?.fullName,
+				read: n.read,
+				createdAt: n.createdAt
+			};
+		})
+	);
+
 	return {
+		user: locals.user,
 		profile: {
+			id: user.id,
 			fullName: user.fullName,
 			username: user.username,
 			email: user.email,
 			dateOfBirth: user.dateOfBirth.toISOString().split('T')[0], // Format for input type="date"
 			location: user.location,
 			relationshipStatus: user.relationshipStatus,
+			isPrivate: user.isPrivate,
 			profilePictureUrl: user.profilePictureUrl,
 			coverPhotoUrl: user.coverPhotoUrl
 		},
-		posts: posts.map(p => p.toJSON())
+		posts: posts.map(p => p.toJSON()),
+		notifications
 	};
 };
 
@@ -79,6 +100,7 @@ export const actions: Actions = {
 		const dateOfBirthStr = data.get('dateOfBirth')?.toString() || '';
 		const location = data.get('location')?.toString() || '';
 		const relationshipStatus = data.get('relationshipStatus')?.toString() || '';
+		const isPrivate = data.get('isPrivate') === 'on';
 
 		if (!fullName || !username || !dateOfBirthStr) {
 			return fail(400, {
@@ -95,7 +117,8 @@ export const actions: Actions = {
 				newUsername: username,
 				dateOfBirth,
 				location: location || undefined,
-				relationshipStatus: relationshipStatus || undefined
+				relationshipStatus: relationshipStatus || undefined,
+				isPrivate
 			});
 
 			return { successProfile: true, message: 'Profil berhasil diperbarui!' };
@@ -224,6 +247,48 @@ export const actions: Actions = {
 			return { success: true };
 		} catch (error) {
 			return handleActionError(error, 'Failed to delete post');
+		}
+	},
+	acceptFollow: async ({ request, locals }) => {
+		const user = locals.user;
+		if (!user) throw redirect(302, '/auth/login');
+
+		const data = await request.formData();
+		const followerId = data.get('followerId')?.toString();
+		const notificationId = data.get('notificationId')?.toString();
+
+		if (!followerId) return fail(400, { message: 'Missing follower id' });
+
+		try {
+			await container.acceptFollowUseCase.execute({
+				followerId,
+				followingId: user.sub,
+				notificationId
+			});
+			return { success: true };
+		} catch (e: any) {
+			return fail(400, { message: e.message });
+		}
+	},
+	rejectFollow: async ({ request, locals }) => {
+		const user = locals.user;
+		if (!user) throw redirect(302, '/auth/login');
+
+		const data = await request.formData();
+		const followerId = data.get('followerId')?.toString();
+		const notificationId = data.get('notificationId')?.toString();
+
+		if (!followerId) return fail(400, { message: 'Missing follower id' });
+
+		try {
+			await container.rejectFollowUseCase.execute({
+				followerId,
+				followingId: user.sub,
+				notificationId
+			});
+			return { success: true };
+		} catch (e: any) {
+			return fail(400, { message: e.message });
 		}
 	}
 };

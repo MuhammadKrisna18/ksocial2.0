@@ -35,8 +35,6 @@ npm run dev -- --open
 
 ## 🛠️ Tech Stack & Arsitektur
 
-
-
 ### 🖥️ Arsitektur Frontend
 - **Framework**: SvelteKit 2 dengan Svelte 5 (Client-Side & Server-Side Rendering Hybrid).
 - **Styling**: Tailwind CSS v4 dengan pendekatan UI Modern (Glassmorphism, animasi interaktif, *responsive design*).
@@ -45,9 +43,9 @@ npm run dev -- --open
 ### ⚙️ Arsitektur Backend
 - **Platform**: Node.js (dijalankan via SvelteKit Server Endpoints & Hooks).
 - **Pola Arsitektur**: **Clean Architecture** (Solid Principles).
-  - **Domain Layer**: Logika inti, *Entities* (ex: `User`), dan *Value Objects* (ex: `Email`, `Username`, `RoleName`).
-  - **Application Layer**: Penanganan *Use Case* (ex: `LoginUseCase`, `RegisterUseCase`) dan *Interfaces* kontrak.
-  - **Infrastructure Layer**: Interaksi dengan dunia luar. Menggunakan **Drizzle ORM** untuk **PostgreSQL**, kriptografi, JWT, dan *Dependency Injection (DI) Container* manual.
+  - **Domain Layer**: Logika inti, *Entities* (ex: `User`, `Post`, `Follow`), dan *Value Objects* (ex: `Email`, `Username`, `RoleName`).
+  - **Application Layer**: Penanganan *Use Case* (ex: `LoginUseCase`, `FollowUserUseCase`) dan *Interfaces* kontrak.
+  - **Infrastructure Layer**: Interaksi dengan dunia luar. Menggunakan **Drizzle ORM** untuk **PostgreSQL**, kriptografi, JWT, Local File Storage, dan *Dependency Injection (DI) Container* manual.
   - **Presentation Layer**: Menangani antarmuka sistem (HTTP Request, Cookie, Router) yang diintegrasikan langsung pada SvelteKit Server.
 
 ---
@@ -61,24 +59,26 @@ npm run dev -- --open
   - Halaman **Register** dengan layout yang rapi dan penanda input visual.
 - **Dashboard Admin**: Halaman khusus admin dengan navigasi dan tata letak eksklusif.
 - **Dashboard User**: 
-  - **Beranda (Feed)**: Layout *feed* interaktif dengan fitur pembuatan postingan (*Create Post*) yang terhubung ke _database_.
-  - **Profil Pengguna**: Halaman profil dinamis (contoh: `/user/profile/username`) yang menampilkan detail *user* beserta riwayat *postingan*-nya. Mendukung fitur **Privasi** (menampilkan status "Privat" jika tidak dapat diakses).
-  - **Teman (Friends)**: Daftar pengguna (selain admin) dengan antarmuka _grid_ modern, *avatar* bergradasi, dan tautan menuju profil masing-masing pengguna.
-  - **Pengaturan (Settings)**: Pengelolaan preferensi seperti fitur *toggle* **Akun Privat** dengan *Confirmation Modal* responsif tanpa _reload_ halaman (menggunakan Svelte Actions).
+  - **Beranda (Feed)**: Layout *feed* interaktif.
+  - **Profil Dinamis (`/user/[username]`)**: Halaman profil publik yang menampilkan detail *user* beserta riwayat *postingan*-nya. Mendukung fitur **Privasi** (menampilkan status "Privat" dan menyembunyikan postingan jika tidak saling berteman).
+  - **Edit Profil Interaktif**: Pengubahan data diri, checkbox privasi, serta pemotongan (*cropping*) Foto Profil dan Sampul langsung di sisi klien menggunakan CropperJS.
+  - **Notifikasi**: Sistem notifikasi langsung (khususnya untuk *Follow Request*) yang terintegrasi di halaman profil pribadi pengguna.
 
-### ⚙️ Backend & Keamanan
-- **Fitur Fungsional Selesai**:
-  - **CRUD Postingan**: Implementasi penuh pembuatan _post_, pengambilan *feed*, penyimpanan UUID berbasis *Crypto*, dan relasi *Post-to-User* via PostgreSQL.
-  - **Sistem Privasi Akun**: Field `is_private` ditambahkan di *database* yang langsung terintegrasi dengan UseCase dan Handler (menyembunyikan *feed* dari *user* asing jika diaktifkan).
-- **Arsitektur Rapi (Clean Architecture)**: Implementasi pemisahan tugas secara terstruktur (Entity, Value Object, Repository, Use Case) dengan *Dependency Injection* (DI) manual.
+### ⚙️ Backend, Postingan, & Relasi
+- **Manajemen Postingan Lengkap**:
+  - **Create Post**: Membuat postingan dengan fitur upload media multi-gambar dengan modal *popup*.
+  - **Delete Post**: Menghapus postingan milik sendiri langsung dari titik tiga pada *Post Card*.
+  - **Save Post (Bookmark)**: Menyimpan postingan milik siapapun ke tab "Saved". Jika postingan asli dihapus, ia otomatis terhapus dari daftar _Saved_ pengguna lain (Cascade).
+- **Sistem Pertemanan (Follow System)**:
+  - **Follow / Unfollow**: Mengikuti pengguna lain.
+  - **Mutual Follow (Friends)**: Jika dua akun saling mem-*follow*, status otomatis berubah menjadi **Friends**.
+  - **Akun Private (Follow Request)**: Jika sebuah akun diset menjadi *Private*, orang yang mem-*follow* harus mendapatkan persetujuan (*Accept/Reject*) via notifikasi terlebih dahulu.
+- **Upload File (Local File Storage)**: Mengelola unggahan foto postingan dan avatar, mendukung segala format gambar standar.
 - **Autentikasi & Otorisasi**:
   - Sistem Login dan Pendaftaran aman berbasis JWT & HTTP-Only Cookie.
-  - **Role-Based Access Control (RBAC)**: Sistem hanya memiliki dua peran pasti: `admin` dan `user` (Peran moderator telah dihapus).
+  - **Role-Based Access Control (RBAC)**: Sistem memisahkan antara `admin` dan `user`.
 - **Proteksi Router (Deny-by-Default)**: 
-  - Hanya rute yang secara eksplisit didaftarkan sebagai publik (`/login`, `/register`) yang bisa diakses bebas.
-  - *Fallback* rute statis untuk CSS/JS dilindungi agar tidak menyebabkan celah keamanan.
-  - Otomatis mengalihkan *(redirect)* pengguna berdasarkan role-nya ketika login atau mengakses halaman terlarang.
-- **Optimasi Database**: Solusi penanganan masalah *N+1 Query* pada pengambilan data banyak pengguna menggunakan fitur `inArray` dari Drizzle ORM.
+  - Hanya rute publik (`/login`, `/register`) yang bebas diakses, sisanya dilindungi dan diredirect otomatis sesuai peran.
 
 ---
 
@@ -92,3 +92,4 @@ npm run dev -- --open
 | `npm run db:studio` | Membuka antarmuka GUI untuk melihat isi database |
 | `npm run db:seed` | Menambahkan data awal (seperti akun Admin) |
 | `npm run lint` / `format` | Merapikan dan mengecek penulisan kode |
+| `npm run check` | Memeriksa tipe data Typescript dan Svelte (SSR) |

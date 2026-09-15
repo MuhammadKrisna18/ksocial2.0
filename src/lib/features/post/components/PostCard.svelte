@@ -18,18 +18,18 @@
 <div class="rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-5 shadow-lg shadow-slate-200/40 dark:shadow-slate-900/40 border border-slate-100 dark:border-slate-700 transition-transform hover:-translate-y-1 hover:shadow-xl duration-300">
 	<!-- Post Header -->
 	<div class="flex items-center justify-between">
-		<div class="flex items-center gap-3">
-			<div class="h-10 w-10 shrink-0 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold shadow-md uppercase">
+		<a href="/user/{post.authorUsername}" class="flex items-center gap-3 group/author">
+			<div class="h-10 w-10 shrink-0 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold shadow-md uppercase group-hover/author:ring-2 ring-purple-500 transition-all">
 				{post.authorName?.charAt(0) || post.authorUsername?.charAt(0)}
 			</div>
 			<div>
-				<p class="text-sm font-bold text-slate-900 dark:text-white">
+				<p class="text-sm font-bold text-slate-900 dark:text-white group-hover/author:underline">
 					{post.authorName}
-					<span class="ml-1 text-xs font-normal text-slate-500 dark:text-slate-400">@{post.authorUsername}</span>
+					<span class="ml-1 text-xs font-normal text-slate-500 dark:text-slate-400 no-underline">@{post.authorUsername}</span>
 				</p>
 				<p class="text-xs text-slate-400 dark:text-slate-500">{formatTimeAgo(post.createdAt)}</p>
 			</div>
-		</div>
+		</a>
 		<details class="relative">
 			<summary class="list-none p-2 text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-full transition-colors cursor-pointer [&::-webkit-details-marker]:hidden">
 				<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

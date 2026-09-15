@@ -1,4 +1,5 @@
-import type { TokenService, JwtPayload } from '$lib/infrastructure/external-services/TokenService';
+import type { TokenService } from '$lib/infrastructure/external-services/TokenService';
+import type { JwtPayload } from '$lib/application/interfaces/ITokenService';
 import { AuthenticationError } from '$lib/application/exceptions';
 
 export class ValidateTokenUseCase {

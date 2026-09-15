@@ -9,6 +9,10 @@ interface CreateUserData {
 	dateOfBirth: Date;
 	roleIds: string[];
 	isPrivate?: boolean;
+	profilePictureUrl?: string | null;
+	coverPhotoUrl?: string | null;
+	location?: string | null;
+	relationshipStatus?: string | null;
 }
 
 export interface IUserRepository {
