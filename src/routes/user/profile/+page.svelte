@@ -2,6 +2,8 @@
 	import { enhance } from '$app/forms';
 	import Cropper from 'cropperjs';
 	import 'cropperjs/dist/cropper.css';
+	import PostCard from '$lib/features/post/components/PostCard.svelte';
+	import CreatePostModal from '$lib/features/post/components/CreatePostModal.svelte';
 
 	let { data, form } = $props();
 	
@@ -220,6 +222,35 @@
 					</form>
 				</section>
 
+				<!-- Posts Section -->
+				<section>
+					<div class="mb-8 border-b border-slate-200 dark:border-slate-800 pb-4">
+						<h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+							<svg class="w-7 h-7 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+							</svg>
+							Postingan Anda
+						</h2>
+						<p class="mt-2 text-slate-500 dark:text-slate-400">Kelola semua postingan yang pernah Anda buat.</p>
+					</div>
+
+					<!-- Create Post -->
+					<div class="mb-6">
+						<CreatePostModal currentUser={data.user} {form} />
+					</div>
+
+					<div class="space-y-6">
+						{#if data.posts.length === 0}
+							<div class="text-center py-12 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+								<p class="text-slate-500 dark:text-slate-400 text-lg">Belum ada postingan. Mulai berbagi momen Anda!</p>
+							</div>
+						{:else}
+							{#each data.posts as post}
+								<PostCard {post} currentUser={data.user} />
+							{/each}
+						{/if}
+					</div>
+				</section>
 
 			</div>
 		{/if}

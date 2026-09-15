@@ -12,5 +12,6 @@ export interface IPostRepository {
 	getFeed(currentUserId?: string): Promise<Post[]>;
 	toggleSave(userId: string, postId: string): Promise<boolean>;
 	getSavedPosts(userId: string): Promise<Post[]>;
+	getUserPosts(userId: string, currentUserId?: string): Promise<Post[]>;
 	deletePost(postId: string, userId: string): Promise<boolean>;
 }

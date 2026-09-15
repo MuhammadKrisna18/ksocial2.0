@@ -116,6 +116,43 @@ export class DrizzlePostRepository implements IPostRepository {
 		});
 	}
 
+	async getUserPosts(userId: string, currentUserId?: string): Promise<Post[]> {
+		const results = await db
+			.select({
+				post: posts,
+				author: {
+					fullName: users.fullName,
+					username: users.username
+				},
+				savedByUserId: savedPosts.userId
+			})
+			.from(posts)
+			.innerJoin(users, eq(posts.userId, users.id))
+			.leftJoin(savedPosts, and(
+				eq(savedPosts.postId, posts.id),
+				currentUserId ? eq(savedPosts.userId, currentUserId) : undefined
+			))
+			.where(eq(posts.userId, userId))
+			.orderBy(desc(posts.createdAt));
+
+		return results.map((row) => {
+			return Post.create({
+				id: row.post.id,
+				authorId: row.post.userId,
+				authorName: row.author.fullName,
+				authorUsername: row.author.username,
+				content: row.post.content,
+				likesCount: row.post.likesCount,
+				commentsCount: row.post.commentsCount,
+				media: row.post.media as any,
+				isSaved: !!row.savedByUserId,
+				createdAt: row.post.createdAt,
+				updatedAt: row.post.updatedAt
+			});
+		});
+	}
+
+
 	async deletePost(postId: string, userId: string): Promise<boolean> {
 		// First verify if the post exists and belongs to the user
 		const postExists = await db.select().from(posts).where(and(eq(posts.id, postId), eq(posts.userId, userId)));
