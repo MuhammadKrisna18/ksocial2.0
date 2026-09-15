@@ -57,38 +57,7 @@ export const actions: Actions = {
 		}
 	},
 
-	updatePassword: async ({ request, locals }) => {
-		const data = await request.formData();
-		const oldPassword = data.get('oldPassword')?.toString() || '';
-		const newPassword = data.get('newPassword')?.toString() || '';
-		const confirmPassword = data.get('confirmPassword')?.toString() || '';
 
-		if (!oldPassword || !newPassword || !confirmPassword) {
-			return fail(400, {
-				successPassword: false,
-				message: 'Semua kolom password wajib diisi.'
-			});
-		}
-
-		if (newPassword !== confirmPassword) {
-			return fail(400, {
-				successPassword: false,
-				message: 'Password baru dan konfirmasi password tidak cocok.'
-			});
-		}
-
-		try {
-			await container.updateUserUseCase.updatePassword({
-				userId: locals.user!.sub,
-				oldPassword,
-				newPassword
-			});
-
-			return { successPassword: true, message: 'Password berhasil diubah!' };
-		} catch (error: any) {
-			return handleActionError(error, 'Gagal merubah password. Pastikan password lama Anda benar.', { successPassword: false });
-		}
-	},
 
 	uploadProfilePicture: async ({ request, locals }) => {
 		const data = await request.formData();
