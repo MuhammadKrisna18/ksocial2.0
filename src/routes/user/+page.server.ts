@@ -4,8 +4,8 @@ import { fail } from '@sveltejs/kit';
 import { handleActionError } from '$lib/presentation/utils/response';
 import { postFileStorage } from '$lib/infrastructure/storage/LocalFileStorage';
 
-export const load: PageServerLoad = async () => {
-	const posts = await container.getFeedUseCase.execute();
+export const load: PageServerLoad = async ({ locals }) => {
+	const posts = await container.getFeedUseCase.execute(locals.user?.sub);
 	
 	// Convert entities to JSON objects
 	return {
@@ -49,6 +49,26 @@ export const actions: Actions = {
 			return { success: true };
 		} catch (error) {
 			return handleActionError(error, 'Failed to create post', { content });
+		}
+	},
+	toggleSave: async ({ request, locals }) => {
+		const userId = locals.user?.sub;
+		if (!userId) {
+			return fail(401, { error: 'Unauthorized' });
+		}
+
+		const data = await request.formData();
+		const postId = data.get('postId')?.toString();
+
+		if (!postId) {
+			return fail(400, { error: 'Post ID is required' });
+		}
+
+		try {
+			await container.toggleSavePostUseCase.execute(userId, postId);
+			return { success: true };
+		} catch (error) {
+			return handleActionError(error, 'Failed to toggle save post');
 		}
 	}
 };

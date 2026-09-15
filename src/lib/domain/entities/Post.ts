@@ -7,6 +7,7 @@ export interface PostProps {
 	likesCount: number;
 	commentsCount: number;
 	media?: { url: string; type: 'image' | 'video' }[];
+	isSaved?: boolean;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -50,6 +51,10 @@ export class Post {
 		return this.props.media;
 	}
 
+	get isSaved(): boolean {
+		return this.props.isSaved ?? false;
+	}
+
 	get createdAt(): Date {
 		return this.props.createdAt;
 	}
@@ -68,6 +73,7 @@ export class Post {
 			likesCount: this.likesCount,
 			commentsCount: this.commentsCount,
 			media: this.media,
+			isSaved: this.isSaved,
 			createdAt: this.createdAt,
 			updatedAt: this.updatedAt
 		};
