@@ -5,6 +5,17 @@
 	let { form }: { form: ActionData } = $props();
 
 	let isLoading = $state(false);
+
+	function quickLogin(email: string, pass: string) {
+		const emailInput = document.getElementById('email') as HTMLInputElement;
+		const pwdInput = document.getElementById('password') as HTMLInputElement;
+		if (emailInput && pwdInput) {
+			emailInput.value = email;
+			pwdInput.value = pass;
+			const formElement = emailInput.closest('form');
+			if (formElement) formElement.requestSubmit();
+		}
+	}
 </script>
 
 <form
@@ -102,4 +113,34 @@
 	<p class="mt-6 text-center text-sm font-medium text-slate-600">
 		Don't have an account? <a href="/register" class="font-bold text-primary-600 hover:text-primary-700 hover:underline underline-offset-4 transition-all">Sign up</a>
 	</p>
+
+	<!-- Quick Login for Testing -->
+	<div class="mt-8 pt-6 border-t border-slate-200">
+		<p class="text-xs text-center text-slate-500 font-medium mb-3">Quick Login (Testing Only)</p>
+		<div class="flex flex-col gap-2">
+			<button 
+				type="button"
+				onclick={() => quickLogin('admin.ksocial.sveltekit@admin.co.id', 'admin.ksocial.sveltekit')}
+				class="w-full rounded-lg bg-slate-800 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-700 transition-colors"
+			>
+				Login as Admin
+			</button>
+			<div class="flex gap-2">
+				<button 
+					type="button"
+					onclick={() => quickLogin('user1@example.com', 'password123')}
+					class="w-1/2 rounded-lg bg-indigo-100 px-3 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-200 transition-colors"
+				>
+					Login as User 1
+				</button>
+				<button 
+					type="button"
+					onclick={() => quickLogin('user2@example.com', 'password123')}
+					class="w-1/2 rounded-lg bg-indigo-100 px-3 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-200 transition-colors"
+				>
+					Login as User 2
+				</button>
+			</div>
+		</div>
+	</div>
 </form>

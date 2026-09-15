@@ -21,6 +21,11 @@ export interface UpdatePasswordDTO {
 	newPassword: string;
 }
 
+export interface UpdatePrivacyDTO {
+	userId: string;
+	isPrivate: boolean;
+}
+
 export class UpdateUserUseCase {
 	constructor(
 		private readonly userRepo: IUserRepository,
@@ -83,5 +88,14 @@ export class UpdateUserUseCase {
 		const passwordHash = await this.hashService.hash(password.toString());
 
 		await this.userRepo.update(user.id, { passwordHash });
+	}
+
+	async updatePrivacy(dto: UpdatePrivacyDTO): Promise<void> {
+		const user = await this.userRepo.findById(dto.userId);
+		if (!user) {
+			throw new Error('User not found');
+		}
+
+		await this.userRepo.update(user.id, { isPrivate: dto.isPrivate });
 	}
 }

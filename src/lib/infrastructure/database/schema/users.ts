@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, boolean } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { posts } from './posts';
 
@@ -9,6 +9,7 @@ export const users = pgTable('users', {
 	username: text('username').notNull().unique(),
 	passwordHash: text('password_hash').notNull(),
 	dateOfBirth: timestamp('date_of_birth', { withTimezone: true }).notNull().defaultNow(),
+	isPrivate: boolean('is_private').notNull().default(false),
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
 });

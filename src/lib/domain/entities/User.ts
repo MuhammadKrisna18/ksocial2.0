@@ -8,6 +8,7 @@ export interface UserProps {
 	username: string;
 	roles: RoleNameType[];
 	dateOfBirth: Date;
+	isPrivate: boolean;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -20,6 +21,7 @@ export class User {
 	readonly username: string;
 	readonly roles: RoleNameType[];
 	readonly dateOfBirth: Date;
+	readonly isPrivate: boolean;
 	readonly createdAt: Date;
 	readonly updatedAt: Date;
 
@@ -31,6 +33,7 @@ export class User {
 		this.username = props.username;
 		this.roles = props.roles;
 		this.dateOfBirth = props.dateOfBirth;
+		this.isPrivate = props.isPrivate;
 		this.createdAt = props.createdAt;
 		this.updatedAt = props.updatedAt;
 	}
