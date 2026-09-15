@@ -11,8 +11,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	const user = await container.userRepository.findById(userId);
 	
+	
+
 	return {
-		isPrivate: user?.isPrivate ?? false
+		isPrivate: user?.isPrivate ?? false,
+		userId
 	};
 };
 

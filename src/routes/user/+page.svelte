@@ -22,7 +22,7 @@
 	<title>Feed — K-Social</title>
 </svelte:head>
 
-<div class="mx-auto max-w-3xl p-4 sm:p-6 lg:p-8">
+<div class="mx-auto max-w-5xl p-4 sm:p-6 lg:p-8">
 	<!-- Header -->
 	<div class="mb-8">
 		<h1 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">Home Feed</h1>

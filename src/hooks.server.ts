@@ -73,7 +73,13 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	}
 
-	const response = await resolve(event);
+	const userThemeCookieName = event.locals.user ? `theme_${event.locals.user.sub}` : 'theme';
+	const theme = event.cookies.get(userThemeCookieName) || 'light';
+	event.locals.theme = theme;
+
+	const response = await resolve(event, {
+		transformPageChunk: ({ html }) => html.replace('%sveltekit.html.attributes%', `class="${theme}"`)
+	});
 
 
 	if (!PUBLIC_ROUTES.has(pathname)) {

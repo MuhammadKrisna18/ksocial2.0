@@ -28,6 +28,12 @@ export interface UpdatePrivacyDTO {
 	isPrivate: boolean;
 }
 
+export interface UpdatePhotosDTO {
+	userId: string;
+	profilePictureUrl?: string | null;
+	coverPhotoUrl?: string | null;
+}
+
 export class UpdateUserUseCase {
 	constructor(
 		private readonly userRepo: IUserRepository,
@@ -99,5 +105,17 @@ export class UpdateUserUseCase {
 		}
 
 		await this.userRepo.update(user.id, { isPrivate: dto.isPrivate });
+	}
+
+	async updatePhotos(dto: UpdatePhotosDTO): Promise<void> {
+		const user = await this.userRepo.findById(dto.userId);
+		if (!user) {
+			throw new NotFoundError('User not found');
+		}
+
+		await this.userRepo.update(user.id, {
+			...(dto.profilePictureUrl !== undefined && { profilePictureUrl: dto.profilePictureUrl }),
+			...(dto.coverPhotoUrl !== undefined && { coverPhotoUrl: dto.coverPhotoUrl })
+		});
 	}
 }

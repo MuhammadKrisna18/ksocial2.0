@@ -5,26 +5,19 @@
 	let { data } = $props();
 
 	// Real state for dark mode
-	let isDarkMode = $state(false);
-
-	onMount(() => {
-		// Initialize from localStorage or OS preference
-		if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-			isDarkMode = true;
-		} else {
-			isDarkMode = false;
-		}
-	});
+	let isDarkMode = $state(data.theme === 'dark');
 
 	function toggleDarkMode() {
 		isDarkMode = !isDarkMode;
+		const themeValue = isDarkMode ? 'dark' : 'light';
+		
 		if (isDarkMode) {
 			document.documentElement.classList.add('dark');
-			localStorage.theme = 'dark';
 		} else {
 			document.documentElement.classList.remove('dark');
-			localStorage.theme = 'light';
 		}
+		
+		document.cookie = `theme_${data.userId}=${themeValue}; path=/; max-age=31536000`;
 	}
 	
 	// Real state for privacy

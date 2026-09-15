@@ -4,6 +4,7 @@ declare global {
 	namespace App {
 		interface Locals {
 			user: JwtPayload | null;
+			theme: string;
 		}
 
 	}

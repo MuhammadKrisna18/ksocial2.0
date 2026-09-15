@@ -10,6 +10,8 @@ export const users = pgTable('users', {
 	passwordHash: text('password_hash').notNull(),
 	dateOfBirth: timestamp('date_of_birth', { withTimezone: true }).notNull().defaultNow(),
 	isPrivate: boolean('is_private').notNull().default(false),
+	profilePictureUrl: text('profile_picture_url'),
+	coverPhotoUrl: text('cover_photo_url'),
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
 });

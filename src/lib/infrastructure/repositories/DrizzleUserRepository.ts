@@ -14,6 +14,8 @@ export interface CreateUserData {
 	dateOfBirth: Date;
 	roleIds: string[];
 	isPrivate?: boolean;
+	profilePictureUrl?: string | null;
+	coverPhotoUrl?: string | null;
 }
 
 export class DrizzleUserRepository implements IUserRepository {
@@ -27,6 +29,8 @@ export class DrizzleUserRepository implements IUserRepository {
 			roles: roleNames,
 			dateOfBirth: row.dateOfBirth,
 			isPrivate: row.isPrivate,
+			profilePictureUrl: row.profilePictureUrl,
+			coverPhotoUrl: row.coverPhotoUrl,
 			createdAt: row.createdAt,
 			updatedAt: row.updatedAt
 		});
@@ -76,7 +80,9 @@ export class DrizzleUserRepository implements IUserRepository {
 				username: data.username,
 				passwordHash: data.passwordHash,
 				dateOfBirth: data.dateOfBirth,
-				isPrivate: data.isPrivate ?? false
+				isPrivate: data.isPrivate ?? false,
+				profilePictureUrl: data.profilePictureUrl,
+				coverPhotoUrl: data.coverPhotoUrl
 			})
 			.returning();
 
@@ -120,6 +126,8 @@ export class DrizzleUserRepository implements IUserRepository {
 				...(data.passwordHash && { passwordHash: data.passwordHash }),
 				...(data.dateOfBirth && { dateOfBirth: data.dateOfBirth }),
 				...(data.isPrivate !== undefined && { isPrivate: data.isPrivate }),
+				...(data.profilePictureUrl !== undefined && { profilePictureUrl: data.profilePictureUrl }),
+				...(data.coverPhotoUrl !== undefined && { coverPhotoUrl: data.coverPhotoUrl }),
 				updatedAt: new Date()
 			})
 			.where(eq(users.id, id))

@@ -10,5 +10,5 @@ export const load: PageServerLoad = ({ locals }) => {
 		throw redirect(302, '/admin');
 	}
 
-	return { user: locals.user };
+	throw redirect(302, '/user');
 };
