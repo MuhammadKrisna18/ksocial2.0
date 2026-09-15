@@ -8,6 +8,7 @@ import { ValidateTokenUseCase } from '$lib/application/use-cases/ValidateTokenUs
 import { UpdateUserUseCase } from '$lib/application/use-cases/UpdateUserUseCase';
 import { GetDashboardStatsUseCase } from '$lib/application/use-cases/GetDashboardStatsUseCase';
 import { GetUsersUseCase } from '$lib/application/use-cases/GetUsersUseCase';
+import { DeleteAccountUseCase } from '$lib/application/use-cases/DeleteAccountUseCase';
 
 const hashService = new HashService();
 const tokenService = new TokenService();
@@ -24,5 +25,6 @@ export const container = {
 	validateTokenUseCase: new ValidateTokenUseCase(tokenService),
 	updateUserUseCase: new UpdateUserUseCase(userRepository, hashService),
 	getDashboardStatsUseCase: new GetDashboardStatsUseCase(userRepository),
-	getUsersUseCase: new GetUsersUseCase(userRepository)
+	getUsersUseCase: new GetUsersUseCase(userRepository),
+	deleteAccountUseCase: new DeleteAccountUseCase(userRepository)
 };

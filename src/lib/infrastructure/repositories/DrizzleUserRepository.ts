@@ -129,6 +129,19 @@ export class DrizzleUserRepository implements IUserRepository {
 		return this.mapToEntity(row, roleNames);
 	}
 
+	async delete(id: string): Promise<void> {
+		// Because of cascading deletes (if configured) or standard operations, 
+		// we first delete the roles to avoid foreign key constraints, 
+		// though in Drizzle if we defined 'cascade', it would be handled. 
+		// For safety, we can delete userRoles first or let cascade handle it.
+		// Since we didn't specify cascade in schema (we don't know for sure), 
+		// let's do a transaction to be safe.
+		await db.transaction(async (tx) => {
+			await tx.delete(userRoles).where(eq(userRoles.userId, id));
+			await tx.delete(users).where(eq(users.id, id));
+		});
+	}
+
 	async count(): Promise<number> {
 		const result = await db.select({ count: users.id }).from(users);
 		return result.length;
