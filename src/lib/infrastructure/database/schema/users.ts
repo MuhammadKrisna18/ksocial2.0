@@ -12,6 +12,8 @@ export const users = pgTable('users', {
 	isPrivate: boolean('is_private').notNull().default(false),
 	profilePictureUrl: text('profile_picture_url'),
 	coverPhotoUrl: text('cover_photo_url'),
+	location: text('location'),
+	relationshipStatus: text('relationship_status'),
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
 });

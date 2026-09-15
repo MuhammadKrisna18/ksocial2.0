@@ -24,6 +24,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 			username: user.username,
 			email: user.email,
 			dateOfBirth: user.dateOfBirth.toISOString().split('T')[0], // Format for input type="date"
+			location: user.location,
+			relationshipStatus: user.relationshipStatus,
 			profilePictureUrl: user.profilePictureUrl,
 			coverPhotoUrl: user.coverPhotoUrl
 		},
@@ -75,6 +77,8 @@ export const actions: Actions = {
 		const fullName = data.get('fullName')?.toString() || '';
 		const username = data.get('username')?.toString() || '';
 		const dateOfBirthStr = data.get('dateOfBirth')?.toString() || '';
+		const location = data.get('location')?.toString() || '';
+		const relationshipStatus = data.get('relationshipStatus')?.toString() || '';
 
 		if (!fullName || !username || !dateOfBirthStr) {
 			return fail(400, {
@@ -89,7 +93,9 @@ export const actions: Actions = {
 				userId: locals.user!.sub,
 				fullName,
 				newUsername: username,
-				dateOfBirth
+				dateOfBirth,
+				location: location || undefined,
+				relationshipStatus: relationshipStatus || undefined
 			});
 
 			return { successProfile: true, message: 'Profil berhasil diperbarui!' };

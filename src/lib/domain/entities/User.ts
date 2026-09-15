@@ -11,6 +11,8 @@ export interface UserProps {
 	isPrivate: boolean;
 	profilePictureUrl?: string | null;
 	coverPhotoUrl?: string | null;
+	location?: string | null;
+	relationshipStatus?: string | null;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -26,6 +28,8 @@ export class User {
 	readonly isPrivate: boolean;
 	readonly profilePictureUrl?: string | null;
 	readonly coverPhotoUrl?: string | null;
+	readonly location?: string | null;
+	readonly relationshipStatus?: string | null;
 	readonly createdAt: Date;
 	readonly updatedAt: Date;
 
@@ -40,6 +44,8 @@ export class User {
 		this.isPrivate = props.isPrivate;
 		this.profilePictureUrl = props.profilePictureUrl;
 		this.coverPhotoUrl = props.coverPhotoUrl;
+		this.location = props.location;
+		this.relationshipStatus = props.relationshipStatus;
 		this.createdAt = props.createdAt;
 		this.updatedAt = props.updatedAt;
 	}

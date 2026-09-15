@@ -15,6 +15,8 @@ export interface UpdateProfileDTO {
 	fullName: string;
 	newUsername: string;
 	dateOfBirth: Date;
+	location?: string;
+	relationshipStatus?: string;
 }
 
 export interface UpdatePasswordDTO {
@@ -75,7 +77,9 @@ export class UpdateUserUseCase {
 		await this.userRepo.update(user.id, {
 			fullName: dto.fullName,
 			username: username.toString(),
-			dateOfBirth: dto.dateOfBirth
+			dateOfBirth: dto.dateOfBirth,
+			...(dto.location !== undefined && { location: dto.location }),
+			...(dto.relationshipStatus !== undefined && { relationshipStatus: dto.relationshipStatus })
 		});
 	}
 
