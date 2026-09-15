@@ -35,7 +35,7 @@ npm run dev -- --open
 
 ## 🛠️ Tech Stack & Arsitektur
 
-## 🛠️ Tech Stack & Arsitektur
+
 
 ### 🖥️ Arsitektur Frontend
 - **Framework**: SvelteKit 2 dengan Svelte 5 (Client-Side & Server-Side Rendering Hybrid).
