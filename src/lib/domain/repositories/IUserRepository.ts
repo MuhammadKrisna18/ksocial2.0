@@ -1,6 +1,6 @@
 import type { User } from '$lib/domain/entities/User';
 
-export interface CreateUserData {
+interface CreateUserData {
 	id: string;
 	fullName: string;
 	email: string;

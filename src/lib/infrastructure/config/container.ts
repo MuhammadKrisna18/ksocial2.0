@@ -13,25 +13,74 @@ import { DeleteAccountUseCase } from '$lib/application/use-cases/DeleteAccountUs
 import { CreatePostUseCase } from '$lib/application/use-cases/CreatePostUseCase';
 import { GetFeedUseCase } from '$lib/application/use-cases/GetFeedUseCase';
 
-const hashService = new HashService();
-const tokenService = new TokenService();
-const userRepository = new DrizzleUserRepository();
-const roleRepository = new DrizzleRoleRepository();
-const postRepository = new DrizzlePostRepository();
+class Container {
+	// --- Services & Repositories (Singletons) ---
+	private _hashService?: HashService;
+	get hashService(): HashService {
+		if (!this._hashService) this._hashService = new HashService();
+		return this._hashService;
+	}
 
-export const container = {
-	hashService,
-	tokenService,
-	userRepository,
-	roleRepository,
-	postRepository,
-	loginUseCase: new LoginUseCase(userRepository, hashService, tokenService),
-	registerUseCase: new RegisterUseCase(userRepository, roleRepository, hashService, tokenService),
-	validateTokenUseCase: new ValidateTokenUseCase(tokenService),
-	updateUserUseCase: new UpdateUserUseCase(userRepository, hashService),
-	getDashboardStatsUseCase: new GetDashboardStatsUseCase(userRepository),
-	getUsersUseCase: new GetUsersUseCase(userRepository),
-	deleteAccountUseCase: new DeleteAccountUseCase(userRepository),
-	createPostUseCase: new CreatePostUseCase(postRepository),
-	getFeedUseCase: new GetFeedUseCase(postRepository)
-};
+	private _tokenService?: TokenService;
+	get tokenService(): TokenService {
+		if (!this._tokenService) this._tokenService = new TokenService();
+		return this._tokenService;
+	}
+
+	private _userRepository?: DrizzleUserRepository;
+	get userRepository(): DrizzleUserRepository {
+		if (!this._userRepository) this._userRepository = new DrizzleUserRepository();
+		return this._userRepository;
+	}
+
+	private _roleRepository?: DrizzleRoleRepository;
+	get roleRepository(): DrizzleRoleRepository {
+		if (!this._roleRepository) this._roleRepository = new DrizzleRoleRepository();
+		return this._roleRepository;
+	}
+
+	private _postRepository?: DrizzlePostRepository;
+	get postRepository(): DrizzlePostRepository {
+		if (!this._postRepository) this._postRepository = new DrizzlePostRepository();
+		return this._postRepository;
+	}
+
+	// --- Use Cases (Lazy instantiated) ---
+	get loginUseCase(): LoginUseCase {
+		return new LoginUseCase(this.userRepository, this.hashService, this.tokenService);
+	}
+
+	get registerUseCase(): RegisterUseCase {
+		return new RegisterUseCase(this.userRepository, this.roleRepository, this.hashService, this.tokenService);
+	}
+
+	get validateTokenUseCase(): ValidateTokenUseCase {
+		return new ValidateTokenUseCase(this.tokenService);
+	}
+
+	get updateUserUseCase(): UpdateUserUseCase {
+		return new UpdateUserUseCase(this.userRepository, this.hashService);
+	}
+
+	get getDashboardStatsUseCase(): GetDashboardStatsUseCase {
+		return new GetDashboardStatsUseCase(this.userRepository);
+	}
+
+	get getUsersUseCase(): GetUsersUseCase {
+		return new GetUsersUseCase(this.userRepository);
+	}
+
+	get deleteAccountUseCase(): DeleteAccountUseCase {
+		return new DeleteAccountUseCase(this.userRepository);
+	}
+
+	get createPostUseCase(): CreatePostUseCase {
+		return new CreatePostUseCase(this.postRepository);
+	}
+
+	get getFeedUseCase(): GetFeedUseCase {
+		return new GetFeedUseCase(this.postRepository);
+	}
+}
+
+export const container = new Container();
