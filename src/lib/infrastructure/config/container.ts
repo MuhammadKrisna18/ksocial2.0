@@ -14,6 +14,7 @@ import { CreatePostUseCase } from '$lib/application/use-cases/CreatePostUseCase'
 import { GetFeedUseCase } from '$lib/application/use-cases/GetFeedUseCase';
 import { ToggleSavePostUseCase } from '$lib/application/use-cases/ToggleSavePostUseCase';
 import { GetSavedPostsUseCase } from '$lib/application/use-cases/GetSavedPostsUseCase';
+import { DeletePostUseCase } from '$lib/application/use-cases/DeletePostUseCase';
 
 class Container {
 	// --- Services & Repositories (Singletons) ---
@@ -90,6 +91,10 @@ class Container {
 
 	get getSavedPostsUseCase(): GetSavedPostsUseCase {
 		return new GetSavedPostsUseCase(this.postRepository);
+	}
+
+	get deletePostUseCase(): DeletePostUseCase {
+		return new DeletePostUseCase(this.postRepository);
 	}
 }
 

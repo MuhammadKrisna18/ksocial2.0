@@ -115,4 +115,20 @@ export class DrizzlePostRepository implements IPostRepository {
 			});
 		});
 	}
+
+	async deletePost(postId: string, userId: string): Promise<boolean> {
+		// First verify if the post exists and belongs to the user
+		const postExists = await db.select().from(posts).where(and(eq(posts.id, postId), eq(posts.userId, userId)));
+		
+		if (postExists.length === 0) {
+			return false;
+		}
+
+		// Delete from saved_posts first to avoid foreign key constraint violations
+		await db.delete(savedPosts).where(eq(savedPosts.postId, postId));
+		
+		// Then delete the post
+		const result = await db.delete(posts).where(eq(posts.id, postId)).returning({ id: posts.id });
+		return result.length > 0;
+	}
 }

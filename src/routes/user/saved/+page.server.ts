@@ -36,5 +36,21 @@ export const actions: Actions = {
 		} catch (error) {
 			return handleActionError(error, 'Failed to toggle save post');
 		}
+	},
+	deletePost: async ({ request, locals }) => {
+		const userId = locals.user?.sub;
+		if (!userId) return fail(401, { error: 'Unauthorized' });
+
+		const data = await request.formData();
+		const postId = data.get('postId')?.toString();
+
+		if (!postId) return fail(400, { error: 'Post ID is required' });
+
+		try {
+			await container.deletePostUseCase.execute(postId, userId);
+			return { success: true };
+		} catch (error) {
+			return handleActionError(error, 'Failed to delete post');
+		}
 	}
 };
