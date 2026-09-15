@@ -26,7 +26,7 @@ export const actions: Actions = {
 
 		try {
 			await container.updateUserUseCase.updateUsername({
-				userId: locals.user.id,
+				userId: locals.user.sub,
 				newUsername: username
 			});
 			
@@ -51,7 +51,7 @@ export const actions: Actions = {
 
 		try {
 			await container.updateUserUseCase.updatePassword({
-				userId: locals.user.id,
+				userId: locals.user.sub,
 				oldPassword,
 				newPassword
 			});

@@ -1,6 +1,7 @@
 import type { PageServerLoad, Actions } from './$types';
 import { container } from '$lib/infrastructure/config/container';
 import { fail } from '@sveltejs/kit';
+import { handleActionError } from '$lib/presentation/utils/response';
 
 export const load: PageServerLoad = async () => {
 	const posts = await container.getFeedUseCase.execute();
@@ -32,7 +33,7 @@ export const actions: Actions = {
 			});
 			return { success: true };
 		} catch (error) {
-			return fail(500, { error: 'Failed to create post', content });
+			return handleActionError(error, 'Failed to create post', { content });
 		}
 	}
 };

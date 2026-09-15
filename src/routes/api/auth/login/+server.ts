@@ -1,7 +1,7 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 import { container } from '$lib/infrastructure/config/container';
-import { jsonResponse, errorResponse } from '$lib/presentation/utils/response';
+import { jsonResponse, errorResponse, handleApplicationError } from '$lib/presentation/utils/response';
 import { ACCESS_TOKEN_COOKIE, getAuthCookieOptions } from '$lib/presentation/utils/cookie';
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
@@ -23,7 +23,6 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		cookies.set(ACCESS_TOKEN_COOKIE, result.accessToken, getAuthCookieOptions(!dev));
 		return jsonResponse(result, 200);
 	} catch (err) {
-		const message = err instanceof Error ? err.message : 'Login failed';
-		return errorResponse(message, 401);
+		return handleApplicationError(err, 'Login failed');
 	}
 };

@@ -1,5 +1,6 @@
 import type { IPostRepository } from '$lib/domain/repositories/IPostRepository';
-import type { Post } from '$lib/domain/entities/Post';
+import { Post } from '$lib/domain/entities/Post';
+import { ValidationError } from '$lib/application/exceptions';
 import { randomUUID } from 'crypto';
 
 export interface CreatePostRequest {
@@ -12,7 +13,7 @@ export class CreatePostUseCase {
 
 	async execute(request: CreatePostRequest): Promise<Post> {
 		if (!request.content || request.content.trim() === '') {
-			throw new Error('Content cannot be empty');
+			throw new ValidationError('Content cannot be empty');
 		}
 
 		return this.postRepository.create({

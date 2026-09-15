@@ -1,6 +1,7 @@
 import type { PageServerLoad, Actions } from './$types';
 import { container } from '$lib/infrastructure/config/container';
 import { fail } from '@sveltejs/kit';
+import { handleActionError } from '$lib/presentation/utils/response';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	// User is guaranteed to exist due to hooks.server.ts protection
@@ -48,10 +49,7 @@ export const actions: Actions = {
 
 			return { successProfile: true, message: 'Profil berhasil diperbarui!' };
 		} catch (error: any) {
-			return fail(400, {
-				successProfile: false,
-				message: error.message || 'Terjadi kesalahan saat memperbarui profil.'
-			});
+			return handleActionError(error, 'Terjadi kesalahan saat memperbarui profil.', { successProfile: false });
 		}
 	},
 
@@ -84,10 +82,7 @@ export const actions: Actions = {
 
 			return { successPassword: true, message: 'Password berhasil diubah!' };
 		} catch (error: any) {
-			return fail(400, {
-				successPassword: false,
-				message: error.message || 'Gagal merubah password. Pastikan password lama Anda benar.'
-			});
+			return handleActionError(error, 'Gagal merubah password. Pastikan password lama Anda benar.', { successPassword: false });
 		}
 	}
 };

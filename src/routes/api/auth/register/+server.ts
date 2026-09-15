@@ -1,7 +1,7 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 import { container } from '$lib/infrastructure/config/container';
-import { jsonResponse, errorResponse } from '$lib/presentation/utils/response';
+import { jsonResponse, errorResponse, handleApplicationError } from '$lib/presentation/utils/response';
 import { ACCESS_TOKEN_COOKIE, getAuthCookieOptions } from '$lib/presentation/utils/cookie';
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
@@ -25,12 +25,14 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		return errorResponse('Email, username, and password are required', 400);
 	}
 
+	const fullName = (body as any).fullName || username;
+	const dateOfBirth = (body as any).dateOfBirth ? new Date((body as any).dateOfBirth) : new Date('2000-01-01');
+
 	try {
-		const result = await container.registerUseCase.execute({ email, username, password });
+		const result = await container.registerUseCase.execute({ email, username, password, fullName, dateOfBirth });
 		cookies.set(ACCESS_TOKEN_COOKIE, result.accessToken, getAuthCookieOptions(!dev));
 		return jsonResponse(result, 201);
 	} catch (err) {
-		const message = err instanceof Error ? err.message : 'Registration failed';
-		return errorResponse(message, 400);
+		return handleApplicationError(err, 'Registration failed');
 	}
 };

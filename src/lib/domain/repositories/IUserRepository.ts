@@ -8,6 +8,7 @@ interface CreateUserData {
 	passwordHash: string;
 	dateOfBirth: Date;
 	roleIds: string[];
+	isPrivate?: boolean;
 }
 
 export interface IUserRepository {

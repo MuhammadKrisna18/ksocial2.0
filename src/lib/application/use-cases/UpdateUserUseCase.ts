@@ -1,5 +1,7 @@
 import type { IUserRepository } from '$lib/domain/repositories/IUserRepository';
-import type { IHashService } from '$lib/application/interfaces/IHashService';
+import type { HashService } from '$lib/infrastructure/external-services/HashService';
+import { User } from '$lib/domain/entities/User';
+import { NotFoundError, ConflictError, AuthenticationError } from '$lib/application/exceptions';
 import { Username } from '$lib/domain/value-objects/Username';
 import { Password } from '$lib/domain/value-objects/Password';
 
@@ -29,13 +31,13 @@ export interface UpdatePrivacyDTO {
 export class UpdateUserUseCase {
 	constructor(
 		private readonly userRepo: IUserRepository,
-		private readonly hashService: IHashService
+		private readonly hashService: HashService
 	) {}
 
 	async updateUsername(dto: UpdateUsernameDTO): Promise<void> {
 		const user = await this.userRepo.findById(dto.userId);
 		if (!user) {
-			throw new Error('User not found');
+			throw new NotFoundError('User not found');
 		}
 
 		const username = Username.create(dto.newUsername);
@@ -43,7 +45,7 @@ export class UpdateUserUseCase {
 		if (user.username !== username.toString()) {
 			const exists = await this.userRepo.existsByUsername(username.toString());
 			if (exists) {
-				throw new Error('Username already taken');
+				throw new ConflictError('Username already taken');
 			}
 			await this.userRepo.update(user.id, { username: username.toString() });
 		}
@@ -52,7 +54,7 @@ export class UpdateUserUseCase {
 	async updateProfile(dto: UpdateProfileDTO): Promise<void> {
 		const user = await this.userRepo.findById(dto.userId);
 		if (!user) {
-			throw new Error('User not found');
+			throw new NotFoundError('User not found');
 		}
 
 		const username = Username.create(dto.newUsername);
@@ -60,7 +62,7 @@ export class UpdateUserUseCase {
 		if (user.username !== username.toString()) {
 			const exists = await this.userRepo.existsByUsername(username.toString());
 			if (exists) {
-				throw new Error('Username already taken');
+				throw new ConflictError('Username already taken');
 			}
 		}
 
@@ -74,17 +76,17 @@ export class UpdateUserUseCase {
 	async updatePassword(dto: UpdatePasswordDTO): Promise<void> {
 		const user = await this.userRepo.findById(dto.userId);
 		if (!user) {
-			throw new Error('User not found');
+			throw new NotFoundError('User not found');
 		}
 
 		if (dto.oldPassword) {
 			const isValid = await this.hashService.compare(dto.oldPassword, user.passwordHash);
 			if (!isValid) {
-				throw new Error('Invalid old password');
+				throw new AuthenticationError('Invalid old password');
 			}
 		}
 
-		const password = Password.create(dto.newPassword);
+		const password = Password.createRaw(dto.newPassword);
 		const passwordHash = await this.hashService.hash(password.toString());
 
 		await this.userRepo.update(user.id, { passwordHash });
@@ -93,7 +95,7 @@ export class UpdateUserUseCase {
 	async updatePrivacy(dto: UpdatePrivacyDTO): Promise<void> {
 		const user = await this.userRepo.findById(dto.userId);
 		if (!user) {
-			throw new Error('User not found');
+			throw new NotFoundError('User not found');
 		}
 
 		await this.userRepo.update(user.id, { isPrivate: dto.isPrivate });

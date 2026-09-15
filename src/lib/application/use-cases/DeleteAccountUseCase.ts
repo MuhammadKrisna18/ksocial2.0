@@ -1,4 +1,5 @@
 import type { IUserRepository } from '$lib/domain/repositories/IUserRepository';
+import { NotFoundError } from '$lib/application/exceptions';
 
 export class DeleteAccountUseCase {
 	constructor(private readonly userRepository: IUserRepository) {}
@@ -7,7 +8,7 @@ export class DeleteAccountUseCase {
 		const user = await this.userRepository.findById(userId);
 		
 		if (!user) {
-			throw new Error('User not found');
+			throw new NotFoundError('User not found');
 		}
 
 		await this.userRepository.delete(userId);

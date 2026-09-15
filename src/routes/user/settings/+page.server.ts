@@ -1,6 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import { container } from '$lib/infrastructure/config/container';
 import type { PageServerLoad, Actions } from './$types';
+import { handleActionError } from '$lib/presentation/utils/response';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const userId = locals.user?.sub;
@@ -32,7 +33,7 @@ export const actions: Actions = {
 			});
 			return { success: true };
 		} catch (error) {
-			return { success: false, error: 'Failed to update privacy settings' };
+			return handleActionError(error, 'Failed to update privacy settings', { success: false });
 		}
 	}
 };
