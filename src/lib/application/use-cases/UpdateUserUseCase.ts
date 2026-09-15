@@ -8,6 +8,13 @@ export interface UpdateUsernameDTO {
 	newUsername: string;
 }
 
+export interface UpdateProfileDTO {
+	userId: string;
+	fullName: string;
+	newUsername: string;
+	dateOfBirth: Date;
+}
+
 export interface UpdatePasswordDTO {
 	userId: string;
 	oldPassword?: string;
@@ -35,6 +42,28 @@ export class UpdateUserUseCase {
 			}
 			await this.userRepo.update(user.id, { username: username.toString() });
 		}
+	}
+
+	async updateProfile(dto: UpdateProfileDTO): Promise<void> {
+		const user = await this.userRepo.findById(dto.userId);
+		if (!user) {
+			throw new Error('User not found');
+		}
+
+		const username = Username.create(dto.newUsername);
+
+		if (user.username !== username.toString()) {
+			const exists = await this.userRepo.existsByUsername(username.toString());
+			if (exists) {
+				throw new Error('Username already taken');
+			}
+		}
+
+		await this.userRepo.update(user.id, {
+			fullName: dto.fullName,
+			username: username.toString(),
+			dateOfBirth: dto.dateOfBirth
+		});
 	}
 
 	async updatePassword(dto: UpdatePasswordDTO): Promise<void> {
