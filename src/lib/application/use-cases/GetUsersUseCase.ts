@@ -12,10 +12,15 @@ export interface UserDTO {
 export class GetUsersUseCase {
 	constructor(private readonly userRepo: IUserRepository) {}
 
-	async execute(): Promise<UserDTO[]> {
+	async execute(excludeUserId?: string): Promise<UserDTO[]> {
 		const users = await this.userRepo.findAll();
 		
-		return users.map(user => ({
+		let filteredUsers = users;
+		if (excludeUserId) {
+			filteredUsers = users.filter(user => user.id !== excludeUserId);
+		}
+
+		return filteredUsers.map(user => ({
 			id: user.id,
 			fullName: user.fullName,
 			username: user.username,

@@ -30,8 +30,8 @@
 		
 		<!-- Profile Info Text -->
 		<div class="pt-24 pb-8 px-6 text-center">
-			<h1 class="text-4xl font-black text-slate-900 tracking-tight">{profile?.fullName || 'Profile Anda'}</h1>
-			<p class="mt-2 text-slate-500 font-medium text-xl">@{profile?.username || 'username'}</p>
+			<h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{profile?.fullName || 'Profile Anda'}</h1>
+			<p class="mt-2 text-slate-500 dark:text-slate-400 font-medium text-xl">@{profile?.username || 'username'}</p>
 		</div>
 	</div>
 
@@ -46,14 +46,14 @@
 				
 				<!-- Personal Info Form -->
 				<section>
-					<div class="mb-8 border-b border-slate-200 pb-4">
-						<h2 class="text-2xl font-bold text-slate-900 flex items-center gap-3">
+					<div class="mb-8 border-b border-slate-200 dark:border-slate-800 pb-4">
+						<h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
 							<svg class="w-7 h-7 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
 							</svg>
 							Informasi Personal
 						</h2>
-						<p class="mt-2 text-slate-500">Perbarui identitas publik dan detail pribadi Anda.</p>
+						<p class="mt-2 text-slate-500 dark:text-slate-400">Perbarui identitas publik dan detail pribadi Anda.</p>
 					</div>
 
 					<!-- Form result feedback -->
@@ -81,23 +81,23 @@
 						class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6"
 					>
 						<div class="md:col-span-2">
-							<label for="fullName" class="block text-sm font-bold text-slate-700">Nama Lengkap</label>
-							<input type="text" id="fullName" name="fullName" value={profile.fullName} required class="mt-1.5 block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all" />
+							<label for="fullName" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Nama Lengkap</label>
+							<input type="text" id="fullName" name="fullName" value={profile.fullName} required class="mt-1.5 block w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all" />
 						</div>
 
 						<div>
-							<label for="username" class="block text-sm font-bold text-slate-700">Username</label>
-							<input type="text" id="username" name="username" value={profile.username} required class="mt-1.5 block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all" />
+							<label for="username" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Username</label>
+							<input type="text" id="username" name="username" value={profile.username} required class="mt-1.5 block w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all" />
 						</div>
 
 						<div>
-							<label for="dateOfBirth" class="block text-sm font-bold text-slate-700">Tanggal Lahir</label>
-							<input type="date" id="dateOfBirth" name="dateOfBirth" value={profile.dateOfBirth} required class="mt-1.5 block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all" />
+							<label for="dateOfBirth" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Tanggal Lahir</label>
+							<input type="date" id="dateOfBirth" name="dateOfBirth" value={profile.dateOfBirth} required class="mt-1.5 block w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all" />
 						</div>
 
 						<div class="md:col-span-2">
-							<label for="email" class="block text-sm font-bold text-slate-700">Email <span class="text-xs font-medium text-slate-400 ml-1">(Hanya Baca)</span></label>
-							<input type="email" id="email" value={profile.email} disabled class="mt-1.5 block w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-slate-500 cursor-not-allowed" />
+							<label for="email" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Email <span class="text-xs font-medium text-slate-400 ml-1">(Hanya Baca)</span></label>
+							<input type="email" id="email" value={profile.email} disabled class="mt-1.5 block w-full rounded-xl border border-slate-200 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-800/50 px-4 py-3 text-slate-500 dark:text-slate-400 cursor-not-allowed" />
 						</div>
 
 						<div class="md:col-span-2 pt-4">
@@ -118,14 +118,14 @@
 
 				<!-- Security Form -->
 				<section>
-					<div class="mb-8 border-b border-slate-200 pb-4">
-						<h2 class="text-2xl font-bold text-slate-900 flex items-center gap-3">
+					<div class="mb-8 border-b border-slate-200 dark:border-slate-800 pb-4">
+						<h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
 							<svg class="w-7 h-7 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
 							</svg>
 							Keamanan & Password
 						</h2>
-						<p class="mt-2 text-slate-500">Pastikan akun Anda tetap aman dengan menggunakan kata sandi yang kuat.</p>
+						<p class="mt-2 text-slate-500 dark:text-slate-400">Pastikan akun Anda tetap aman dengan menggunakan kata sandi yang kuat.</p>
 					</div>
 
 					<!-- Form result feedback -->
@@ -153,22 +153,22 @@
 						class="space-y-6 max-w-2xl"
 					>
 						<div>
-							<label for="oldPassword" class="block text-sm font-bold text-slate-700">Password Lama</label>
-							<input type="password" id="oldPassword" name="oldPassword" required class="mt-1.5 block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" />
+							<label for="oldPassword" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Password Lama</label>
+							<input type="password" id="oldPassword" name="oldPassword" required class="mt-1.5 block w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" />
 						</div>
 
 						<div>
-							<label for="newPassword" class="block text-sm font-bold text-slate-700">Password Baru</label>
-							<input type="password" id="newPassword" name="newPassword" required class="mt-1.5 block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" />
+							<label for="newPassword" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Password Baru</label>
+							<input type="password" id="newPassword" name="newPassword" required class="mt-1.5 block w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" />
 						</div>
 
 						<div>
-							<label for="confirmPassword" class="block text-sm font-bold text-slate-700">Konfirmasi Password Baru</label>
-							<input type="password" id="confirmPassword" name="confirmPassword" required class="mt-1.5 block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" />
+							<label for="confirmPassword" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Konfirmasi Password Baru</label>
+							<input type="password" id="confirmPassword" name="confirmPassword" required class="mt-1.5 block w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" />
 						</div>
 
 						<div class="pt-2">
-							<button type="submit" disabled={passwordLoading} class="w-full md:w-auto px-8 flex justify-center py-3.5 rounded-xl text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+							<button type="submit" disabled={passwordLoading} class="w-full md:w-auto px-8 flex justify-center py-3.5 rounded-xl text-sm font-bold text-white bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
 								{#if passwordLoading}
 									<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
 										<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

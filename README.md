@@ -24,7 +24,7 @@ npm run db:push
 npm run db:seed
 ```
 
-*(Catatan: Akun admin default yang terbuat dari seeder adalah `admin.ksocial.sveltekit@admin.co.id` dengan password `admin.ksocial.sveltekit`)*
+*(Catatan: Akun admin default yang terbuat dari seeder adalah `admin.ksocial.sveltekit@admin.co.id` dengan password `admin.ksocial.sveltekit`. Ada juga 2 akun user tambahan untuk testing: `user1@example.com` & `user2@example.com`)*
 
 ### Menjalankan Server
 ```bash
@@ -57,12 +57,19 @@ npm run dev -- --open
 ### 🖥️ Frontend (UI/UX)
 - **Desain Premium**: Menggunakan estetika modern seperti *Glassmorphism*, gradien halus, bayangan, dan animasi interaktif.
 - **Halaman Autentikasi**: 
-  - Halaman **Login** dengan penanganan *error* responsif.
+  - Halaman **Login** dengan penanganan *error* responsif, serta **Tombol Quick Login** untuk mempercepat _testing_.
   - Halaman **Register** dengan layout yang rapi dan penanda input visual.
 - **Dashboard Admin**: Halaman khusus admin dengan navigasi dan tata letak eksklusif.
-- **Dashboard User**: Halaman utama pengguna dengan *sidebar*, *header*, tombol *create post*, dan susunan *feed* postingan sosial media yang interaktif (efek *hover* pada *Like*, *Comment*, *Share*).
+- **Dashboard User**: 
+  - **Beranda (Feed)**: Layout *feed* interaktif dengan fitur pembuatan postingan (*Create Post*) yang terhubung ke _database_.
+  - **Profil Pengguna**: Halaman profil dinamis (contoh: `/user/profile/username`) yang menampilkan detail *user* beserta riwayat *postingan*-nya. Mendukung fitur **Privasi** (menampilkan status "Privat" jika tidak dapat diakses).
+  - **Teman (Friends)**: Daftar pengguna (selain admin) dengan antarmuka _grid_ modern, *avatar* bergradasi, dan tautan menuju profil masing-masing pengguna.
+  - **Pengaturan (Settings)**: Pengelolaan preferensi seperti fitur *toggle* **Akun Privat** dengan *Confirmation Modal* responsif tanpa _reload_ halaman (menggunakan Svelte Actions).
 
 ### ⚙️ Backend & Keamanan
+- **Fitur Fungsional Selesai**:
+  - **CRUD Postingan**: Implementasi penuh pembuatan _post_, pengambilan *feed*, penyimpanan UUID berbasis *Crypto*, dan relasi *Post-to-User* via PostgreSQL.
+  - **Sistem Privasi Akun**: Field `is_private` ditambahkan di *database* yang langsung terintegrasi dengan UseCase dan Handler (menyembunyikan *feed* dari *user* asing jika diaktifkan).
 - **Arsitektur Rapi (Clean Architecture)**: Implementasi pemisahan tugas secara terstruktur (Entity, Value Object, Repository, Use Case) dengan *Dependency Injection* (DI) manual.
 - **Autentikasi & Otorisasi**:
   - Sistem Login dan Pendaftaran aman berbasis JWT & HTTP-Only Cookie.
