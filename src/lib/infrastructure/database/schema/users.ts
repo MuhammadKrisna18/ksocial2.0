@@ -1,4 +1,6 @@
 import { pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
+import { posts } from './posts';
 
 export const users = pgTable('users', {
 	id: text('id').primaryKey(),
@@ -10,6 +12,10 @@ export const users = pgTable('users', {
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
 });
+
+export const usersRelations = relations(users, ({ many }) => ({
+	posts: many(posts)
+}));
 
 export type UserRow = typeof users.$inferSelect;
 export type NewUserRow = typeof users.$inferInsert;
