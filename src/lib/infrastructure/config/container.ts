@@ -28,6 +28,9 @@ import { DrizzleCommentRepository } from '$lib/infrastructure/repositories/Drizz
 import { ToggleLikeUseCase } from '$lib/application/use-cases/post/ToggleLikeUseCase';
 import { AddCommentUseCase } from '$lib/application/use-cases/post/AddCommentUseCase';
 import { GetCommentsUseCase } from '$lib/application/use-cases/post/GetCommentsUseCase';
+import { ToggleCommentLikeUseCase } from '$lib/application/use-cases/post/ToggleCommentLikeUseCase';
+import { ToggleSaveCommentUseCase } from '$lib/application/use-cases/post/ToggleSaveCommentUseCase';
+import { GetSavedCommentsUseCase } from '$lib/application/use-cases/post/GetSavedCommentsUseCase';
 import { eventDispatcher } from '$lib/infrastructure/events/DomainEventDispatcher';
 import { NotificationEventHandler } from '$lib/application/event-handlers/NotificationEventHandler';
 
@@ -161,6 +164,18 @@ class Container {
 
 	get getCommentsUseCase(): GetCommentsUseCase {
 		return new GetCommentsUseCase(this.commentRepository);
+	}
+
+	get toggleCommentLikeUseCase(): ToggleCommentLikeUseCase {
+		return new ToggleCommentLikeUseCase(this.commentRepository);
+	}
+
+	get toggleSaveCommentUseCase(): ToggleSaveCommentUseCase {
+		return new ToggleSaveCommentUseCase(this.commentRepository);
+	}
+
+	get getSavedCommentsUseCase(): GetSavedCommentsUseCase {
+		return new GetSavedCommentsUseCase(this.commentRepository);
 	}
 
 	get followUserUseCase(): FollowUserUseCase {

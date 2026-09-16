@@ -8,12 +8,13 @@ import crypto from 'crypto';
 export class AddCommentUseCase {
 	constructor(private readonly commentRepository: ICommentRepository) {}
 
-	async execute(userId: string, postId: string, content: string): Promise<Comment> {
+	async execute(userId: string, postId: string, content: string, parentId?: string): Promise<Comment> {
 		const comment = Comment.create({
 			id: crypto.randomUUID(),
 			userId,
 			postId,
 			content,
+			parentId,
 			createdAt: new Date()
 		});
 

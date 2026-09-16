@@ -3,6 +3,8 @@ export * from './users';
 export * from './userRoles';
 export * from './posts';
 export * from './savedPosts';
+export * from './commentLikes';
+export * from './savedComments';
 export * from './follows';
 export * from './notifications';
 export * from './likes';

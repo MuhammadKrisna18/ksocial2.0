@@ -8,6 +8,12 @@ export interface CommentProps {
 	authorName?: string;
 	authorUsername?: string;
 	authorProfilePicture?: string | null;
+	parentId?: string | null;
+	likesCount?: number;
+	isLiked?: boolean;
+	isSaved?: boolean;
+	repliesCount?: number;
+	replies?: Comment[];
 }
 
 export class Comment {
@@ -49,6 +55,30 @@ export class Comment {
 		return this.props.authorProfilePicture;
 	}
 
+	get parentId(): string | null | undefined {
+		return this.props.parentId;
+	}
+
+	get likesCount(): number | undefined {
+		return this.props.likesCount;
+	}
+
+	get isLiked(): boolean | undefined {
+		return this.props.isLiked;
+	}
+
+	get isSaved(): boolean | undefined {
+		return this.props.isSaved;
+	}
+
+	get repliesCount(): number | undefined {
+		return this.props.repliesCount;
+	}
+
+	get replies(): Comment[] | undefined {
+		return this.props.replies;
+	}
+
 	toJSON() {
 		return {
 			id: this.id,
@@ -58,7 +88,13 @@ export class Comment {
 			createdAt: this.createdAt,
 			authorName: this.authorName,
 			authorUsername: this.authorUsername,
-			authorProfilePicture: this.authorProfilePicture
+			authorProfilePicture: this.authorProfilePicture,
+			parentId: this.parentId,
+			likesCount: this.likesCount,
+			isLiked: this.isLiked,
+			isSaved: this.isSaved,
+			repliesCount: this.repliesCount,
+			replies: this.replies?.map(r => r.toJSON())
 		};
 	}
 }

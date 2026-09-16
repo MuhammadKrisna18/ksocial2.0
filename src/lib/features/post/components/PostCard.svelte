@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import CommentItem from './CommentItem.svelte';
 
 	let { post, currentUser } = $props();
 
@@ -14,6 +15,9 @@
 	let newComment = $state('');
 	let isSubmittingComment = $state(false);
 	let isLoadingComments = $state(false);
+	
+	let replyToComment = $state<any | null>(null);
+	let commentInputRef = $state<HTMLTextAreaElement | null>(null);
 
 	function formatTimeAgo(dateString: Date | string) {
 		const date = new Date(dateString);
@@ -70,6 +74,21 @@
 			isLoadingComments = false;
 		}
 	}
+	
+	function handleReply(comment: any) {
+		replyToComment = comment;
+		showComments = true;
+		setTimeout(() => {
+			if (commentInputRef) {
+				commentInputRef.focus();
+			}
+		}, 0);
+	}
+
+	function cancelReply() {
+		replyToComment = null;
+		newComment = '';
+	}
 
 	async function submitComment(e: Event) {
 		e.preventDefault();
@@ -77,17 +96,37 @@
 		
 		isSubmittingComment = true;
 		try {
+			const payload = {
+				content: newComment,
+				parentId: replyToComment ? replyToComment.id : undefined
+			};
 			const res = await fetch(`/api/posts/${post.id}/comments`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ content: newComment })
+				body: JSON.stringify(payload)
 			});
 			
 			if (res.ok) {
 				const data = await res.json();
-				comments = [data.comment, ...comments];
+				if (replyToComment) {
+					// It's a reply, find the parent in our local state and add it
+					const parentId = replyToComment.id;
+					// Since we only do 1 level nesting, the parent is either top level or a reply
+					// If it's a reply, the actual parent we want to attach to is the top level comment
+					const topLevelParentId = replyToComment.parentId || replyToComment.id;
+					
+					const parentIndex = comments.findIndex(c => c.id === topLevelParentId);
+					if (parentIndex !== -1) {
+						if (!comments[parentIndex].replies) comments[parentIndex].replies = [];
+						comments[parentIndex].replies = [...comments[parentIndex].replies, data.comment];
+					}
+				} else {
+					comments = [data.comment, ...comments];
+					commentsCount++;
+				}
+				
 				newComment = '';
-				commentsCount++;
+				replyToComment = null;
 			}
 		} catch (error) {
 			console.error("Failed to post comment", error);
@@ -216,6 +255,18 @@
 	{#if showComments}
 		<div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 animate-in slide-in-from-top-2 duration-200">
 			<!-- Add Comment -->
+			{#if replyToComment}
+				<div class="mb-2 flex items-center justify-between bg-slate-100 dark:bg-slate-800 px-3 py-2 rounded-xl text-xs">
+					<span class="text-slate-600 dark:text-slate-400">
+						Membalas <span class="font-bold">@{replyToComment.authorUsername}</span>
+					</span>
+					<button type="button" onclick={cancelReply} class="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+						<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+						</svg>
+					</button>
+				</div>
+			{/if}
 			<form onsubmit={submitComment} class="flex gap-3 mb-6">
 				<div class="h-8 w-8 shrink-0 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden flex items-center justify-center font-bold text-xs text-slate-500 dark:text-slate-400">
 					{#if currentUser?.profilePictureUrl}
@@ -226,8 +277,9 @@
 				</div>
 				<div class="flex-1 flex items-end gap-2 bg-slate-50 dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 focus-within:ring-2 focus-within:ring-blue-500/50 transition-all">
 					<textarea 
+						bind:this={commentInputRef}
 						bind:value={newComment} 
-						placeholder="Tulis komentar..." 
+						placeholder={replyToComment ? `Balas @${replyToComment.authorUsername}...` : "Tulis komentar..."} 
 						class="w-full bg-transparent border-none focus:ring-0 resize-none text-sm px-3 py-1.5 max-h-32 min-h-[36px]"
 						rows="1"
 						oninput={(e) => {
@@ -257,24 +309,7 @@
 					<p class="text-center text-sm text-slate-500 py-4">Belum ada komentar.</p>
 				{:else}
 					{#each comments as comment}
-						<div class="flex gap-3 text-sm">
-							<a href="/user/{comment.authorUsername}" class="h-8 w-8 shrink-0 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden flex items-center justify-center font-bold text-xs text-slate-500 dark:text-slate-400">
-								{#if comment.authorProfilePicture}
-									<img src={comment.authorProfilePicture} alt={comment.authorName} class="w-full h-full object-cover" />
-								{:else}
-									{comment.authorName?.charAt(0) || comment.authorUsername?.charAt(0) || '?'}
-								{/if}
-							</a>
-							<div class="flex-1">
-								<div class="bg-slate-50 dark:bg-slate-900/50 rounded-2xl px-4 py-2.5 inline-block">
-									<a href="/user/{comment.authorUsername}" class="font-bold text-slate-900 dark:text-white hover:underline mr-1 text-xs">{comment.authorName}</a>
-									<span class="text-slate-700 dark:text-slate-300">{comment.content}</span>
-								</div>
-								<div class="px-4 mt-1 flex items-center gap-3">
-									<span class="text-xs text-slate-500">{formatTimeAgo(comment.createdAt)}</span>
-								</div>
-							</div>
-						</div>
+						<CommentItem {comment} {currentUser} {post} onReply={handleReply} />
 					{/each}
 				{/if}
 			</div>

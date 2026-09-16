@@ -2,14 +2,15 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { container } from '$lib/infrastructure/config/container';
 
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
 	const postId = params.id;
 	if (!postId) {
 		return json({ error: 'Post ID is required' }, { status: 400 });
 	}
 
 	try {
-		const comments = await container.getCommentsUseCase.execute(postId);
+		const userId = locals.user?.sub;
+		const comments = await container.getCommentsUseCase.execute(postId, userId);
 		return json({ comments: comments.map(c => c.toJSON()) });
 	} catch (error: any) {
 		console.error('Get comments error:', error);
@@ -31,12 +32,13 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 	try {
 		const data = await request.json();
 		const content = data.content?.trim();
+		const parentId = data.parentId;
 
 		if (!content) {
 			return json({ error: 'Comment content cannot be empty' }, { status: 400 });
 		}
 
-		const comment = await container.addCommentUseCase.execute(userId, postId, content);
+		const comment = await container.addCommentUseCase.execute(userId, postId, content, parentId);
 		
 		// To return with author info, we could either fetch the user info in the use case
 		// or just append the current user's info to the returned comment here.
