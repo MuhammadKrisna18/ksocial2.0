@@ -2,6 +2,7 @@ import { desc, eq, and } from 'drizzle-orm';
 import { db } from '../database/client';
 import { posts } from '../database/schema/posts';
 import { savedPosts } from '../database/schema/savedPosts';
+import { likes } from '../database/schema/likes';
 import { users } from '../database/schema/users';
 import { Post } from '../../domain/entities/Post';
 import type { IPostRepository, CreatePostData } from '../../domain/repositories/IPostRepository';
@@ -46,13 +47,18 @@ export class DrizzlePostRepository implements IPostRepository {
 					fullName: users.fullName,
 					username: users.username
 				},
-				savedByUserId: savedPosts.userId
+				savedByUserId: savedPosts.userId,
+				likedByUserId: likes.userId
 			})
 			.from(posts)
 			.innerJoin(users, eq(posts.userId, users.id))
 			.leftJoin(savedPosts, and(
 				eq(savedPosts.postId, posts.id),
 				currentUserId ? eq(savedPosts.userId, currentUserId) : undefined
+			))
+			.leftJoin(likes, and(
+				eq(likes.postId, posts.id),
+				currentUserId ? eq(likes.userId, currentUserId) : undefined
 			))
 			.orderBy(desc(posts.createdAt));
 
@@ -67,6 +73,7 @@ export class DrizzlePostRepository implements IPostRepository {
 				commentsCount: row.post.commentsCount,
 				media: row.post.media as any,
 				isSaved: !!row.savedByUserId,
+				isLiked: !!row.likedByUserId,
 				createdAt: row.post.createdAt,
 				updatedAt: row.post.updatedAt
 			});
@@ -91,11 +98,16 @@ export class DrizzlePostRepository implements IPostRepository {
 				author: {
 					fullName: users.fullName,
 					username: users.username
-				}
+				},
+				likedByUserId: likes.userId
 			})
 			.from(savedPosts)
 			.innerJoin(posts, eq(savedPosts.postId, posts.id))
 			.innerJoin(users, eq(posts.userId, users.id))
+			.leftJoin(likes, and(
+				eq(likes.postId, posts.id),
+				eq(likes.userId, userId) // userId is the current user since it's their saved posts
+			))
 			.where(eq(savedPosts.userId, userId))
 			.orderBy(desc(savedPosts.createdAt));
 
@@ -110,6 +122,7 @@ export class DrizzlePostRepository implements IPostRepository {
 				commentsCount: row.post.commentsCount,
 				media: row.post.media as any,
 				isSaved: true,
+				isLiked: !!row.likedByUserId,
 				createdAt: row.post.createdAt,
 				updatedAt: row.post.updatedAt
 			});
@@ -124,13 +137,18 @@ export class DrizzlePostRepository implements IPostRepository {
 					fullName: users.fullName,
 					username: users.username
 				},
-				savedByUserId: savedPosts.userId
+				savedByUserId: savedPosts.userId,
+				likedByUserId: likes.userId
 			})
 			.from(posts)
 			.innerJoin(users, eq(posts.userId, users.id))
 			.leftJoin(savedPosts, and(
 				eq(savedPosts.postId, posts.id),
 				currentUserId ? eq(savedPosts.userId, currentUserId) : undefined
+			))
+			.leftJoin(likes, and(
+				eq(likes.postId, posts.id),
+				currentUserId ? eq(likes.userId, currentUserId) : undefined
 			))
 			.where(eq(posts.userId, userId))
 			.orderBy(desc(posts.createdAt));
@@ -146,6 +164,7 @@ export class DrizzlePostRepository implements IPostRepository {
 				commentsCount: row.post.commentsCount,
 				media: row.post.media as any,
 				isSaved: !!row.savedByUserId,
+				isLiked: !!row.likedByUserId,
 				createdAt: row.post.createdAt,
 				updatedAt: row.post.updatedAt
 			});

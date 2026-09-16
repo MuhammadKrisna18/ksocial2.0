@@ -5,3 +5,5 @@ export * from './posts';
 export * from './savedPosts';
 export * from './follows';
 export * from './notifications';
+export * from './likes';
+export * from './comments';

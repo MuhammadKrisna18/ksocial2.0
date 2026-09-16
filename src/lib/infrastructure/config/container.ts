@@ -23,6 +23,11 @@ import { AcceptFollowUseCase } from '$lib/application/use-cases/follow/AcceptFol
 import { RejectFollowUseCase } from '$lib/application/use-cases/follow/RejectFollowUseCase';
 import { GetFollowStatusUseCase } from '$lib/application/use-cases/follow/GetFollowStatusUseCase';
 import { GetNotificationsUseCase } from '$lib/application/use-cases/notification/GetNotificationsUseCase';
+import { DrizzleLikeRepository } from '$lib/infrastructure/repositories/DrizzleLikeRepository';
+import { DrizzleCommentRepository } from '$lib/infrastructure/repositories/DrizzleCommentRepository';
+import { ToggleLikeUseCase } from '$lib/application/use-cases/post/ToggleLikeUseCase';
+import { AddCommentUseCase } from '$lib/application/use-cases/post/AddCommentUseCase';
+import { GetCommentsUseCase } from '$lib/application/use-cases/post/GetCommentsUseCase';
 import { eventDispatcher } from '$lib/infrastructure/events/DomainEventDispatcher';
 import { NotificationEventHandler } from '$lib/application/event-handlers/NotificationEventHandler';
 
@@ -68,6 +73,18 @@ class Container {
 	get notificationRepository(): DrizzleNotificationRepository {
 		if (!this._notificationRepository) this._notificationRepository = new DrizzleNotificationRepository();
 		return this._notificationRepository;
+	}
+
+	private _likeRepository?: DrizzleLikeRepository;
+	get likeRepository(): DrizzleLikeRepository {
+		if (!this._likeRepository) this._likeRepository = new DrizzleLikeRepository();
+		return this._likeRepository;
+	}
+
+	private _commentRepository?: DrizzleCommentRepository;
+	get commentRepository(): DrizzleCommentRepository {
+		if (!this._commentRepository) this._commentRepository = new DrizzleCommentRepository();
+		return this._commentRepository;
 	}
 
 	private _notificationEventHandler?: NotificationEventHandler;
@@ -132,6 +149,18 @@ class Container {
 
 	get getUserPostsUseCase(): GetUserPostsUseCase {
 		return new GetUserPostsUseCase(this.postRepository);
+	}
+
+	get toggleLikeUseCase(): ToggleLikeUseCase {
+		return new ToggleLikeUseCase(this.likeRepository);
+	}
+
+	get addCommentUseCase(): AddCommentUseCase {
+		return new AddCommentUseCase(this.commentRepository);
+	}
+
+	get getCommentsUseCase(): GetCommentsUseCase {
+		return new GetCommentsUseCase(this.commentRepository);
 	}
 
 	get followUserUseCase(): FollowUserUseCase {
