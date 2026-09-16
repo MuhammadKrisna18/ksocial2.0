@@ -16,6 +16,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	return {
 		isPrivate: user?.isPrivate ?? false,
+		requireFollowForMessage: user?.requireFollowForMessage ?? false,
 		userId
 	};
 };
@@ -29,11 +30,13 @@ export const actions: Actions = {
 
 		const data = await request.formData();
 		const isPrivate = data.get('isPrivate') === 'true';
+		const requireFollowForMessage = data.get('requireFollowForMessage') === 'true';
 
 		try {
 			await container.updateUserUseCase.updatePrivacy({
 				userId,
-				isPrivate
+				isPrivate,
+				requireFollowForMessage
 			});
 			return { success: true };
 		} catch (error) {

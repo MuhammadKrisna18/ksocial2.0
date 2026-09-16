@@ -28,7 +28,8 @@ export interface UpdatePasswordDTO {
 
 export interface UpdatePrivacyDTO {
 	userId: string;
-	isPrivate: boolean;
+	isPrivate?: boolean;
+	requireFollowForMessage?: boolean;
 }
 
 export interface UpdatePhotosDTO {
@@ -110,7 +111,10 @@ export class UpdateUserUseCase {
 			throw new NotFoundError('User not found');
 		}
 
-		await this.userRepo.update(user.id, { isPrivate: dto.isPrivate });
+		await this.userRepo.update(user.id, { 
+			...(dto.isPrivate !== undefined && { isPrivate: dto.isPrivate }),
+			...(dto.requireFollowForMessage !== undefined && { requireFollowForMessage: dto.requireFollowForMessage })
+		});
 	}
 
 	async updatePhotos(dto: UpdatePhotosDTO): Promise<void> {

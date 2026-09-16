@@ -17,41 +17,53 @@ export interface UserProps {
 	coverPhotoUrl?: string | null;
 	location?: string | null;
 	relationshipStatus?: string | null;
+	requireFollowForMessage: boolean;
 	createdAt: Date;
 	updatedAt: Date;
 }
 
 export class User {
-	readonly id: string;
-	readonly fullName: string;
-	readonly email: Email;
-	readonly passwordHash: string;
-	readonly username: Username;
-	readonly roles: RoleNameType[];
-	readonly dateOfBirth: Date;
-	readonly isPrivate: boolean;
-	readonly profilePictureUrl?: string | null;
-	readonly coverPhotoUrl?: string | null;
-	readonly location?: string | null;
-	readonly relationshipStatus?: string | null;
-	readonly createdAt: Date;
-	readonly updatedAt: Date;
+	private constructor(private readonly props: UserProps) {}
 
-	constructor(props: UserProps) {
-		this.id = props.id;
-		this.fullName = props.fullName;
-		this.email = props.email;
-		this.passwordHash = props.passwordHash;
-		this.username = props.username;
-		this.roles = props.roles;
-		this.dateOfBirth = props.dateOfBirth;
-		this.isPrivate = props.isPrivate;
-		this.profilePictureUrl = props.profilePictureUrl;
-		this.coverPhotoUrl = props.coverPhotoUrl;
-		this.location = props.location;
-		this.relationshipStatus = props.relationshipStatus;
-		this.createdAt = props.createdAt;
-		this.updatedAt = props.updatedAt;
+	get id(): string { return this.props.id; }
+	get fullName(): string { return this.props.fullName; }
+	get email(): Email { return this.props.email; }
+	get username(): Username { return this.props.username; }
+	get passwordHash(): string { return this.props.passwordHash; }
+	get roles(): RoleNameType[] { return this.props.roles || []; }
+	get profilePictureUrl(): string | null { return this.props.profilePictureUrl || null; }
+	get coverPhotoUrl(): string | null { return this.props.coverPhotoUrl || null; }
+	get location(): string | null { return this.props.location || null; }
+	get relationshipStatus(): string | null { return this.props.relationshipStatus || null; }
+	get dateOfBirth(): Date { return this.props.dateOfBirth; }
+	get isPrivate(): boolean { return this.props.isPrivate; }
+	get requireFollowForMessage(): boolean { return this.props.requireFollowForMessage; }
+	get createdAt(): Date { return this.props.createdAt; }
+	get updatedAt(): Date { return this.props.updatedAt; }
+
+	static create(props: UserProps): User {
+		return new User(props);
+	}
+
+	updateProfile(
+		fullName?: string,
+		profilePictureUrl?: string | null,
+		coverPhotoUrl?: string | null,
+		location?: string | null,
+		relationshipStatus?: string | null,
+		dateOfBirth?: Date,
+		isPrivate?: boolean,
+		requireFollowForMessage?: boolean
+	): void {
+		if (fullName !== undefined) this.props.fullName = fullName;
+		if (profilePictureUrl !== undefined) this.props.profilePictureUrl = profilePictureUrl;
+		if (coverPhotoUrl !== undefined) this.props.coverPhotoUrl = coverPhotoUrl;
+		if (location !== undefined) this.props.location = location;
+		if (relationshipStatus !== undefined) this.props.relationshipStatus = relationshipStatus;
+		if (dateOfBirth !== undefined) this.props.dateOfBirth = dateOfBirth;
+		if (isPrivate !== undefined) this.props.isPrivate = isPrivate;
+		if (requireFollowForMessage !== undefined) this.props.requireFollowForMessage = requireFollowForMessage;
+		this.props.updatedAt = new Date();
 	}
 
 	hasRole(role: RoleNameType): boolean {

@@ -20,6 +20,7 @@ export interface CreateUserData {
 	coverPhotoUrl?: string | null;
 	location?: string | null;
 	relationshipStatus?: string | null;
+	requireFollowForMessage?: boolean;
 }
 
 export class DrizzleUserRepository implements IUserRepository {
@@ -33,6 +34,7 @@ export class DrizzleUserRepository implements IUserRepository {
 			roles: roleNames,
 			dateOfBirth: row.dateOfBirth,
 			isPrivate: row.isPrivate,
+			requireFollowForMessage: row.requireFollowForMessage,
 			profilePictureUrl: row.profilePictureUrl,
 			coverPhotoUrl: row.coverPhotoUrl,
 			location: row.location,
@@ -87,6 +89,7 @@ export class DrizzleUserRepository implements IUserRepository {
 				passwordHash: data.passwordHash,
 				dateOfBirth: data.dateOfBirth,
 				isPrivate: data.isPrivate ?? false,
+				requireFollowForMessage: data.requireFollowForMessage ?? false,
 				profilePictureUrl: data.profilePictureUrl,
 				coverPhotoUrl: data.coverPhotoUrl,
 				location: data.location,
@@ -134,6 +137,7 @@ export class DrizzleUserRepository implements IUserRepository {
 				...(data.passwordHash && { passwordHash: data.passwordHash }),
 				...(data.dateOfBirth && { dateOfBirth: data.dateOfBirth }),
 				...(data.isPrivate !== undefined && { isPrivate: data.isPrivate }),
+				...(data.requireFollowForMessage !== undefined && { requireFollowForMessage: data.requireFollowForMessage }),
 				...(data.profilePictureUrl !== undefined && { profilePictureUrl: data.profilePictureUrl }),
 				...(data.coverPhotoUrl !== undefined && { coverPhotoUrl: data.coverPhotoUrl }),
 				...(data.location !== undefined && { location: data.location }),

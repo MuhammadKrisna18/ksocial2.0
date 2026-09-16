@@ -41,6 +41,7 @@
 
 	const menuItems = [
 		{ name: 'Feed', path: '/user', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
+		{ name: 'Messages', path: '/user/messages', icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
 		{ name: 'Friends', path: '/user/friends', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' },
 		{ name: 'Saved', path: '/user/saved', icon: 'M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z' },
 		{ name: 'Profile', path: '/user/profile', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
@@ -95,12 +96,16 @@
 			<!-- User Profile Footer -->
 			<div class="border-t border-slate-100 dark:border-slate-800 p-4">
 				<div class="flex items-center gap-3">
-					<div class="h-12 w-12 shrink-0 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-blue-500/20">
-						U
-					</div>
+					{#if data.currentUser?.profilePictureUrl}
+						<img src={data.currentUser.profilePictureUrl} alt="Profile" class="h-12 w-12 shrink-0 rounded-full object-cover shadow-md shadow-slate-500/20" />
+					{:else}
+						<div class="h-12 w-12 shrink-0 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-blue-500/20">
+							{data.currentUser?.fullName ? data.currentUser.fullName.charAt(0).toUpperCase() : 'U'}
+						</div>
+					{/if}
 					<div class="min-w-0 flex-1">
-						<p class="truncate text-sm font-bold text-slate-800 dark:text-slate-200">John Doe</p>
-						<p class="truncate text-xs font-medium text-slate-500 dark:text-slate-400">@johndoe</p>
+						<p class="truncate text-sm font-bold text-slate-800 dark:text-slate-200">{data.currentUser?.fullName || data.user?.email || 'User'}</p>
+						<p class="truncate text-xs font-medium text-slate-500 dark:text-slate-400">@{data.currentUser?.username || 'user'}</p>
 					</div>
 				</div>
 				<form method="POST" action="/login?/logout" class="mt-4">

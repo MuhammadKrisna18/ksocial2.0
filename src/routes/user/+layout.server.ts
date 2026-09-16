@@ -7,7 +7,18 @@ export const load = async ({ locals }) => {
 	}
 
 	let notifications: any[] = [];
+	let currentUser = null;
 	try {
+		const userEntity = await container.userRepository.findById(locals.user.sub);
+		if (userEntity) {
+			currentUser = {
+				id: userEntity.id,
+				username: userEntity.username.toString(),
+				fullName: userEntity.fullName,
+				profilePictureUrl: userEntity.profilePictureUrl
+			};
+		}
+
 		const rawNotifications = await container.getNotificationsUseCase.execute(locals.user.sub);
 		
 		notifications = await Promise.all(
@@ -31,6 +42,7 @@ export const load = async ({ locals }) => {
 
 	return {
 		user: locals.user,
+		currentUser,
 		notifications
 	};
 };

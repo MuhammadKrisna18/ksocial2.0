@@ -10,6 +10,7 @@ export const users = pgTable('users', {
 	passwordHash: text('password_hash').notNull(),
 	dateOfBirth: timestamp('date_of_birth', { withTimezone: true }).notNull().defaultNow(),
 	isPrivate: boolean('is_private').notNull().default(false),
+	requireFollowForMessage: boolean('require_follow_for_message').notNull().default(false),
 	profilePictureUrl: text('profile_picture_url'),
 	coverPhotoUrl: text('cover_photo_url'),
 	location: text('location'),

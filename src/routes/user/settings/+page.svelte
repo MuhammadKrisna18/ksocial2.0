@@ -24,6 +24,7 @@
 	
 	// Real state for privacy
 	let isPrivate = $state(data.isPrivate);
+	let requireFollowForMessage = $state(data.requireFollowForMessage);
 	let isUpdating = $state(false);
 
 	// Modal state
@@ -36,6 +37,18 @@
 		showPrivacyModal = false;
 		setTimeout(() => {
 			if (formElement) formElement.requestSubmit();
+		}, 0);
+	}
+
+	let messageFormElement: HTMLFormElement;
+	let showMessagePrivacyModal = $state(false);
+	let pendingMessagePrivacyState = $state(false);
+
+	function confirmMessagePrivacyToggle() {
+		requireFollowForMessage = pendingMessagePrivacyState;
+		showMessagePrivacyModal = false;
+		setTimeout(() => {
+			if (messageFormElement) messageFormElement.requestSubmit();
 		}, 0);
 	}
 </script>
@@ -94,6 +107,7 @@
 							}}
 						>
 							<input type="hidden" name="isPrivate" value={isPrivate.toString()} />
+							<input type="hidden" name="requireFollowForMessage" value={requireFollowForMessage.toString()} />
 							<button 
 								type="button"
 								disabled={isUpdating}
@@ -111,6 +125,59 @@
 										</svg>
 									</span>
 									<span class="{isPrivate ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out'} absolute inset-0 flex h-full w-full items-center justify-center transition-opacity">
+										<svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 12 12">
+											<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+										</svg>
+									</span>
+								</span>
+							</button>
+						</form>
+					</div>
+				</div>
+
+				<div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 md:p-8 shadow-sm mt-4">
+					<div class="flex items-center justify-between">
+						<div class="pr-4">
+							<h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+								<svg class="w-5 h-5 text-slate-500 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+								</svg>
+								Batasi Pesan Masuk
+							</h3>
+							<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Jika diaktifkan, hanya pengikut yang telah disetujui yang dapat mengirim pesan kepada Anda. (Khusus Akun Privat)</p>
+						</div>
+						
+						<form 
+							bind:this={messageFormElement}
+							method="POST" 
+							action="?/updatePrivacy"
+							use:enhance={() => {
+								isUpdating = true;
+								return async ({ update }) => {
+									await update({ reset: false });
+									isUpdating = false;
+								};
+							}}
+						>
+							<input type="hidden" name="isPrivate" value={isPrivate.toString()} />
+							<input type="hidden" name="requireFollowForMessage" value={requireFollowForMessage.toString()} />
+							<button 
+								type="button"
+								disabled={!isPrivate || isUpdating}
+								class="{requireFollowForMessage ? 'bg-green-600' : 'bg-slate-200'} {!isPrivate || isUpdating ? 'opacity-50 cursor-not-allowed' : ''} relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 shadow-sm"
+								onclick={() => {
+									pendingMessagePrivacyState = !requireFollowForMessage;
+									showMessagePrivacyModal = true;
+								}}
+							>
+								<span class="sr-only">Toggle Require Follow for Message</span>
+								<span class="{requireFollowForMessage ? 'translate-x-5' : 'translate-x-0'} pointer-events-none relative inline-block h-6 w-6 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out">
+									<span class="{requireFollowForMessage ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in'} absolute inset-0 flex h-full w-full items-center justify-center transition-opacity">
+										<svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 12 12">
+											<path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+										</svg>
+									</span>
+									<span class="{requireFollowForMessage ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out'} absolute inset-0 flex h-full w-full items-center justify-center transition-opacity">
 										<svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 12 12">
 											<path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
 										</svg>
@@ -271,6 +338,45 @@
 				type="button"
 				onclick={confirmPrivacyToggle}
 				class="px-5 py-2.5 rounded-xl text-sm font-bold bg-green-600 text-white hover:bg-green-700 transition-colors shadow-md shadow-green-500/20 active:scale-95"
+			>
+				Ya, Lanjutkan
+			</button>
+		</div>
+	</div>
+</div>
+{/if}
+
+<!-- Message Privacy Confirmation Modal -->
+{#if showMessagePrivacyModal}
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+	<div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in zoom-in-95 duration-200">
+		<div class="flex items-center gap-3 mb-4 text-blue-500">
+			<svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+			</svg>
+			<h3 class="text-xl font-bold text-slate-900">Konfirmasi Perubahan</h3>
+		</div>
+		<p class="text-slate-600 mb-8 leading-relaxed">
+			Apakah Anda yakin ingin mengubah pengaturan pesan menjadi 
+			<strong class="text-slate-900">{pendingMessagePrivacyState ? 'Dibatasi' : 'Tidak Dibatasi'}</strong>? 
+			{#if pendingMessagePrivacyState}
+				Jika dibatasi, hanya pengikut yang telah disetujui yang dapat mengirim pesan kepada Anda.
+			{:else}
+				Jika tidak dibatasi, semua orang (walaupun Anda tidak mengikuti/di-acc mereka) dapat mengirimi Anda pesan secara langsung.
+			{/if}
+		</p>
+		<div class="flex justify-end gap-3">
+			<button 
+				type="button"
+				onclick={() => showMessagePrivacyModal = false}
+				class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
+			>
+				Batal
+			</button>
+			<button 
+				type="button"
+				onclick={confirmMessagePrivacyToggle}
+				class="px-5 py-2.5 rounded-xl text-sm font-bold bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-md shadow-blue-500/20 active:scale-95"
 			>
 				Ya, Lanjutkan
 			</button>
