@@ -16,6 +16,12 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	const posts = await container.getUserPostsUseCase.execute(locals.user!.sub, locals.user!.sub);
 
+	// Get followers and following counts
+	const followers = await container.followRepository.getFollowers(locals.user!.sub);
+	const following = await container.followRepository.getFollowing(locals.user!.sub);
+	const followersCount = followers.filter(f => f.status === 'accepted').length;
+	const followingCount = following.filter(f => f.status === 'accepted').length;
+
 	// Notifications are now loaded in the layout server
 
 	return {
@@ -30,7 +36,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 			relationshipStatus: user.relationshipStatus,
 			isPrivate: user.isPrivate,
 			profilePictureUrl: user.profilePictureUrl,
-			coverPhotoUrl: user.coverPhotoUrl
+			coverPhotoUrl: user.coverPhotoUrl,
+			followersCount,
+			followingCount
 		},
 		posts: posts.map(p => ({
 			id: p.id,

@@ -142,19 +142,33 @@
 		</div>
 	</div>
 
-	<!-- Main Content Area (Forms without Cards) -->
-	<div class="max-w-4xl mx-auto px-6 lg:px-8 pb-16 pt-8">
+	<!-- Main Content Area -->
+	<div class="max-w-7xl mx-auto px-6 lg:px-8 pb-16 pt-8">
 		{#if !profile}
 			<div class="rounded-xl bg-red-50 p-4 border border-red-200 text-red-600 font-medium shadow-sm">
 				Data profile tidak ditemukan. Silakan login kembali.
 			</div>
 		{:else}
-			<div class="space-y-16">
+			<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 				
-				<!-- Notifications have been moved to the global header -->
-				
-				<!-- Personal Details Card (Read-only) -->
-				<section>
+				<!-- Left Column (Sidebar) -->
+				<div class="lg:col-span-1 space-y-6">
+					
+					<!-- Stats Card -->
+					<div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex justify-around text-center">
+						<div class="flex flex-col items-center">
+							<span class="text-2xl font-black text-slate-900 dark:text-white">{profile.followersCount || 0}</span>
+							<span class="text-sm font-medium text-slate-500">Pengikut</span>
+						</div>
+						<div class="w-px bg-slate-200 dark:bg-slate-800 my-2"></div>
+						<div class="flex flex-col items-center">
+							<span class="text-2xl font-black text-slate-900 dark:text-white">{profile.followingCount || 0}</span>
+							<span class="text-sm font-medium text-slate-500">Diikuti</span>
+						</div>
+					</div>
+
+					<!-- Personal Details Card (Read-only) -->
+					<section>
 					<div class="relative bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-6">
 						<div class="flex items-center justify-between mb-2">
 							<h2 class="text-xl font-bold text-slate-900 dark:text-white">Personal details</h2>
@@ -215,10 +229,13 @@
 							</div>
 						</div>
 					</div>
-				</section>
+					</section>
+				</div>
 
-				<!-- Posts Section -->
-				<section>
+				<!-- Right Column (Posts) -->
+				<div class="lg:col-span-2 space-y-6">
+					<!-- Posts Section -->
+					<section>
 					<div class="mb-8 border-b border-slate-200 dark:border-slate-800 pb-4">
 						<h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
 							<svg class="w-7 h-7 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -246,8 +263,8 @@
 						{/if}
 					</div>
 				</section>
-
 			</div>
+		</div>
 		{/if}
 	</div>
 </div>

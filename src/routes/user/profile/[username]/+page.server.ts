@@ -36,13 +36,26 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			followStatus = statusResult.status;
 		}
 
+		// Get followers and following counts
+		const followers = await container.followRepository.getFollowers(user.id);
+		const following = await container.followRepository.getFollowing(user.id);
+		const followersCount = followers.filter(f => f.status === 'accepted').length;
+		const followingCount = following.filter(f => f.status === 'accepted').length;
+
 		return {
 			profile: {
 				id: user.id,
 				fullName: user.fullName,
 				username: user.username.toString(),
 				email: user.email.toString(),
-				isPrivate: user.isPrivate
+				dateOfBirth: user.dateOfBirth.toISOString().split('T')[0],
+				location: user.location,
+				relationshipStatus: user.relationshipStatus,
+				isPrivate: user.isPrivate,
+				profilePictureUrl: user.profilePictureUrl,
+				coverPhotoUrl: user.coverPhotoUrl,
+				followersCount,
+				followingCount
 			},
 			posts: userPosts,
 			isCurrentUser: locals.user?.sub === user.id,
