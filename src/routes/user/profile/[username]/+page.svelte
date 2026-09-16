@@ -10,6 +10,7 @@
 	let canViewFeed = $derived(!profile.isPrivate || isCurrentUser || followStatus === 'following' || followStatus === 'friends');
 	
 	import { enhance } from '$app/forms';
+	import PostCard from '$lib/features/post/components/PostCard.svelte';
 	let isFollowingState = $state(false);
 </script>
 
@@ -168,20 +169,7 @@
 				{#if posts.length > 0}
 					<div class="space-y-6">
 						{#each posts as post}
-							<div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
-								<div class="flex items-center gap-3 mb-4">
-									<div class="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
-										{profile.fullName ? profile.fullName.charAt(0).toUpperCase() : profile.username.toString().charAt(0).toUpperCase()}
-									</div>
-									<div>
-										<h4 class="font-bold text-slate-900 dark:text-white leading-tight">{profile.fullName || profile.username}</h4>
-										<p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-											{new Date(post.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-										</p>
-									</div>
-								</div>
-								<p class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{post.content}</p>
-							</div>
+							<PostCard {post} currentUser={data.user} />
 						{/each}
 					</div>
 				{:else}

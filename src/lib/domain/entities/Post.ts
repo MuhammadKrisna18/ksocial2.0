@@ -6,6 +6,7 @@ export interface PostProps {
 	content: string;
 	likesCount: number;
 	commentsCount: number;
+	sharesCount: number;
 	media?: { url: string; type: 'image' | 'video' }[];
 	isSaved?: boolean;
 	isLiked?: boolean;
@@ -48,6 +49,10 @@ export class Post {
 		return this.props.commentsCount;
 	}
 
+	get sharesCount(): number {
+		return this.props.sharesCount;
+	}
+
 	get media(): { url: string; type: 'image' | 'video' }[] | undefined {
 		return this.props.media;
 	}
@@ -77,6 +82,7 @@ export class Post {
 			content: this.content,
 			likesCount: this.likesCount,
 			commentsCount: this.commentsCount,
+			sharesCount: this.sharesCount,
 			media: this.media,
 			isSaved: this.isSaved,
 			isLiked: this.isLiked,

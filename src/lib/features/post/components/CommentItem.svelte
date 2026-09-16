@@ -50,6 +50,22 @@
 			isSaved = !isSaved;
 		}
 	}
+
+	async function deleteComment(e: Event) {
+		e.preventDefault();
+		if (!confirm('Apakah kamu yakin ingin menghapus komentar ini?')) return;
+		
+		try {
+			const res = await fetch(`/api/comments/${comment.id}`, { method: 'DELETE' });
+			if (res.ok) {
+				window.location.reload();
+			} else {
+				console.error('Delete failed', res.status);
+			}
+		} catch (error) {
+			console.error('Delete error', error);
+		}
+	}
 </script>
 
 <div class="flex gap-3 text-sm group/comment">
@@ -87,6 +103,12 @@
 			<button type="button" onclick={toggleSave} class="text-xs font-semibold {isSaved ? 'text-blue-500' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'} transition-colors">
 				Simpan
 			</button>
+
+			{#if currentUser?.sub === comment.userId}
+				<button type="button" onclick={deleteComment} class="text-xs font-semibold text-red-500 hover:text-red-700 transition-colors">
+					Hapus
+				</button>
+			{/if}
 		</div>
 		
 		{#if comment.replies && comment.replies.length > 0}

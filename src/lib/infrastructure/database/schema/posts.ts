@@ -11,6 +11,7 @@ export const posts = pgTable('posts', {
 	media: jsonb('media').$type<{ url: string, type: 'image' | 'video' }[]>(),
 	likesCount: integer('likes_count').notNull().default(0),
 	commentsCount: integer('comments_count').notNull().default(0),
+	sharesCount: integer('shares_count').notNull().default(0),
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
 });

@@ -8,6 +8,7 @@
 	let isLiked = $state(post.isLiked);
 	let likesCount = $state(post.likesCount);
 	let commentsCount = $state(post.commentsCount);
+	let sharesCount = $state(post.sharesCount || 0);
 
 	// Comment state
 	let showComments = $state(false);
@@ -49,6 +50,31 @@
 			// Revert on error
 			isLiked = !isLiked;
 			likesCount += isLiked ? 1 : -1;
+		}
+	}
+
+	async function sharePost(e: Event) {
+		e.preventDefault();
+		const details = (e.currentTarget as HTMLElement).closest('details');
+		if (details) details.open = false;
+
+		// Copy link to clipboard
+		const link = `${window.location.origin}/post/${post.id}`;
+		try {
+			await navigator.clipboard.writeText(link);
+			alert('Link copied to clipboard!');
+		} catch (err) {
+			console.error('Failed to copy', err);
+		}
+
+		try {
+			const res = await fetch(`/api/posts/${post.id}/share`, { method: 'POST' });
+			if (res.ok) {
+				const data = await res.json();
+				sharesCount = data.sharesCount;
+			}
+		} catch (error) {
+			console.error('Share error', error);
 		}
 	}
 
@@ -108,9 +134,11 @@
 		
 		isSubmittingComment = true;
 		try {
+			const topLevelParentId = replyToComment ? (replyToComment.parentId || replyToComment.id) : undefined;
+			
 			const payload = {
 				content: newComment,
-				parentId: replyToComment ? replyToComment.id : undefined
+				parentId: topLevelParentId
 			};
 			const res = await fetch(`/api/posts/${post.id}/comments`, {
 				method: 'POST',
@@ -120,13 +148,8 @@
 			
 			if (res.ok) {
 				const data = await res.json();
-				if (replyToComment) {
+				if (replyToComment && topLevelParentId) {
 					// It's a reply, find the parent in our local state and add it
-					const parentId = replyToComment.id;
-					// Since we only do 1 level nesting, the parent is either top level or a reply
-					// If it's a reply, the actual parent we want to attach to is the top level comment
-					const topLevelParentId = replyToComment.parentId || replyToComment.id;
-					
 					const parentIndex = comments.findIndex(c => c.id === topLevelParentId);
 					if (parentIndex !== -1) {
 						if (!comments[parentIndex].replies) comments[parentIndex].replies = [];
@@ -191,6 +214,14 @@
 						{post.isSaved ? 'Unsave' : 'Save'}
 					</button>
 				</form>
+				
+				<button class="w-full text-left px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 flex items-center gap-3 transition-colors" onclick={sharePost}>
+					<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+					</svg>
+					Share {sharesCount > 0 ? `(${sharesCount})` : ''}
+				</button>
+
 				{#if currentUser?.sub === post.authorId}
 					<form 
 						method="POST" 
@@ -253,14 +284,6 @@
 			</div>
 			<span>{commentsCount}</span>
 		</button>
-		<button type="button" class="flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors group text-sm font-medium ml-auto">
-			<div class="p-1.5 rounded-full group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 transition-colors">
-				<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
-				</svg>
-			</div>
-			<span class="hidden sm:inline">Share</span>
-		</button>
 	</div>
 
 	<!-- Comments Section -->
@@ -292,7 +315,7 @@
 						bind:this={commentInputRef}
 						bind:value={newComment} 
 						placeholder={replyToComment ? `Balas @${replyToComment.authorUsername}...` : "Tulis komentar..."} 
-						class="w-full bg-transparent border-none focus:ring-0 resize-none text-sm px-3 py-1.5 max-h-32 min-h-[36px]"
+						class="w-full bg-transparent border-none focus:ring-0 resize-none text-sm px-3 py-1.5 max-h-32 min-h-[36px] text-slate-900 dark:text-white"
 						rows="1"
 						oninput={(e) => {
 							e.currentTarget.style.height = 'auto';

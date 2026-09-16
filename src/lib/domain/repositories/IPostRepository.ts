@@ -13,5 +13,6 @@ export interface IPostRepository {
 	toggleSave(userId: string, postId: string): Promise<boolean>;
 	getSavedPosts(userId: string): Promise<Post[]>;
 	getUserPosts(userId: string, currentUserId?: string): Promise<Post[]>;
-	deletePost(postId: string, userId: string): Promise<boolean>;
+	deletePost(id: string, userId: string): Promise<boolean>;
+	incrementShares(id: string): Promise<Post>;
 }

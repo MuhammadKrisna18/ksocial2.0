@@ -187,4 +187,32 @@ export class DrizzlePostRepository implements IPostRepository {
 		const result = await db.delete(posts).where(eq(posts.id, postId)).returning({ id: posts.id });
 		return result.length > 0;
 	}
+
+	async incrementShares(id: string): Promise<Post> {
+		const result = await db.update(posts)
+			.set({
+				sharesCount: sql`${posts.sharesCount} + 1`
+			})
+			.where(eq(posts.id, id))
+			.returning();
+			
+		if (result.length === 0) {
+			throw new Error("Post not found");
+		}
+		
+		const post = result[0];
+		return Post.create({
+			id: post.id,
+			authorId: post.userId,
+			authorName: '', // we don't need it just to return
+			authorUsername: '',
+			content: post.content,
+			likesCount: post.likesCount,
+			commentsCount: post.commentsCount,
+			sharesCount: post.sharesCount,
+			media: post.media || undefined,
+			createdAt: post.createdAt,
+			updatedAt: post.updatedAt
+		});
+	}
 }

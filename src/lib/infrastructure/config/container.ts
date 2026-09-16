@@ -17,6 +17,7 @@ import { GetFeedUseCase } from '$lib/application/use-cases/post/GetFeedUseCase';
 import { ToggleSavePostUseCase } from '$lib/application/use-cases/post/ToggleSavePostUseCase';
 import { GetSavedPostsUseCase } from '$lib/application/use-cases/post/GetSavedPostsUseCase';
 import { DeletePostUseCase } from '$lib/application/use-cases/post/DeletePostUseCase';
+import { SharePostUseCase } from '$lib/application/use-cases/post/SharePostUseCase';
 import { GetUserPostsUseCase } from '$lib/application/use-cases/post/GetUserPostsUseCase';
 import { FollowUserUseCase } from '$lib/application/use-cases/follow/FollowUserUseCase';
 import { AcceptFollowUseCase } from '$lib/application/use-cases/follow/AcceptFollowUseCase';
@@ -30,6 +31,7 @@ import { AddCommentUseCase } from '$lib/application/use-cases/post/AddCommentUse
 import { GetCommentsUseCase } from '$lib/application/use-cases/post/GetCommentsUseCase';
 import { ToggleCommentLikeUseCase } from '$lib/application/use-cases/post/ToggleCommentLikeUseCase';
 import { ToggleSaveCommentUseCase } from '$lib/application/use-cases/post/ToggleSaveCommentUseCase';
+import { DeleteCommentUseCase } from '$lib/application/use-cases/post/DeleteCommentUseCase';
 import { GetSavedCommentsUseCase } from '$lib/application/use-cases/post/GetSavedCommentsUseCase';
 import { eventDispatcher } from '$lib/infrastructure/events/DomainEventDispatcher';
 import { NotificationEventHandler } from '$lib/application/event-handlers/NotificationEventHandler';
@@ -150,6 +152,10 @@ class Container {
 		return new DeletePostUseCase(this.postRepository);
 	}
 
+	get sharePostUseCase(): SharePostUseCase {
+		return new SharePostUseCase(this.postRepository);
+	}
+
 	get getUserPostsUseCase(): GetUserPostsUseCase {
 		return new GetUserPostsUseCase(this.postRepository);
 	}
@@ -176,6 +182,10 @@ class Container {
 
 	get getSavedCommentsUseCase(): GetSavedCommentsUseCase {
 		return new GetSavedCommentsUseCase(this.commentRepository);
+	}
+
+	get deleteCommentUseCase(): DeleteCommentUseCase {
+		return new DeleteCommentUseCase(this.commentRepository, this.postRepository);
 	}
 
 	get followUserUseCase(): FollowUserUseCase {

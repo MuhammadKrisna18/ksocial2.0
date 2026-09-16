@@ -82,11 +82,13 @@ export class DrizzleCommentRepository implements ICommentRepository {
 		const rootComments: Comment[] = [];
 		for (const c of flatComments) {
 			if (c.parentId) {
-				const parent = allCommentsMap.get(c.parentId);
-				if (parent && parent.replies) {
-					// We need to mutate the replies array, but it's returned by getter
-					// In typescript, we can just push to the array returned by the getter.
-					parent.replies.push(c);
+				let current = allCommentsMap.get(c.parentId);
+				// Find root ancestor
+				while (current && current.parentId) {
+					current = allCommentsMap.get(current.parentId);
+				}
+				if (current && current.replies) {
+					current.replies.push(c);
 				}
 			} else {
 				rootComments.push(c);

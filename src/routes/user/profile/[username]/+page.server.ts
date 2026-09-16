@@ -17,14 +17,11 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			throw error(404, 'User not found');
 		}
 
-		// (Opsional) Dapatkan postingan dari user tersebut.
-		// Untuk sementara kita mungkin hanya melempar user profile.
-		const posts = await container.postRepository.getFeed();
-		const userPosts = posts.filter(p => p.authorId === user.id).map(p => ({
-			id: p.id,
-			content: p.content,
-			createdAt: p.createdAt.toISOString()
-		}));
+		// Dapatkan postingan dari user tersebut.
+		const userPosts = await container.getUserPostsUseCase.execute(user.id, locals.user?.sub);
+		
+		// Konversi data untuk dikirim ke frontend
+		const serializedPosts = userPosts.map(p => p.toJSON());
 
 		// Dapatkan status follow
 		let followStatus = 'none';
@@ -57,7 +54,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 				followersCount,
 				followingCount
 			},
-			posts: userPosts,
+			posts: serializedPosts,
 			isCurrentUser: locals.user?.sub === user.id,
 			followStatus
 		};
