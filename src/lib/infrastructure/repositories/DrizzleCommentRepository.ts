@@ -172,8 +172,8 @@ export class DrizzleCommentRepository implements ICommentRepository {
 		.innerJoin(users, eq(comments.userId, users.id))
 		.leftJoin(commentLikes, eq(comments.id, commentLikes.commentId))
 		.where(eq(savedComments.userId, userId))
-		.groupBy(comments.id, users.id, savedComments.savedAt)
-		.orderBy(desc(savedComments.savedAt));
+		.groupBy(comments.id, users.id, savedComments.createdAt)
+		.orderBy(desc(savedComments.createdAt));
 
 		return results.map(row => Comment.create({
 			id: row.comment.id,
