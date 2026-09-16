@@ -27,7 +27,7 @@ export class DrizzleFollowRepository implements IFollowRepository {
 		return this.mapToEntity(row);
 	}
 
-	async updateStatus(followerId: string, followingId: string, status: 'accepted'): Promise<void> {
+	async updateStatus(followerId: string, followingId: string, status: 'pending' | 'accepted'): Promise<void> {
 		await db
 			.update(follows)
 			.set({ status })

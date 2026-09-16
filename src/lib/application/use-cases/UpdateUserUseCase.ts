@@ -51,7 +51,7 @@ export class UpdateUserUseCase {
 
 		const username = Username.create(dto.newUsername);
 
-		if (user.username !== username.toString()) {
+		if (user.username.toString() !== username.toString()) {
 			const exists = await this.userRepo.existsByUsername(username.toString());
 			if (exists) {
 				throw new ConflictError('Username already taken');
@@ -68,7 +68,7 @@ export class UpdateUserUseCase {
 
 		const username = Username.create(dto.newUsername);
 
-		if (user.username !== username.toString()) {
+		if (user.username.toString() !== username.toString()) {
 			const exists = await this.userRepo.existsByUsername(username.toString());
 			if (exists) {
 				throw new ConflictError('Username already taken');

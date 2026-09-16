@@ -50,8 +50,8 @@ export class RegisterUseCase {
 
 		const accessToken = this.tokenService.sign({
 			sub: user.id,
-			email: user.email,
-			username: user.username,
+			email: user.email.toString(),
+			username: user.username.toString(),
 			roles: user.roles
 		});
 
@@ -59,8 +59,8 @@ export class RegisterUseCase {
 			accessToken,
 			user: {
 				id: user.id,
-				email: user.email,
-				username: user.username,
+				email: user.email.toString(),
+				username: user.username.toString(),
 				roles: user.roles
 			}
 		};

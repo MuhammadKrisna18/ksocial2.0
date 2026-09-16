@@ -1,11 +1,15 @@
 import type { RoleNameType } from '$lib/domain/value-objects/RoleName';
+import type { Email } from '$lib/domain/value-objects/Email';
+import type { Username } from '$lib/domain/value-objects/Username';
+import { UserFollowRequestedEvent } from '$lib/domain/events/UserFollowRequestedEvent';
+import { UserFollowAcceptedEvent } from '$lib/domain/events/UserFollowAcceptedEvent';
 
 export interface UserProps {
 	id: string;
 	fullName: string;
-	email: string;
+	email: Email;
 	passwordHash: string;
-	username: string;
+	username: Username;
 	roles: RoleNameType[];
 	dateOfBirth: Date;
 	isPrivate: boolean;
@@ -20,9 +24,9 @@ export interface UserProps {
 export class User {
 	readonly id: string;
 	readonly fullName: string;
-	readonly email: string;
+	readonly email: Email;
 	readonly passwordHash: string;
-	readonly username: string;
+	readonly username: Username;
 	readonly roles: RoleNameType[];
 	readonly dateOfBirth: Date;
 	readonly isPrivate: boolean;
@@ -56,5 +60,26 @@ export class User {
 
 	isAdmin(): boolean {
 		return this.hasRole('admin');
+	}
+
+	canViewProfileOf(otherUser: User, followStatus?: string): boolean {
+		if (this.id === otherUser.id) return true;
+		if (this.isAdmin()) return true;
+		if (!otherUser.isPrivate) return true;
+		if (followStatus === 'accepted') return true;
+		return false;
+	}
+
+	processFollowRequest(followerId: string): { status: 'pending' | 'accepted'; event: any } {
+		const status = this.isPrivate ? 'pending' : 'accepted';
+		let event;
+		
+		if (status === 'pending') {
+			event = new UserFollowRequestedEvent(followerId, this.id);
+		} else {
+			event = new UserFollowAcceptedEvent(followerId, this.id);
+		}
+		
+		return { status, event };
 	}
 }

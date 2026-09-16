@@ -23,8 +23,8 @@ export class GetUsersUseCase {
 		return filteredUsers.map(user => ({
 			id: user.id,
 			fullName: user.fullName,
-			username: user.username,
-			email: user.email,
+			username: user.username.toString(),
+			email: user.email.toString(),
 			roles: user.roles,
 			dateOfBirth: user.dateOfBirth
 		}));

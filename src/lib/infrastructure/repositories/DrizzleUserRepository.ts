@@ -4,6 +4,8 @@ import { users, roles, userRoles } from '$lib/infrastructure/database/schema/ind
 import { User } from '$lib/domain/entities/User';
 import type { IUserRepository } from '$lib/domain/repositories/IUserRepository';
 import type { RoleNameType } from '$lib/domain/value-objects/RoleName';
+import { Email } from '$lib/domain/value-objects/Email';
+import { Username } from '$lib/domain/value-objects/Username';
 
 export interface CreateUserData {
 	id: string;
@@ -25,8 +27,8 @@ export class DrizzleUserRepository implements IUserRepository {
 		return new User({
 			id: row.id,
 			fullName: row.fullName,
-			email: row.email,
-			username: row.username,
+			email: Email.create(row.email),
+			username: Username.create(row.username),
 			passwordHash: row.passwordHash,
 			roles: roleNames,
 			dateOfBirth: row.dateOfBirth,

@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	// Check if the user is trying to view their own profile
 	const currentUser = await container.userRepository.findById(currentUserId);
-	if (currentUser?.username === username) {
+	if (currentUser?.username.toString() === username) {
 		throw redirect(302, '/user/profile');
 	}
 
@@ -43,7 +43,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		user: locals.user,
 		targetProfile: {
 			id: targetUser.id,
-			username: targetUser.username,
+			username: targetUser.username.toString(),
 			fullName: targetUser.fullName,
 			profilePictureUrl: targetUser.profilePictureUrl,
 			coverPhotoUrl: targetUser.coverPhotoUrl,

@@ -26,7 +26,7 @@
 			
 			<!-- Circular Profile Picture -->
 			<div class="h-32 w-32 sm:h-40 sm:w-40 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 border-4 border-white dark:border-slate-900 shadow-lg flex items-center justify-center text-white font-black text-5xl shrink-0">
-				{profile.fullName ? profile.fullName.charAt(0).toUpperCase() : profile.username.charAt(0).toUpperCase()}
+				{profile.fullName ? profile.fullName.charAt(0).toUpperCase() : profile.username.toString().charAt(0).toUpperCase()}
 			</div>
 			
 			<!-- User Info -->
@@ -77,7 +77,7 @@
 							<div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
 								<div class="flex items-center gap-3 mb-4">
 									<div class="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
-										{profile.fullName ? profile.fullName.charAt(0).toUpperCase() : profile.username.charAt(0).toUpperCase()}
+										{profile.fullName ? profile.fullName.charAt(0).toUpperCase() : profile.username.toString().charAt(0).toUpperCase()}
 									</div>
 									<div>
 										<h4 class="font-bold text-slate-900 dark:text-white leading-tight">{profile.fullName || profile.username}</h4>

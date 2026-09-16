@@ -23,6 +23,8 @@ import { AcceptFollowUseCase } from '$lib/application/use-cases/AcceptFollowUseC
 import { RejectFollowUseCase } from '$lib/application/use-cases/RejectFollowUseCase';
 import { GetFollowStatusUseCase } from '$lib/application/use-cases/GetFollowStatusUseCase';
 import { GetNotificationsUseCase } from '$lib/application/use-cases/GetNotificationsUseCase';
+import { eventDispatcher } from '$lib/infrastructure/events/DomainEventDispatcher';
+import { NotificationEventHandler } from '$lib/application/event-handlers/NotificationEventHandler';
 
 class Container {
 	// --- Services & Repositories (Singletons) ---
@@ -66,6 +68,17 @@ class Container {
 	get notificationRepository(): DrizzleNotificationRepository {
 		if (!this._notificationRepository) this._notificationRepository = new DrizzleNotificationRepository();
 		return this._notificationRepository;
+	}
+
+	private _notificationEventHandler?: NotificationEventHandler;
+	get notificationEventHandler(): NotificationEventHandler {
+		if (!this._notificationEventHandler) {
+			this._notificationEventHandler = new NotificationEventHandler(this.notificationRepository);
+			
+			eventDispatcher.register('UserFollowRequestedEvent', (event: any) => this._notificationEventHandler!.handleFollowRequested(event));
+			eventDispatcher.register('UserFollowAcceptedEvent', (event: any) => this._notificationEventHandler!.handleFollowAccepted(event));
+		}
+		return this._notificationEventHandler;
 	}
 
 	// --- Use Cases (Lazy instantiated) ---
@@ -122,11 +135,11 @@ class Container {
 	}
 
 	get followUserUseCase(): FollowUserUseCase {
-		return new FollowUserUseCase(this.followRepository, this.notificationRepository, this.userRepository);
+		return new FollowUserUseCase(this.followRepository, this.userRepository);
 	}
 
 	get acceptFollowUseCase(): AcceptFollowUseCase {
-		return new AcceptFollowUseCase(this.followRepository, this.notificationRepository);
+		return new AcceptFollowUseCase(this.followRepository);
 	}
 
 	get rejectFollowUseCase(): RejectFollowUseCase {
@@ -143,3 +156,7 @@ class Container {
 }
 
 export const container = new Container();
+
+// Initialize event handlers
+container.notificationEventHandler;
+
