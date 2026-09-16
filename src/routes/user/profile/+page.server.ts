@@ -40,19 +40,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 			followersCount,
 			followingCount
 		},
-		posts: posts.map(p => ({
-			id: p.id,
-			content: p.content,
-			media: p.media,
-			createdAt: p.createdAt,
-			authorName: p.authorName,
-			authorUsername: p.authorUsername.toString(),
-			authorProfilePicture: p.authorProfilePictureUrl,
-			isLiked: p.isLiked,
-			isSaved: p.isSaved,
-			likesCount: p.likesCount,
-			commentsCount: p.commentsCount
-		})),
+		posts: posts.map(p => p.toJSON()),
 		isCurrentUser: locals.user?.sub === user.id
 	};
 };

@@ -22,6 +22,46 @@
 	let croppedBlob = $state<Blob | null>(null);
 	let uploadFormElement = $state<HTMLFormElement | null>(null);
 	
+	// --- Follows Modal State ---
+	let showFollowersModal = $state(false);
+	let showFollowingModal = $state(false);
+	let followersList = $state<{id: string, username: string, fullName: string, profilePictureUrl: string | null}[]>([]);
+	let followingList = $state<{id: string, username: string, fullName: string, profilePictureUrl: string | null}[]>([]);
+	let isLoadingFollowers = $state(false);
+	let isLoadingFollowing = $state(false);
+
+	async function fetchFollowers() {
+		showFollowersModal = true;
+		isLoadingFollowers = true;
+		try {
+			const res = await fetch(`/api/users/${profile.id}/followers`);
+			if (res.ok) {
+				const resData = await res.json();
+				followersList = resData.followers;
+			}
+		} catch (error) {
+			console.error("Failed to fetch followers", error);
+		} finally {
+			isLoadingFollowers = false;
+		}
+	}
+
+	async function fetchFollowing() {
+		showFollowingModal = true;
+		isLoadingFollowing = true;
+		try {
+			const res = await fetch(`/api/users/${profile.id}/following`);
+			if (res.ok) {
+				const resData = await res.json();
+				followingList = resData.following;
+			}
+		} catch (error) {
+			console.error("Failed to fetch following", error);
+		} finally {
+			isLoadingFollowing = false;
+		}
+	}
+	
 	function onFileSelected(e: Event, type: 'profile'|'cover') {
 		const input = e.target as HTMLInputElement;
 		if (input.files && input.files[0]) {
@@ -156,15 +196,15 @@
 					
 					<!-- Stats Card -->
 					<div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex justify-around text-center">
-						<div class="flex flex-col items-center">
+						<button class="flex flex-col items-center hover:opacity-80 focus:outline-none" onclick={fetchFollowers}>
 							<span class="text-2xl font-black text-slate-900 dark:text-white">{profile.followersCount || 0}</span>
 							<span class="text-sm font-medium text-slate-500">Pengikut</span>
-						</div>
+						</button>
 						<div class="w-px bg-slate-200 dark:bg-slate-800 my-2"></div>
-						<div class="flex flex-col items-center">
+						<button class="flex flex-col items-center hover:opacity-80 focus:outline-none" onclick={fetchFollowing}>
 							<span class="text-2xl font-black text-slate-900 dark:text-white">{profile.followingCount || 0}</span>
 							<span class="text-sm font-medium text-slate-500">Diikuti</span>
-						</div>
+						</button>
 					</div>
 
 					<!-- Personal Details Card (Read-only) -->
@@ -433,4 +473,114 @@
 		</div>
 	</div>
 </div>
+{/if}
+
+<!-- Followers Modal -->
+{#if showFollowersModal}
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-200">
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div class="fixed inset-0" onclick={() => showFollowersModal = false}></div>
+		<div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md flex flex-col max-h-[80vh] relative z-10">
+			<div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+				<h3 class="text-xl font-bold text-slate-900 dark:text-white">Pengikut</h3>
+				<button onclick={() => showFollowersModal = false} class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+					<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+			<div class="p-4 overflow-y-auto flex-1">
+				{#if isLoadingFollowers}
+					<div class="flex justify-center p-8">
+						<svg class="animate-spin h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24">
+							<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+							<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+						</svg>
+					</div>
+				{:else if followersList.length === 0}
+					<div class="text-center p-8 text-slate-500 dark:text-slate-400">
+						Belum ada pengikut.
+					</div>
+				{:else}
+					<div class="flex flex-col gap-4">
+						{#each followersList as follower}
+							<div class="flex items-center gap-3">
+								<a href={`/user/profile/${follower.username}`} class="shrink-0" onclick={() => showFollowersModal = false}>
+									{#if follower.profilePictureUrl}
+										<img src={follower.profilePictureUrl} alt={follower.fullName} class="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-700" />
+									{:else}
+										<div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold border border-blue-200 dark:border-blue-800">
+											{follower.fullName.charAt(0).toUpperCase()}
+										</div>
+									{/if}
+								</a>
+								<div class="flex flex-col">
+									<a href={`/user/profile/${follower.username}`} class="font-bold text-slate-900 dark:text-white hover:underline text-sm" onclick={() => showFollowersModal = false}>
+										{follower.fullName}
+									</a>
+									<span class="text-xs text-slate-500 dark:text-slate-400">@{follower.username}</span>
+								</div>
+							</div>
+						{/each}
+					</div>
+				{/if}
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Following Modal -->
+{#if showFollowingModal}
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-200">
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div class="fixed inset-0" onclick={() => showFollowingModal = false}></div>
+		<div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md flex flex-col max-h-[80vh] relative z-10">
+			<div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+				<h3 class="text-xl font-bold text-slate-900 dark:text-white">Diikuti</h3>
+				<button onclick={() => showFollowingModal = false} class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+					<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+			<div class="p-4 overflow-y-auto flex-1">
+				{#if isLoadingFollowing}
+					<div class="flex justify-center p-8">
+						<svg class="animate-spin h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24">
+							<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+							<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+						</svg>
+					</div>
+				{:else if followingList.length === 0}
+					<div class="text-center p-8 text-slate-500 dark:text-slate-400">
+						Belum mengikuti siapapun.
+					</div>
+				{:else}
+					<div class="flex flex-col gap-4">
+						{#each followingList as following}
+							<div class="flex items-center gap-3">
+								<a href={`/user/profile/${following.username}`} class="shrink-0" onclick={() => showFollowingModal = false}>
+									{#if following.profilePictureUrl}
+										<img src={following.profilePictureUrl} alt={following.fullName} class="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-700" />
+									{:else}
+										<div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold border border-blue-200 dark:border-blue-800">
+											{following.fullName.charAt(0).toUpperCase()}
+										</div>
+									{/if}
+								</a>
+								<div class="flex flex-col">
+									<a href={`/user/profile/${following.username}`} class="font-bold text-slate-900 dark:text-white hover:underline text-sm" onclick={() => showFollowingModal = false}>
+										{following.fullName}
+									</a>
+									<span class="text-xs text-slate-500 dark:text-slate-400">@{following.username}</span>
+								</div>
+							</div>
+						{/each}
+					</div>
+				{/if}
+			</div>
+		</div>
+	</div>
 {/if}

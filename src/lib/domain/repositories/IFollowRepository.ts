@@ -15,4 +15,6 @@ export interface IFollowRepository {
 	findByUsers(followerId: string, followingId: string): Promise<Follow | null>;
 	getFollowers(userId: string): Promise<Follow[]>;
 	getFollowing(userId: string): Promise<Follow[]>;
+	getFollowersDetails(userId: string): Promise<{id: string; username: string; fullName: string; profilePictureUrl: string | null; status: FollowStatus}[]>;
+	getFollowingDetails(userId: string): Promise<{id: string; username: string; fullName: string; profilePictureUrl: string | null; status: FollowStatus}[]>;
 }

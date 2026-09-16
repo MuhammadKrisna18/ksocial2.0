@@ -18,6 +18,8 @@ import { ToggleSavePostUseCase } from '$lib/application/use-cases/post/ToggleSav
 import { GetSavedPostsUseCase } from '$lib/application/use-cases/post/GetSavedPostsUseCase';
 import { DeletePostUseCase } from '$lib/application/use-cases/post/DeletePostUseCase';
 import { SharePostUseCase } from '$lib/application/use-cases/post/SharePostUseCase';
+import { GetFollowersDetailsUseCase } from '$lib/application/use-cases/follow/GetFollowersDetailsUseCase';
+import { GetFollowingDetailsUseCase } from '$lib/application/use-cases/follow/GetFollowingDetailsUseCase';
 import { GetUserPostsUseCase } from '$lib/application/use-cases/post/GetUserPostsUseCase';
 import { GetPostLikesUseCase } from '$lib/application/use-cases/post/GetPostLikesUseCase';
 import { FollowUserUseCase } from '$lib/application/use-cases/follow/FollowUserUseCase';
@@ -135,6 +137,14 @@ class Container {
 
 	get createPostUseCase(): CreatePostUseCase {
 		return new CreatePostUseCase(this.postRepository);
+	}
+
+	get getFollowersDetailsUseCase(): GetFollowersDetailsUseCase {
+		return new GetFollowersDetailsUseCase(this.followRepository);
+	}
+
+	get getFollowingDetailsUseCase(): GetFollowingDetailsUseCase {
+		return new GetFollowingDetailsUseCase(this.followRepository);
 	}
 
 	get getFeedUseCase(): GetFeedUseCase {

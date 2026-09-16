@@ -83,4 +83,41 @@ export class DrizzleFollowRepository implements IFollowRepository {
 			
 		return rows.map(r => this.mapToEntity(r));
 	}
+
+	async getFollowersDetails(userId: string): Promise<{id: string; username: string; fullName: string; profilePictureUrl: string | null; status: 'pending' | 'accepted'}[]> {
+		// Import users here if not imported at the top, but we need to import it at the top.
+		// Actually I can just write the query assuming users is imported, but let me check if users is imported.
+		// I'll just use a direct import to be safe if I can't check easily.
+		const { users } = await import('../database/schema/users');
+		
+		const results = await db.select({
+			id: users.id,
+			username: users.username,
+			fullName: users.fullName,
+			profilePictureUrl: users.profilePictureUrl,
+			status: follows.status
+		})
+		.from(follows)
+		.innerJoin(users, eq(follows.followerId, users.id))
+		.where(eq(follows.followingId, userId));
+
+		return results as any;
+	}
+
+	async getFollowingDetails(userId: string): Promise<{id: string; username: string; fullName: string; profilePictureUrl: string | null; status: 'pending' | 'accepted'}[]> {
+		const { users } = await import('../database/schema/users');
+
+		const results = await db.select({
+			id: users.id,
+			username: users.username,
+			fullName: users.fullName,
+			profilePictureUrl: users.profilePictureUrl,
+			status: follows.status
+		})
+		.from(follows)
+		.innerJoin(users, eq(follows.followingId, users.id))
+		.where(eq(follows.followerId, userId));
+
+		return results as any;
+	}
 }
