@@ -63,7 +63,15 @@
 	<div class="flex-1">
 		<div class="bg-slate-50 dark:bg-slate-900/50 rounded-2xl px-4 py-2.5 inline-block">
 			<a href="/user/{comment.authorUsername}" class="font-bold text-slate-900 dark:text-white hover:underline mr-1 text-xs">{comment.authorName}</a>
-			<span class="text-slate-700 dark:text-slate-300">{comment.content}</span>
+			<span class="text-slate-700 dark:text-slate-300 break-words">
+				{#each comment.content.split(/(\s+)/) as word}
+					{#if word.startsWith('@')}
+						<a href="/user/{word.substring(1)}" class="text-blue-600 dark:text-blue-400 font-medium hover:underline">{word}</a>
+					{:else}
+						{word}
+					{/if}
+				{/each}
+			</span>
 		</div>
 		<div class="px-4 mt-1 flex items-center gap-4">
 			<span class="text-xs text-slate-500">{formatTimeAgo(comment.createdAt)}</span>

@@ -78,9 +78,21 @@
 	function handleReply(comment: any) {
 		replyToComment = comment;
 		showComments = true;
+		
+		const prefix = `@${comment.authorUsername} `;
+		if (!newComment.startsWith(prefix)) {
+			if (newComment.trim() === '' || newComment.startsWith('@')) {
+				newComment = prefix;
+			} else {
+				newComment = prefix + newComment;
+			}
+		}
+		
 		setTimeout(() => {
 			if (commentInputRef) {
 				commentInputRef.focus();
+				// Move cursor to the end
+				commentInputRef.setSelectionRange(commentInputRef.value.length, commentInputRef.value.length);
 			}
 		}, 0);
 	}
