@@ -16,6 +16,29 @@
 
 	import { enhance } from '$app/forms';
 
+	// --- Search State ---
+	let searchQuery = $state('');
+	let searchResults = $state<any[]>([]);
+	let showSearchDropdown = $state(false);
+
+	async function handleSearch() {
+		if (searchQuery.trim().length === 0) {
+			searchResults = [];
+			showSearchDropdown = false;
+			return;
+		}
+
+		try {
+			const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
+			if (res.ok) {
+				searchResults = await res.json();
+				showSearchDropdown = searchResults.length > 0;
+			}
+		} catch (error) {
+			console.error("Search failed", error);
+		}
+	}
+
 	const menuItems = [
 		{ name: 'Feed', path: '/user', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
 		{ name: 'Friends', path: '/user/friends', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' },
@@ -103,12 +126,44 @@
 			</button>
 			
 			<div class="flex flex-1 items-center justify-end gap-4">
-				<button class="rounded-full p-2 text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-600 dark:hover:text-slate-300 transition">
-					<span class="sr-only">Search</span>
-					<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-					</svg>
-				</button>
+				<div class="relative z-50">
+					<!-- Search Button for Mobile (Toggles Input) -->
+					<div class="flex items-center">
+						<div class="relative hidden sm:block">
+							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+								<svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+								</svg>
+							</div>
+							<input
+								type="text"
+								placeholder="Cari pengguna..."
+								bind:value={searchQuery}
+								oninput={handleSearch}
+								class="block w-full sm:w-64 pl-10 pr-3 py-2 border border-slate-200 dark:border-slate-700 rounded-full leading-5 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all"
+							/>
+						</div>
+					</div>
+
+					<!-- Search Dropdown -->
+					{#if showSearchDropdown && searchResults.length > 0}
+						<div class="absolute right-0 mt-2 w-full sm:w-80 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden origin-top-right animate-in fade-in zoom-in-95 duration-200 z-50">
+							<div class="max-h-[300px] overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700/50">
+								{#each searchResults as user}
+									<a href="/user/profile/{user.username}" class="flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors" onclick={() => {showSearchDropdown = false; searchQuery = '';}}>
+										<div class="h-10 w-10 shrink-0 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
+											{user.fullName ? user.fullName.charAt(0).toUpperCase() : 'U'}
+										</div>
+										<div class="min-w-0 flex-1">
+											<p class="text-sm font-bold text-slate-900 dark:text-white truncate">{user.fullName}</p>
+											<p class="text-xs text-slate-500 dark:text-slate-400 truncate">@{user.username}</p>
+										</div>
+									</a>
+								{/each}
+							</div>
+						</div>
+					{/if}
+				</div>
 				<div class="relative">
 					<button onclick={toggleNotif} class="relative rounded-full p-2 text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-600 dark:hover:text-slate-300 transition focus:outline-none">
 						<span class="sr-only">View notifications</span>
@@ -170,6 +225,29 @@
 														</div>
 													</div>
 												</div>
+											{:else if notif.type === 'like' || notif.type === 'comment'}
+												<a href="/user" class="block p-4 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+													<div class="flex gap-3">
+														<div class="mt-1 {notif.type === 'like' ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' : 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'} p-2 rounded-full h-fit">
+															{#if notif.type === 'like'}
+																<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+																	<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+																</svg>
+															{:else}
+																<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+																	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+																</svg>
+															{/if}
+														</div>
+														<div class="flex-1 min-w-0">
+															<p class="text-sm text-slate-800 dark:text-slate-200">
+																<span class="font-bold">{notif.senderName}</span>
+																{notif.type === 'like' ? 'menyukai postingan Anda.' : 'mengomentari postingan Anda.'}
+															</p>
+															<p class="text-xs text-slate-500 mt-1">{new Date(notif.createdAt).toLocaleString()}</p>
+														</div>
+													</div>
+												</a>
 											{/if}
 										{/each}
 									</div>

@@ -11,6 +11,7 @@ export class DrizzleNotificationRepository implements INotificationRepository {
 			userId: row.userId,
 			senderId: row.senderId,
 			type: row.type,
+			resourceId: row.resourceId,
 			read: row.read,
 			createdAt: row.createdAt
 		});
@@ -24,6 +25,7 @@ export class DrizzleNotificationRepository implements INotificationRepository {
 				userId: data.userId,
 				senderId: data.senderId,
 				type: data.type,
+				resourceId: data.resourceId,
 				read: false
 			})
 			.returning();

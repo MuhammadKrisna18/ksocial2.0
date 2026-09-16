@@ -5,6 +5,7 @@ export interface CreateNotificationData {
 	userId: string;
 	senderId: string;
 	type: string;
+	resourceId?: string;
 }
 
 export interface INotificationRepository {

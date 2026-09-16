@@ -38,6 +38,7 @@ import { DeleteCommentUseCase } from '$lib/application/use-cases/post/DeleteComm
 import { GetSavedCommentsUseCase } from '$lib/application/use-cases/post/GetSavedCommentsUseCase';
 import { eventDispatcher } from '$lib/infrastructure/events/DomainEventDispatcher';
 import { NotificationEventHandler } from '$lib/application/event-handlers/NotificationEventHandler';
+import { SearchUsersUseCase } from '$lib/application/use-cases/search/SearchUsersUseCase';
 
 class Container {
 	// --- Services & Repositories (Singletons) ---
@@ -102,6 +103,8 @@ class Container {
 			
 			eventDispatcher.register('UserFollowRequestedEvent', (event: any) => this._notificationEventHandler!.handleFollowRequested(event));
 			eventDispatcher.register('UserFollowAcceptedEvent', (event: any) => this._notificationEventHandler!.handleFollowAccepted(event));
+			eventDispatcher.register('PostLikedEvent', (event: any) => this._notificationEventHandler!.handlePostLiked(event));
+			eventDispatcher.register('PostCommentedEvent', (event: any) => this._notificationEventHandler!.handlePostCommented(event));
 		}
 		return this._notificationEventHandler;
 	}
@@ -176,11 +179,11 @@ class Container {
 	}
 
 	get toggleLikeUseCase(): ToggleLikeUseCase {
-		return new ToggleLikeUseCase(this.likeRepository);
+		return new ToggleLikeUseCase(this.likeRepository, this.postRepository);
 	}
 
 	get addCommentUseCase(): AddCommentUseCase {
-		return new AddCommentUseCase(this.commentRepository);
+		return new AddCommentUseCase(this.commentRepository, this.postRepository);
 	}
 
 	get getCommentsUseCase(): GetCommentsUseCase {

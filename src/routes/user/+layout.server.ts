@@ -19,6 +19,7 @@ export const load = async ({ locals }) => {
 					senderId: n.senderId,
 					senderUsername: sender?.username?.toString(),
 					senderName: sender?.fullName,
+					resourceId: n.resourceId,
 					read: n.read,
 					createdAt: n.createdAt
 				};

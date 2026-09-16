@@ -6,7 +6,8 @@ export const notifications = pgTable('notifications', {
 	id: text('id').primaryKey(),
 	userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
 	senderId: text('sender_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-	type: text('type').notNull(), // e.g. 'follow_request', 'follow_accepted'
+	type: text('type').notNull(), // e.g. 'follow_request', 'like', 'comment'
+	resourceId: text('resource_id'), // e.g. post ID
 	read: boolean('read').notNull().default(false),
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 });
