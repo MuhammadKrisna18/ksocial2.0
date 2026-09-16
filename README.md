@@ -68,7 +68,11 @@ npm run dev -- --open
 - **Manajemen Postingan Lengkap**:
   - **Create Post**: Membuat postingan dengan fitur upload media multi-gambar dengan modal *popup*.
   - **Delete Post**: Menghapus postingan milik sendiri langsung dari titik tiga pada *Post Card*.
-  - **Save Post (Bookmark)**: Menyimpan postingan milik siapapun ke tab "Saved". Jika postingan asli dihapus, ia otomatis terhapus dari daftar _Saved_ pengguna lain (Cascade).
+  - **Like & Share Post**: Fitur suka postingan secara optimistik dan menyalin tautan postingan.
+  - **Save Post & Comment**: Menyimpan postingan atau komentar ke tab "Saved" yang terbagi secara rapi (Tabbed View). Jika postingan asli dihapus, ia otomatis terhapus dari daftar _Saved_ pengguna lain (Cascade).
+- **Sistem Komentar Bertingkat (Nested Comments)**:
+  - **Balas Komentar**: Fitur membalas komentar yang otomatis melakukan *mention* `@username` di dalam textarea input balasan. Layout menjorok yang diratakan ke satu level demi menjaga kerapian antar muka UI.
+  - **Interaksi Komentar**: Suka (*Like*), Simpan (*Save*), dan Hapus (*Delete*) komentar secara individual. Otorisasi hapus hanya berlaku untuk penulis komentar.
 - **Sistem Pertemanan (Follow System)**:
   - **Follow / Unfollow**: Mengikuti pengguna lain.
   - **Mutual Follow (Friends)**: Jika dua akun saling mem-*follow*, status otomatis berubah menjadi **Friends**.
