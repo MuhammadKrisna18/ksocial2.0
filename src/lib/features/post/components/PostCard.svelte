@@ -20,6 +20,11 @@
 	let replyToComment = $state<any | null>(null);
 	let commentInputRef = $state<HTMLTextAreaElement | null>(null);
 
+	// Likes Modal state
+	let showLikes = $state(false);
+	let likesList = $state<any[]>([]);
+	let isLoadingLikes = $state(false);
+
 	function formatTimeAgo(dateString: Date | string) {
 		const date = new Date(dateString);
 		const now = new Date();
@@ -51,6 +56,28 @@
 			isLiked = !isLiked;
 			likesCount += isLiked ? 1 : -1;
 		}
+	}
+
+	async function showLikesModal(e: Event) {
+		e.preventDefault();
+		showLikes = true;
+		isLoadingLikes = true;
+		try {
+			const res = await fetch(`/api/posts/${post.id}/likes`);
+			if (res.ok) {
+				const data = await res.json();
+				likesList = data.likes;
+			}
+		} catch (error) {
+			console.error("Failed to fetch likes", error);
+		} finally {
+			isLoadingLikes = false;
+		}
+	}
+
+	function closeLikesModal() {
+		showLikes = false;
+		likesList = [];
 	}
 
 	async function sharePost(e: Event) {
@@ -268,14 +295,20 @@
 
 	<!-- Post Actions -->
 	<div class="flex items-center gap-4 border-t border-slate-100 dark:border-slate-800 pt-3 mt-3">
-		<button type="button" onclick={toggleLike} class="flex items-center gap-2 {isLiked ? 'text-red-500' : 'text-slate-500 hover:text-red-500'} transition-colors group text-sm font-medium">
-			<div class="p-1.5 rounded-full {isLiked ? 'bg-red-50 dark:bg-red-900/30' : 'group-hover:bg-red-50 dark:group-hover:bg-red-900/30'} transition-colors">
+		<div class="flex items-center gap-1 group text-sm font-medium {isLiked ? 'text-red-500' : 'text-slate-500'}">
+			<button type="button" onclick={toggleLike} class="p-1.5 rounded-full {isLiked ? 'bg-red-50 dark:bg-red-900/30' : 'hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30'} transition-colors">
 				<svg class="w-5 h-5" fill={isLiked ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
 				</svg>
-			</div>
-			<span>{likesCount}</span>
-		</button>
+			</button>
+			{#if likesCount > 0}
+				<button type="button" onclick={showLikesModal} class="hover:underline cursor-pointer p-1">
+					{likesCount}
+				</button>
+			{:else}
+				<span class="p-1">{likesCount}</span>
+			{/if}
+		</div>
 		<button type="button" onclick={toggleComments} class="flex items-center gap-2 {showComments ? 'text-blue-600' : 'text-slate-500 hover:text-blue-600'} transition-colors group text-sm font-medium">
 			<div class="p-1.5 rounded-full {showComments ? 'bg-blue-50 dark:bg-blue-900/30' : 'group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30'} transition-colors">
 				<svg class="w-5 h-5" fill={showComments ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor">
@@ -351,3 +384,48 @@
 		</div>
 	{/if}
 </div>
+
+<!-- Likes Modal -->
+{#if showLikes}
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200" onclick={closeLikesModal}>
+		<div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col max-h-[80vh]" onclick={e => e.stopPropagation()}>
+			<div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+				<h3 class="font-bold text-lg text-slate-900 dark:text-white">Menyukai</h3>
+				<button type="button" onclick={closeLikesModal} class="p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+					<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+			<div class="p-4 overflow-y-auto flex-1">
+				{#if isLoadingLikes}
+					<div class="flex justify-center py-8">
+						<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+					</div>
+				{:else if likesList.length === 0}
+					<p class="text-center text-slate-500 dark:text-slate-400 py-8">Belum ada yang menyukai.</p>
+				{:else}
+					<div class="space-y-4">
+						{#each likesList as user}
+							<a href="/user/{user.username}" class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-2 rounded-2xl transition-colors">
+								<div class="h-10 w-10 shrink-0 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm overflow-hidden">
+									{#if user.profilePictureUrl}
+										<img src={user.profilePictureUrl} alt={user.fullName || user.username} class="w-full h-full object-cover" />
+									{:else}
+										{(user.fullName || user.username).charAt(0).toUpperCase()}
+									{/if}
+								</div>
+								<div class="flex-1 min-w-0">
+									<p class="font-bold text-sm text-slate-900 dark:text-white truncate">{user.fullName || user.username}</p>
+									<p class="text-xs text-slate-500 dark:text-slate-400 truncate">@{user.username}</p>
+								</div>
+							</a>
+						{/each}
+					</div>
+				{/if}
+			</div>
+		</div>
+	</div>
+{/if}

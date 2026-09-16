@@ -215,4 +215,19 @@ export class DrizzlePostRepository implements IPostRepository {
 			updatedAt: post.updatedAt
 		});
 	}
+
+	async getPostLikes(postId: string): Promise<{id: string; username: string; fullName: string; profilePictureUrl: string | null}[]> {
+		const results = await db.select({
+			id: users.id,
+			username: users.username,
+			fullName: users.fullName,
+			profilePictureUrl: users.profilePictureUrl
+		})
+		.from(likes)
+		.innerJoin(users, eq(likes.userId, users.id))
+		.where(eq(likes.postId, postId))
+		.orderBy(desc(likes.createdAt));
+
+		return results;
+	}
 }

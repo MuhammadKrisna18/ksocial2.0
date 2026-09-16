@@ -15,4 +15,5 @@ export interface IPostRepository {
 	getUserPosts(userId: string, currentUserId?: string): Promise<Post[]>;
 	deletePost(id: string, userId: string): Promise<boolean>;
 	incrementShares(id: string): Promise<Post>;
+	getPostLikes(postId: string): Promise<{id: string; username: string; fullName: string; profilePictureUrl: string | null}[]>;
 }

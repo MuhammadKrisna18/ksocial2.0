@@ -19,6 +19,7 @@ import { GetSavedPostsUseCase } from '$lib/application/use-cases/post/GetSavedPo
 import { DeletePostUseCase } from '$lib/application/use-cases/post/DeletePostUseCase';
 import { SharePostUseCase } from '$lib/application/use-cases/post/SharePostUseCase';
 import { GetUserPostsUseCase } from '$lib/application/use-cases/post/GetUserPostsUseCase';
+import { GetPostLikesUseCase } from '$lib/application/use-cases/post/GetPostLikesUseCase';
 import { FollowUserUseCase } from '$lib/application/use-cases/follow/FollowUserUseCase';
 import { AcceptFollowUseCase } from '$lib/application/use-cases/follow/AcceptFollowUseCase';
 import { RejectFollowUseCase } from '$lib/application/use-cases/follow/RejectFollowUseCase';
@@ -154,6 +155,10 @@ class Container {
 
 	get sharePostUseCase(): SharePostUseCase {
 		return new SharePostUseCase(this.postRepository);
+	}
+
+	get getPostLikesUseCase(): GetPostLikesUseCase {
+		return new GetPostLikesUseCase(this.postRepository);
 	}
 
 	get getUserPostsUseCase(): GetUserPostsUseCase {
