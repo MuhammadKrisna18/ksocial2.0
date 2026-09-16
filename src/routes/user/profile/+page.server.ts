@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 				id: n.id,
 				type: n.type,
 				senderId: n.senderId,
-				senderUsername: sender?.username,
+				senderUsername: sender?.username?.toString(),
 				senderName: sender?.fullName,
 				read: n.read,
 				createdAt: n.createdAt
@@ -40,8 +40,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 		profile: {
 			id: user.id,
 			fullName: user.fullName,
-			username: user.username,
-			email: user.email,
+			username: user.username.toString(),
+			email: user.email.toString(),
 			dateOfBirth: user.dateOfBirth.toISOString().split('T')[0], // Format for input type="date"
 			location: user.location,
 			relationshipStatus: user.relationshipStatus,
