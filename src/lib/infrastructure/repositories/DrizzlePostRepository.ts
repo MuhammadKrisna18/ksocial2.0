@@ -1,4 +1,4 @@
-import { desc, eq, and } from 'drizzle-orm';
+import { desc, eq, and, sql } from 'drizzle-orm';
 import { db } from '../database/client';
 import { posts } from '../database/schema/posts';
 import { savedPosts } from '../database/schema/savedPosts';
@@ -33,6 +33,7 @@ export class DrizzlePostRepository implements IPostRepository {
 			content: postRow.content,
 			likesCount: postRow.likesCount,
 			commentsCount: postRow.commentsCount,
+			sharesCount: postRow.sharesCount,
 			media: postRow.media as any,
 			createdAt: postRow.createdAt,
 			updatedAt: postRow.updatedAt
@@ -71,6 +72,7 @@ export class DrizzlePostRepository implements IPostRepository {
 				content: row.post.content,
 				likesCount: row.post.likesCount,
 				commentsCount: row.post.commentsCount,
+				sharesCount: row.post.sharesCount,
 				media: row.post.media as any,
 				isSaved: !!row.savedByUserId,
 				isLiked: !!row.likedByUserId,
@@ -120,6 +122,7 @@ export class DrizzlePostRepository implements IPostRepository {
 				content: row.post.content,
 				likesCount: row.post.likesCount,
 				commentsCount: row.post.commentsCount,
+				sharesCount: row.post.sharesCount,
 				media: row.post.media as any,
 				isSaved: true,
 				isLiked: !!row.likedByUserId,
@@ -162,6 +165,7 @@ export class DrizzlePostRepository implements IPostRepository {
 				content: row.post.content,
 				likesCount: row.post.likesCount,
 				commentsCount: row.post.commentsCount,
+				sharesCount: row.post.sharesCount,
 				media: row.post.media as any,
 				isSaved: !!row.savedByUserId,
 				isLiked: !!row.likedByUserId,
@@ -171,6 +175,37 @@ export class DrizzlePostRepository implements IPostRepository {
 		});
 	}
 
+	async findById(id: string): Promise<Post | null> {
+		const results = await db
+			.select({
+				post: posts,
+				author: {
+					fullName: users.fullName,
+					username: users.username
+				}
+			})
+			.from(posts)
+			.innerJoin(users, eq(posts.userId, users.id))
+			.where(eq(posts.id, id))
+			.limit(1);
+
+		if (results.length === 0) return null;
+
+		const row = results[0];
+		return Post.create({
+			id: row.post.id,
+			authorId: row.post.userId,
+			authorName: row.author.fullName,
+			authorUsername: row.author.username,
+			content: row.post.content,
+			likesCount: row.post.likesCount,
+			commentsCount: row.post.commentsCount,
+			sharesCount: row.post.sharesCount,
+			media: row.post.media as any,
+			createdAt: row.post.createdAt,
+			updatedAt: row.post.updatedAt
+		});
+	}
 
 	async deletePost(postId: string, userId: string): Promise<boolean> {
 		// First verify if the post exists and belongs to the user

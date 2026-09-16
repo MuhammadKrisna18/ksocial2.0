@@ -29,6 +29,7 @@ import { GetFollowStatusUseCase } from '$lib/application/use-cases/follow/GetFol
 import { GetNotificationsUseCase } from '$lib/application/use-cases/notification/GetNotificationsUseCase';
 import { DrizzleLikeRepository } from '$lib/infrastructure/repositories/DrizzleLikeRepository';
 import { DrizzleCommentRepository } from '$lib/infrastructure/repositories/DrizzleCommentRepository';
+import { DrizzleMessageRepository } from '$lib/infrastructure/repositories/DrizzleMessageRepository';
 import { ToggleLikeUseCase } from '$lib/application/use-cases/post/ToggleLikeUseCase';
 import { AddCommentUseCase } from '$lib/application/use-cases/post/AddCommentUseCase';
 import { GetCommentsUseCase } from '$lib/application/use-cases/post/GetCommentsUseCase';
@@ -39,6 +40,9 @@ import { GetSavedCommentsUseCase } from '$lib/application/use-cases/post/GetSave
 import { eventDispatcher } from '$lib/infrastructure/events/DomainEventDispatcher';
 import { NotificationEventHandler } from '$lib/application/event-handlers/NotificationEventHandler';
 import { SearchUsersUseCase } from '$lib/application/use-cases/search/SearchUsersUseCase';
+import { GetMessagesUseCase } from '$lib/application/use-cases/chat/GetMessagesUseCase';
+import { SendMessageUseCase } from '$lib/application/use-cases/chat/SendMessageUseCase';
+import { GetChatContactsUseCase } from '$lib/application/use-cases/chat/GetChatContactsUseCase';
 
 class Container {
 	// --- Services & Repositories (Singletons) ---
@@ -94,6 +98,12 @@ class Container {
 	get commentRepository(): DrizzleCommentRepository {
 		if (!this._commentRepository) this._commentRepository = new DrizzleCommentRepository();
 		return this._commentRepository;
+	}
+
+	private _messageRepository?: DrizzleMessageRepository;
+	get messageRepository(): DrizzleMessageRepository {
+		if (!this._messageRepository) this._messageRepository = new DrizzleMessageRepository();
+		return this._messageRepository;
 	}
 
 	private _notificationEventHandler?: NotificationEventHandler;
@@ -224,6 +234,22 @@ class Container {
 
 	get getNotificationsUseCase(): GetNotificationsUseCase {
 		return new GetNotificationsUseCase(this.notificationRepository);
+	}
+
+	get getMessagesUseCase(): GetMessagesUseCase {
+		return new GetMessagesUseCase(this.messageRepository);
+	}
+
+	get sendMessageUseCase(): SendMessageUseCase {
+		return new SendMessageUseCase(this.messageRepository, this.userRepository, this.followRepository);
+	}
+
+	get getChatContactsUseCase(): GetChatContactsUseCase {
+		return new GetChatContactsUseCase(this.messageRepository);
+	}
+
+	get searchUsersUseCase(): SearchUsersUseCase {
+		return new SearchUsersUseCase();
 	}
 }
 

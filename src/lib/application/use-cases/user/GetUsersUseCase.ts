@@ -7,6 +7,7 @@ export interface UserDTO {
 	email: string;
 	roles: string[];
 	dateOfBirth: Date;
+	profilePictureUrl: string | null;
 }
 
 export class GetUsersUseCase {
@@ -26,7 +27,8 @@ export class GetUsersUseCase {
 			username: user.username.toString(),
 			email: user.email.toString(),
 			roles: user.roles,
-			dateOfBirth: user.dateOfBirth
+			dateOfBirth: user.dateOfBirth,
+			profilePictureUrl: user.profilePictureUrl
 		}));
 	}
 }

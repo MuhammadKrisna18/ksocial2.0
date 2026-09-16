@@ -13,7 +13,7 @@ export class SearchUsersUseCase {
 				id: users.id,
 				username: users.username,
 				fullName: users.fullName,
-				bio: users.bio
+				profilePictureUrl: users.profilePictureUrl
 			})
 			.from(users)
 			.where(

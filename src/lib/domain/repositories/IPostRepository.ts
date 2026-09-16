@@ -9,6 +9,7 @@ export interface CreatePostData {
 
 export interface IPostRepository {
 	create(data: CreatePostData): Promise<Post>;
+	findById(id: string): Promise<Post | null>;
 	getFeed(currentUserId?: string): Promise<Post[]>;
 	toggleSave(userId: string, postId: string): Promise<boolean>;
 	getSavedPosts(userId: string): Promise<Post[]>;

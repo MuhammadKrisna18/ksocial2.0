@@ -22,6 +22,16 @@ export class DomainEventDispatcher {
 		this.handlers.get(eventName)!.push(handler);
 	}
 
+	public unregister<T extends IDomainEvent>(eventName: string, handler: EventHandler<T>): void {
+		if (this.handlers.has(eventName)) {
+			const handlers = this.handlers.get(eventName)!;
+			const index = handlers.indexOf(handler);
+			if (index !== -1) {
+				handlers.splice(index, 1);
+			}
+		}
+	}
+
 	public async dispatch(eventName: string, event: IDomainEvent): Promise<void> {
 		const eventHandlers = this.handlers.get(eventName);
 		if (eventHandlers) {

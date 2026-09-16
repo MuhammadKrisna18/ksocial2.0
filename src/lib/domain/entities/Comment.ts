@@ -79,7 +79,7 @@ export class Comment {
 		return this.props.replies;
 	}
 
-	toJSON() {
+	toJSON(): Record<string, any> {
 		return {
 			id: this.id,
 			userId: this.userId,

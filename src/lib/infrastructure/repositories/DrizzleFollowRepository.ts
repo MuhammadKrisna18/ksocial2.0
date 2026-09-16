@@ -51,19 +51,19 @@ export class DrizzleFollowRepository implements IFollowRepository {
 	}
 
 	async findByUsers(followerId: string, followingId: string): Promise<Follow | null> {
-		const rows = await db
-			.select()
-			.from(follows)
-			.where(
-				and(
-					eq(follows.followerId, followerId),
-					eq(follows.followingId, followingId)
-				)
-			)
-			.limit(1);
+		const result = await db.select().from(follows).where(and(eq(follows.followerId, followerId), eq(follows.followingId, followingId)));
+		if (result.length === 0) return null;
+		return this.mapToEntity(result[0]);
+	}
 
-		if (!rows.length) return null;
-		return this.mapToEntity(rows[0]);
+	async getFollowStatus(followerId: string, followingId: string): Promise<string | null> {
+		const result = await db
+			.select({ status: follows.status })
+			.from(follows)
+			.where(and(eq(follows.followerId, followerId), eq(follows.followingId, followingId)))
+			.limit(1);
+			
+		return result.length > 0 ? result[0].status : null;
 	}
 
 	async getFollowers(userId: string): Promise<Follow[]> {

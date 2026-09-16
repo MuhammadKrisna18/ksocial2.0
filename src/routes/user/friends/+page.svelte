@@ -18,7 +18,7 @@
 	<!-- Main Content Area -->
 	<div class="max-w-7xl mx-auto px-6 lg:px-8 pb-16 pt-12 space-y-16">
 		
-		{#snippet userCard(user)}
+		{#snippet userCard(user: any)}
 			<a href="/user/profile/{user.username}" class="block group bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 dark:hover:shadow-indigo-500/5 hover:border-indigo-100 dark:hover:border-indigo-500/30 transition-all duration-300 flex flex-col items-center text-center relative overflow-hidden">
 				
 				<!-- Avatar -->

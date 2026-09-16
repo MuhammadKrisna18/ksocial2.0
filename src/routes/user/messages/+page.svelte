@@ -1,73 +1,138 @@
 <script lang="ts">
 	import { fade, slide } from 'svelte/transition';
+	import { onMount, onDestroy } from 'svelte';
 	
-	// Mock data for contacts
-	const contacts = [
-		{ id: '1', name: 'Sarah Jenkins', username: 'sarahj', avatar: 'https://i.pravatar.cc/150?u=sarahj', lastMessage: 'Hey, are we still on for tomorrow?', time: '10:30 AM', unread: 2, online: true },
-		{ id: '2', name: 'Michael Chen', username: 'mchen', avatar: 'https://i.pravatar.cc/150?u=mchen', lastMessage: 'Thanks for the help earlier!', time: 'Yesterday', unread: 0, online: false },
-		{ id: '3', name: 'Emma Wilson', username: 'emmaw', avatar: null, lastMessage: 'Sent an attachment', time: 'Mon', unread: 0, online: true },
-		{ id: '4', name: 'David Lee', username: 'davidl', avatar: 'https://i.pravatar.cc/150?u=davidl', lastMessage: 'Can you review my PR?', time: 'Sun', unread: 0, online: false },
-	];
+	let { data } = $props(); 
+	let currentUserId = data.user?.sub || '';
 
-	// Mock data for messages based on active contact
+	let contacts = $state<any[]>([]);
 	let activeContactId = $state<string | null>(null);
-	let messages = $state([
-		{ id: 1, senderId: '1', text: 'Hi! How are you doing?', timestamp: '10:00 AM', isMine: false },
-		{ id: 2, senderId: 'me', text: 'Hey Sarah! I am good, just working on a new project.', timestamp: '10:05 AM', isMine: true },
-		{ id: 3, senderId: '1', text: 'That sounds exciting! What is it about?', timestamp: '10:06 AM', isMine: false },
-		{ id: 4, senderId: 'me', text: 'Building a new social media app using SvelteKit!', timestamp: '10:10 AM', isMine: true },
-		{ id: 5, senderId: '1', text: 'Wow, I need to see it when it\'s done.', timestamp: '10:15 AM', isMine: false },
-		{ id: 6, senderId: '1', text: 'Hey, are we still on for tomorrow?', timestamp: '10:30 AM', isMine: false },
-	]);
-
+	let messages = $state<any[]>([]);
 	let newMessage = $state('');
+	let showChatList = $state(true); 
 	
-	// Mobile view management
-	let showChatList = $state(true); // true = show list, false = show chat room
+	let eventSource: EventSource | null = null;
+	let errorText = $state('');
+	let messagesContainer: HTMLDivElement | null = $state(null);
 
-	function selectContact(id: string) {
+	onMount(() => {
+		fetchContacts();
+		setupSSE();
+	});
+
+	onDestroy(() => {
+		if (eventSource) {
+			eventSource.close();
+		}
+	});
+
+	async function fetchContacts() {
+		const res = await fetch('/api/chat/contacts');
+		if (res.ok) {
+			const resData = await res.json();
+			contacts = resData.contacts;
+		}
+	}
+
+	function setupSSE() {
+		eventSource = new EventSource('/api/chat/stream');
+		eventSource.onmessage = (event) => {
+			if (event.data === ':') return; // Ping
+			const newMsg = JSON.parse(event.data);
+			
+			if (activeContactId && (
+				(newMsg.senderId === activeContactId && newMsg.receiverId === currentUserId) || 
+				(newMsg.senderId === currentUserId && newMsg.receiverId === activeContactId)
+			)) {
+				if (!messages.find(m => m.id === newMsg.id)) {
+					messages = [...messages, {
+						id: newMsg.id,
+						senderId: newMsg.senderId,
+						text: newMsg.content,
+						timestamp: new Date(newMsg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+						isMine: newMsg.senderId === currentUserId
+					}];
+					scrollToBottom();
+				}
+			}
+			
+			fetchContacts();
+		};
+	}
+
+	async function selectContact(id: string) {
 		activeContactId = id;
 		showChatList = false;
+		errorText = '';
+		messages = []; 
 		
-		// Reset messages to mock data for demonstration
-		if (id !== '1') {
-			messages = [
-				{ id: 1, senderId: id, text: 'Hello there!', timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), isMine: false }
-			];
+		const res = await fetch(`/api/chat/${id}`);
+		if (res.ok) {
+			const resData = await res.json();
+			messages = resData.messages.map((m: any) => ({
+				id: m.id,
+				senderId: m.senderId,
+				text: m.content,
+				timestamp: new Date(m.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+				isMine: m.senderId === currentUserId
+			}));
+			fetchContacts();
+			scrollToBottom();
 		}
 	}
 
 	function backToList() {
 		showChatList = true;
 		activeContactId = null;
+		errorText = '';
 	}
 
-	function sendMessage() {
-		if (newMessage.trim() === '') return;
-		
-		messages.push({
-			id: Date.now(),
-			senderId: 'me',
-			text: newMessage.trim(),
-			timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-			isMine: true
-		});
-		
-		newMessage = '';
-
-		// Simulate reply after 1 second
+	function scrollToBottom() {
 		setTimeout(() => {
-			messages.push({
-				id: Date.now() + 1,
-				senderId: activeContactId!,
-				text: 'Oh, okay! Interesting.',
-				timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-				isMine: false
-			});
-		}, 1000);
+			if (messagesContainer) {
+				messagesContainer.scrollTop = messagesContainer.scrollHeight;
+			}
+		}, 50);
 	}
 
-	let activeContact = $derived(contacts.find(c => c.id === activeContactId));
+	async function sendMessage() {
+		if (newMessage.trim() === '' || !activeContactId) return;
+		
+		const text = newMessage.trim();
+		newMessage = '';
+		errorText = '';
+
+		try {
+			const res = await fetch(`/api/chat/${activeContactId}`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ content: text })
+			});
+
+			const resData = await res.json();
+
+			if (!res.ok) {
+				errorText = resData.error || 'Failed to send message';
+				return;
+			}
+			
+			if (!messages.find(m => m.id === resData.message.id)) {
+				messages = [...messages, {
+					id: resData.message.id,
+					senderId: currentUserId,
+					text: text,
+					timestamp: new Date(resData.message.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+					isMine: true
+				}];
+				scrollToBottom();
+			}
+			fetchContacts();
+		} catch(err) {
+			errorText = "Connection error";
+		}
+	}
+
+	let activeContact = $derived(contacts.find(c => c.userId === activeContactId));
 </script>
 
 <svelte:head>
@@ -102,35 +167,39 @@
 
 		<!-- Contact List -->
 		<div class="flex-1 overflow-y-auto">
+			{#if contacts.length === 0}
+				<div class="p-4 text-center text-slate-500 text-sm mt-10">Belum ada obrolan.</div>
+			{/if}
 			{#each contacts as contact}
 				<button 
-					class="w-full flex items-center gap-3 p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100/50 dark:border-slate-800/50 text-left {activeContactId === contact.id ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''}"
-					onclick={() => selectContact(contact.id)}
+					class="w-full flex items-center gap-3 p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100/50 dark:border-slate-800/50 text-left {activeContactId === contact.userId ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''}"
+					onclick={() => selectContact(contact.userId)}
 				>
 					<div class="relative">
-						{#if contact.avatar}
-							<img src={contact.avatar} alt={contact.name} class="w-12 h-12 rounded-full object-cover">
+						{#if contact.avatarUrl}
+							<img src={contact.avatarUrl} alt={contact.fullName} class="w-12 h-12 rounded-full object-cover">
 						{:else}
 							<div class="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-lg">
-								{contact.name.charAt(0)}
+								{contact.fullName.charAt(0)}
 							</div>
-						{/if}
-						{#if contact.online}
-							<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
 						{/if}
 					</div>
 					
 					<div class="flex-1 min-w-0">
 						<div class="flex justify-between items-baseline mb-0.5">
-							<h3 class="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">{contact.name}</h3>
-							<span class="text-xs text-slate-500 dark:text-slate-400 ml-2 shrink-0">{contact.time}</span>
+							<h3 class="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">{contact.fullName}</h3>
+							<span class="text-xs text-slate-500 dark:text-slate-400 ml-2 shrink-0">
+								{#if contact.lastMessageAt}
+									{new Date(contact.lastMessageAt).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+								{/if}
+							</span>
 						</div>
-						<p class="text-xs text-slate-500 dark:text-slate-400 truncate {contact.unread > 0 ? 'font-semibold text-slate-900 dark:text-slate-200' : ''}">{contact.lastMessage}</p>
+						<p class="text-xs text-slate-500 dark:text-slate-400 truncate {contact.unreadCount > 0 ? 'font-semibold text-slate-900 dark:text-slate-200' : ''}">{contact.lastMessage || 'Sent an attachment'}</p>
 					</div>
 					
-					{#if contact.unread > 0}
+					{#if contact.unreadCount > 0}
 						<div class="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center shrink-0">
-							<span class="text-[10px] font-bold text-white">{contact.unread}</span>
+							<span class="text-[10px] font-bold text-white">{contact.unreadCount}</span>
 						</div>
 					{/if}
 				</button>
@@ -150,44 +219,34 @@
 						</svg>
 					</button>
 					<div class="relative">
-						{#if activeContact.avatar}
-							<img src={activeContact.avatar} alt={activeContact.name} class="w-10 h-10 rounded-full object-cover">
+						{#if activeContact.avatarUrl}
+							<img src={activeContact.avatarUrl} alt={activeContact.fullName} class="w-10 h-10 rounded-full object-cover">
 						{:else}
 							<div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
-								{activeContact.name.charAt(0)}
+								{activeContact.fullName.charAt(0)}
 							</div>
 						{/if}
 					</div>
 					<div>
-						<h2 class="text-sm font-bold text-slate-900 dark:text-slate-100">{activeContact.name}</h2>
-						<p class="text-xs text-slate-500 dark:text-slate-400">{activeContact.online ? 'Active now' : 'Offline'}</p>
+						<h2 class="text-sm font-bold text-slate-900 dark:text-slate-100">{activeContact.fullName}</h2>
+						<p class="text-xs text-slate-500 dark:text-slate-400">@{activeContact.username}</p>
 					</div>
-				</div>
-				
-				<div class="flex gap-1">
-					<button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
-						<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-						</svg>
-					</button>
-					<button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
-						<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-						</svg>
-					</button>
-					<button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
-						<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-						</svg>
-					</button>
 				</div>
 			</div>
 
-			<!-- Messages Area -->
-			<div class="flex-1 overflow-y-auto p-4 space-y-4">
-				<div class="text-center my-4">
-					<span class="text-xs font-semibold text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">Today</span>
+			{#if errorText}
+				<div class="bg-red-50 text-red-600 px-4 py-2 text-sm text-center font-medium border-b border-red-100">
+					{errorText}
 				</div>
+			{/if}
+
+			<!-- Messages Area -->
+			<div class="flex-1 overflow-y-auto p-4 space-y-4" bind:this={messagesContainer}>
+				{#if messages.length === 0}
+					<div class="text-center my-4">
+						<span class="text-xs font-semibold text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">Kirim pesan pertama Anda</span>
+					</div>
+				{/if}
 				
 				{#each messages as msg}
 					<div class="flex {msg.isMine ? 'justify-end' : 'justify-start'}" transition:slide>

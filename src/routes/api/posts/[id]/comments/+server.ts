@@ -30,7 +30,12 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 	}
 
 	try {
-		const data = await request.json();
+		if (!locals.user) {
+			return json({ error: 'Unauthorized' }, { status: 401 });
+		}
+		
+		const body = await request.json();
+		const data = body;
 		const content = data.content?.trim();
 		const parentId = data.parentId;
 
@@ -47,9 +52,9 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 		return json({ 
 			comment: {
 				...comment.toJSON(),
-				authorName: locals.user.name,
+				authorName: locals.user.username,
 				authorUsername: locals.user.username,
-				authorProfilePicture: locals.user.profilePictureUrl
+				authorProfilePicture: null
 			}
 		});
 	} catch (error: any) {

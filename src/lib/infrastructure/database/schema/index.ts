@@ -7,5 +7,6 @@ export * from './commentLikes';
 export * from './savedComments';
 export * from './follows';
 export * from './notifications';
+export * from './messages';
 export * from './likes';
 export * from './comments';

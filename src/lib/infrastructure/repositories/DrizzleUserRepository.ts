@@ -25,7 +25,7 @@ export interface CreateUserData {
 
 export class DrizzleUserRepository implements IUserRepository {
 	private mapToEntity(row: typeof users.$inferSelect, roleNames: RoleNameType[]): User {
-		return new User({
+		return User.create({
 			id: row.id,
 			fullName: row.fullName,
 			email: Email.create(row.email),
