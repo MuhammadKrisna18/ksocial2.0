@@ -16,24 +16,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	const posts = await container.getUserPostsUseCase.execute(locals.user!.sub, locals.user!.sub);
 
-	// Load notifications
-	const rawNotifications = await container.getNotificationsUseCase.execute(user.id);
-	
-	// Map sender names for follow requests
-	const notifications = await Promise.all(
-		rawNotifications.map(async (n) => {
-			const sender = await container.userRepository.findById(n.senderId);
-			return {
-				id: n.id,
-				type: n.type,
-				senderId: n.senderId,
-				senderUsername: sender?.username?.toString(),
-				senderName: sender?.fullName,
-				read: n.read,
-				createdAt: n.createdAt
-			};
-		})
-	);
+	// Notifications are now loaded in the layout server
 
 	return {
 		user: locals.user,
@@ -49,8 +32,20 @@ export const load: PageServerLoad = async ({ locals }) => {
 			profilePictureUrl: user.profilePictureUrl,
 			coverPhotoUrl: user.coverPhotoUrl
 		},
-		posts: posts.map(p => p.toJSON()),
-		notifications
+		posts: posts.map(p => ({
+			id: p.id,
+			content: p.content,
+			media: p.media,
+			createdAt: p.createdAt,
+			authorName: p.authorName,
+			authorUsername: p.authorUsername.toString(),
+			authorProfilePicture: p.authorProfilePictureUrl,
+			isLiked: p.isLiked,
+			isSaved: p.isSaved,
+			likesCount: p.likesCount,
+			commentsCount: p.commentsCount
+		})),
+		isCurrentUser: locals.user?.sub === user.id
 	};
 };
 
@@ -247,48 +242,6 @@ export const actions: Actions = {
 			return { success: true };
 		} catch (error) {
 			return handleActionError(error, 'Failed to delete post');
-		}
-	},
-	acceptFollow: async ({ request, locals }) => {
-		const user = locals.user;
-		if (!user) throw redirect(302, '/auth/login');
-
-		const data = await request.formData();
-		const followerId = data.get('followerId')?.toString();
-		const notificationId = data.get('notificationId')?.toString();
-
-		if (!followerId) return fail(400, { message: 'Missing follower id' });
-
-		try {
-			await container.acceptFollowUseCase.execute({
-				followerId,
-				followingId: user.sub,
-				notificationId
-			});
-			return { success: true };
-		} catch (e: any) {
-			return fail(400, { message: e.message });
-		}
-	},
-	rejectFollow: async ({ request, locals }) => {
-		const user = locals.user;
-		if (!user) throw redirect(302, '/auth/login');
-
-		const data = await request.formData();
-		const followerId = data.get('followerId')?.toString();
-		const notificationId = data.get('notificationId')?.toString();
-
-		if (!followerId) return fail(400, { message: 'Missing follower id' });
-
-		try {
-			await container.rejectFollowUseCase.execute({
-				followerId,
-				followingId: user.sub,
-				notificationId
-			});
-			return { success: true };
-		} catch (e: any) {
-			return fail(400, { message: e.message });
 		}
 	}
 };

@@ -6,7 +6,7 @@ export interface GetFollowStatusDTO {
 }
 
 export interface FollowStatusResult {
-	status: 'none' | 'pending' | 'following' | 'friends';
+	status: 'none' | 'pending' | 'following' | 'friends' | 'follows_you';
 }
 
 export class GetFollowStatusUseCase {
@@ -17,6 +17,9 @@ export class GetFollowStatusUseCase {
 		const targetFollowsCurrent = await this.followRepo.findByUsers(dto.targetUser, dto.currentUser);
 
 		if (!currentFollowsTarget) {
+			if (targetFollowsCurrent?.status === 'accepted') {
+				return { status: 'follows_you' };
+			}
 			return { status: 'none' };
 		}
 

@@ -151,47 +151,7 @@
 		{:else}
 			<div class="space-y-16">
 				
-				<!-- Notifications Section -->
-				{#if data.notifications && data.notifications.length > 0}
-					<section>
-						<div class="mb-6 border-b border-slate-200 dark:border-slate-800 pb-4">
-							<h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-								<svg class="w-7 h-7 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-								</svg>
-								Notifications
-							</h2>
-						</div>
-
-						<div class="space-y-3">
-							{#each data.notifications as notif}
-								{#if notif.type === 'follow_request'}
-									<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between gap-4">
-										<div>
-											<p class="text-slate-900 dark:text-white font-medium">
-												<a href="/user/{notif.senderUsername}" class="font-bold hover:underline">{notif.senderName} (@{notif.senderUsername})</a>
-												requests to follow you.
-											</p>
-											<p class="text-xs text-slate-500 mt-1">{new Date(notif.createdAt).toLocaleString()}</p>
-										</div>
-										<div class="flex items-center gap-2">
-											<form method="POST" action="?/acceptFollow" use:enhance>
-												<input type="hidden" name="followerId" value={notif.senderId} />
-												<input type="hidden" name="notificationId" value={notif.id} />
-												<button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-full transition-colors">Accept</button>
-											</form>
-											<form method="POST" action="?/rejectFollow" use:enhance>
-												<input type="hidden" name="followerId" value={notif.senderId} />
-												<input type="hidden" name="notificationId" value={notif.id} />
-												<button class="px-4 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-full transition-colors">Reject</button>
-											</form>
-										</div>
-									</div>
-								{/if}
-							{/each}
-						</div>
-					</section>
-				{/if}
+				<!-- Notifications have been moved to the global header -->
 				
 				<!-- Personal Details Card (Read-only) -->
 				<section>
