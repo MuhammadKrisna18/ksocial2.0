@@ -3,15 +3,12 @@ import { container } from '$lib/infrastructure/config/container';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ locals }) => {
-	const user = locals.user;
-	if (!user) {
-		return json({ error: 'Unauthorized' }, { status: 401 });
-	}
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	try {
-		const contacts = await container.getChatContactsUseCase.execute(user.sub);
+		const contacts = await container.getChatContactsUseCase.execute(locals.user.sub);
 		return json({ contacts });
-	} catch (error: any) {
-		return json({ error: error.message }, { status: 500 });
+	} catch (error) {
+		return json({ error: error instanceof Error ? error.message : 'Failed to fetch contacts' }, { status: 500 });
 	}
 };

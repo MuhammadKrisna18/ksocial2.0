@@ -13,30 +13,27 @@ export class SendMessageUseCase {
 	) {}
 
 	async execute(senderId: string, receiverId: string, content: string): Promise<Message> {
-		if (senderId === receiverId) {
-			throw new Error("You cannot send a message to yourself.");
-		}
-		
-		const receiver = await this.userRepo.findById(receiverId);
-		if (!receiver) {
-			throw new Error("Receiver not found.");
+		if (!receiverId || senderId === receiverId) {
+			throw new Error('You cannot send a message to yourself.');
 		}
 
-		// Privacy Check
+		const cleanContent = content.trim();
+		if (!cleanContent) throw new Error('Message cannot be empty.');
+		if (cleanContent.length > 1000) throw new Error('Message is too long. Maximum 1000 characters.');
+
+		const receiver = await this.userRepo.findById(receiverId);
+		if (!receiver) throw new Error('Receiver not found.');
+
 		if (receiver.isPrivate && receiver.requireFollowForMessage) {
-			// Check if sender follows receiver and it's accepted
 			const followStatus = await this.followRepo.getFollowStatus(senderId, receiverId);
 			if (followStatus !== 'accepted') {
-				throw new Error("You must follow this user and be accepted to send a message.");
+				throw new Error('You must follow this user and be accepted to send a message.');
 			}
 		}
 
-		const message = Message.create(senderId, receiverId, content);
+		const message = Message.create(senderId, receiverId, cleanContent);
 		await this.messageRepo.save(message);
-
-		// Emit event for real-time (SSE) listening
-		eventDispatcher.dispatch('MessageSentEvent', new MessageSentEvent(message));
-
+		await eventDispatcher.dispatch('MessageSentEvent', new MessageSentEvent(message));
 		return message;
 	}
 }

@@ -12,7 +12,12 @@ export interface ChatContact {
 
 export interface IMessageRepository {
 	save(message: Message): Promise<void>;
-	findByParticipants(userId1: string, userId2: string, limit?: number, offset?: number): Promise<Message[]>;
+	findByParticipants(
+		userId1: string,
+		userId2: string,
+		limit?: number,
+		offset?: number
+	): Promise<Message[]>;
 	getContacts(userId: string): Promise<ChatContact[]>;
 	markAsRead(senderId: string, receiverId: string): Promise<void>;
 }

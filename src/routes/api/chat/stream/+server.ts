@@ -2,58 +2,50 @@ import { eventDispatcher } from '$lib/infrastructure/events/DomainEventDispatche
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = ({ locals }) => {
-	const user = locals.user;
-	
-	if (!user) {
-		return new Response('Unauthorized', { status: 401 });
-	}
+	if (!locals.user) return new Response('Unauthorized', { status: 401 });
 
-	const stream = new ReadableStream({
+	let cleanup = () => {};
+	const stream = new ReadableStream<Uint8Array>({
 		start(controller) {
-			// Define the handler
-			const messageHandler = (event: any) => {
-				const message = event.message;
-				// Send the message if the current user is the receiver OR the sender (for multi-tab sync)
-				if (message.receiverId === user.sub || message.senderId === user.sub) {
-					try {
-						const data = `data: ${JSON.stringify(message)}\n\n`;
-						controller.enqueue(new TextEncoder().encode(data));
-					} catch (e) {
-						// Stream might be closed
-					}
-				}
-			};
-
-			// Subscribe to MessageSentEvent
-			eventDispatcher.register('MessageSentEvent', messageHandler);
-
-			// Keep connection alive with periodic pings (prevent timeouts)
-			const intervalId = setInterval(() => {
-				try {
-					controller.enqueue(new TextEncoder().encode(':\n\n')); // comment in SSE
-				} catch (e) {
-					clearInterval(intervalId);
-				}
-			}, 30000); // 30 seconds
-
-			// Handle stream close
-			return () => {
+			const encoder = new TextEncoder();
+			let closed = false;
+			const close = () => {
+				if (closed) return;
+				closed = true;
 				clearInterval(intervalId);
 				eventDispatcher.unregister('MessageSentEvent', messageHandler);
 			};
+			const messageHandler = (event: any) => {
+				const message = event.message;
+				if (message.senderId !== locals.user?.sub && message.receiverId !== locals.user?.sub) return;
+				try {
+					controller.enqueue(encoder.encode(`event: message\ndata: ${JSON.stringify(message)}\n\n`));
+				} catch {
+					close();
+				}
+			};
+			eventDispatcher.register('MessageSentEvent', messageHandler);
+			const intervalId = setInterval(() => {
+				try {
+					controller.enqueue(encoder.encode(': keepalive\n\n'));
+				} catch {
+					close();
+				}
+			}, 25_000);
+			cleanup = close;
+			controller.enqueue(encoder.encode('retry: 3000\n\n'));
 		},
 		cancel() {
-			// Clean up when client disconnects
-			// The return function in start is automatically called, but sometimes cancel is triggered
-			// eventDispatcher.unregister('MessageSentEvent', messageHandler); is not easily accessible here unless we keep a ref
+			cleanup();
 		}
 	});
 
 	return new Response(stream, {
 		headers: {
-			'Content-Type': 'text/event-stream',
-			'Cache-Control': 'no-cache',
-			'Connection': 'keep-alive'
+			'Content-Type': 'text/event-stream; charset=utf-8',
+			'Cache-Control': 'no-cache, no-store, must-revalidate',
+			'Connection': 'keep-alive',
+			'X-Accel-Buffering': 'no'
 		}
 	});
 };
