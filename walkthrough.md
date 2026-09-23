@@ -66,3 +66,48 @@ svelte-check found 0 errors and 33 warnings in 11 files
 *(33 warnings adalah a11y & runes warning bawaan dari komponen Svelte template).*
 Semua route, use case, DTO, dan type boundary lulus tanpa ada satu pun error.
 Semua akses repository dari `src/routes/**` berhasil dieliminasi 100%.
+
+---
+
+# Walkthrough - Step 3: Pembersihan File Backend yang Tidak Terpakai (Dead Code Cleanup)
+
+Pembersihan file backend (*dead code* dan *scratch scripts*) pada K-Social telah selesai dieksekusi dengan hasil validasi **0 errors** pada `npm run check`.
+
+## 1. File yang Dihapus & Disesuaikan
+
+### A. Application Layer & DI Container
+- **Dihapus**:
+  - `src/lib/application/use-cases/user/DeleteAccountUseCase.ts`: Use case ini tidak pernah dipanggil di endpoint, halaman, maupun action mana pun.
+- **Diperbarui**:
+  - [`src/lib/infrastructure/config/container.ts`](file:///c:/Users/Muhammad%20Krisna/Documents/ProjectSerius/Project%20Sveltekit%28FULLSTACK%29/ksocial2.0-main/src/lib/infrastructure/config/container.ts): Menghapus import `DeleteAccountUseCase` dan getter `deleteAccountUseCase`.
+
+### B. Legacy Route API Layer
+Autentikasi pada K-Social saat ini telah sepenuhnya berpindah ke SvelteKit Form Actions yang idiomatik (`src/routes/(auth)/login/+page.server.ts` dan `src/routes/(auth)/register/+page.server.ts`), sehingga seluruh REST API auth yang tidak pernah dipanggil oleh client dihapus:
+- **Dihapus**:
+  - `src/routes/api/auth/login/+server.ts`
+  - `src/routes/api/auth/register/+server.ts`
+  - `src/routes/api/auth/logout/+server.ts`
+  - `src/routes/api/auth/me/+server.ts`
+  - Direktori `src/routes/api/auth/` (kini bersih/dihapus).
+
+### C. Scratch / Debug Test Scripts di Root
+File-file uji coba koneksi database Postgres/Drizzle ad-hoc yang tertinggal di root directory telah dibersihkan:
+- **Dihapus**:
+  - `test_db.ts`
+  - `check_db.ts`
+  - `test_pg.js`
+
+## 2. Hasil Verifikasi
+
+Jalankan pemeriksaan type-safety TypeScript dan SvelteKit:
+```bash
+npm run check
+```
+
+**Hasil:**
+```
+svelte-check found 0 errors and 33 warnings in 10 files
+```
+*(33 warnings adalah a11y & runes warning bawaan dari komponen Svelte template).*
+Semua rute, use cases, entities, repositories, dan database schemas tetap utuh dan valid tanpa error kompilasi.
+

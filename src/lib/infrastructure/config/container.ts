@@ -11,7 +11,6 @@ import { ValidateTokenUseCase } from '$lib/application/use-cases/auth/ValidateTo
 import { UpdateUserUseCase } from '$lib/application/use-cases/user/UpdateUserUseCase';
 import { GetDashboardStatsUseCase } from '$lib/application/use-cases/user/GetDashboardStatsUseCase';
 import { GetUsersUseCase } from '$lib/application/use-cases/user/GetUsersUseCase';
-import { DeleteAccountUseCase } from '$lib/application/use-cases/user/DeleteAccountUseCase';
 import { CreatePostUseCase } from '$lib/application/use-cases/post/CreatePostUseCase';
 import { GetFeedUseCase } from '$lib/application/use-cases/post/GetFeedUseCase';
 import { ToggleSavePostUseCase } from '$lib/application/use-cases/post/ToggleSavePostUseCase';
@@ -151,9 +150,6 @@ class Container {
 		return new GetUsersUseCase(this.userRepository);
 	}
 
-	get deleteAccountUseCase(): DeleteAccountUseCase {
-		return new DeleteAccountUseCase(this.userRepository);
-	}
 
 	get createPostUseCase(): CreatePostUseCase {
 		return new CreatePostUseCase(this.postRepository);
