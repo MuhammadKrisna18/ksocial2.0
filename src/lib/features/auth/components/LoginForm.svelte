@@ -49,16 +49,16 @@
 
 	<div class="mb-5 relative group">
 		<label for="email" class="mb-1.5 block text-sm font-semibold text-slate-700 transition-colors group-focus-within:text-primary-600">
-			Email
+			Email or Username
 		</label>
 		<input
 			id="email"
 			name="email"
-			type="email"
+			type="text"
 			value={form?.email ?? ''}
 			required
-			autocomplete="email"
-			placeholder="you@example.com"
+			autocomplete="username"
+			placeholder="you@example.com or username"
 			class="w-full rounded-xl border border-slate-200 bg-white/70 px-4 py-3 text-sm text-slate-800 outline-none transition-all duration-300 placeholder:text-slate-400
 				focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-500/20 focus:shadow-md
 				hover:border-slate-300 hover:bg-white/90
@@ -72,7 +72,7 @@
 			<label for="password" class="block text-sm font-semibold text-slate-700 transition-colors group-focus-within:text-primary-600">
 				Password
 			</label>
-			<a href="#" class="text-xs font-semibold text-primary-600 hover:text-primary-700 transition-colors">Forgot password?</a>
+			<span class="text-xs font-semibold text-primary-600 hover:text-primary-700 cursor-pointer transition-colors">Forgot password?</span>
 		</div>
 		<input
 			id="password"

@@ -1,4 +1,5 @@
 import { Email } from '$lib/domain/value-objects/Email';
+import type { User } from '$lib/domain/entities/User';
 import type { IUserRepository } from '$lib/domain/repositories/IUserRepository';
 import type { IHashService } from '$lib/application/interfaces/IHashService';
 import type { ITokenService } from '$lib/application/interfaces/ITokenService';
@@ -13,9 +14,20 @@ export class LoginUseCase {
 	) {}
 
 	async execute(dto: LoginDTO): Promise<AuthResponseDTO> {
-		const email = Email.create(dto.email);
+		const identifier = dto.email.trim();
+		let user: User | null = null;
 
-		const user = await this.userRepo.findByEmail(email.toString());
+		if (identifier.includes('@')) {
+			try {
+				const email = Email.create(identifier);
+				user = await this.userRepo.findByEmail(email.toString());
+			} catch {
+				throw new AuthenticationError('Invalid credentials');
+			}
+		} else {
+			user = await this.userRepo.findByUsername(identifier);
+		}
+
 		if (!user) {
 			throw new AuthenticationError('Invalid credentials');
 		}
