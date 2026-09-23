@@ -1,4 +1,4 @@
-import type { Handle } from '@sveltejs/kit';
+import type { Handle, HandleServerError } from '@sveltejs/kit';
 import { container } from '$lib/infrastructure/config/container';
 import type { RoleNameType } from '$lib/domain/value-objects/RoleName';
 
@@ -81,7 +81,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 		transformPageChunk: ({ html }) => html.replace('%sveltekit.html.attributes%', `class="${theme}"`)
 	});
 
-
 	if (!PUBLIC_ROUTES.has(pathname)) {
 		response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
 		response.headers.set('Pragma', 'no-cache');
@@ -90,3 +89,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	return response;
 };
+
+export const handleError: HandleServerError = ({ error, event }) => {
+	console.error('[SERVER ERROR]', event.url.pathname, error);
+	return {
+		message: error instanceof Error ? error.message : 'Internal Error'
+	};
+};
+
+
