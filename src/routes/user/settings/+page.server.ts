@@ -10,13 +10,16 @@ export const load: PageServerLoad = async ({ locals }) => {
 		throw redirect(302, '/auth/login');
 	}
 
-	const user = await container.userRepository.findById(userId);
-	
-	
+	let user = null;
+	try {
+		user = await container.getUserByIdUseCase.execute(userId);
+	} catch {
+		throw redirect(302, '/auth/login');
+	}
 
 	return {
-		isPrivate: user?.isPrivate ?? false,
-		requireFollowForMessage: user?.requireFollowForMessage ?? false,
+		isPrivate: user.isPrivate ?? false,
+		requireFollowForMessage: user.requireFollowForMessage ?? false,
 		userId
 	};
 };

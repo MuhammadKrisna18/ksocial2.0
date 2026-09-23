@@ -1,15 +1,15 @@
 import { Email } from '$lib/domain/value-objects/Email';
 import type { IUserRepository } from '$lib/domain/repositories/IUserRepository';
-import type { HashService } from '$lib/infrastructure/external-services/HashService';
-import type { TokenService } from '$lib/infrastructure/external-services/TokenService';
+import type { IHashService } from '$lib/application/interfaces/IHashService';
+import type { ITokenService } from '$lib/application/interfaces/ITokenService';
 import { AuthenticationError } from '$lib/application/exceptions';
 import type { LoginDTO, AuthResponseDTO } from '$lib/application/dtos/auth.dto';
 
 export class LoginUseCase {
 	constructor(
 		private readonly userRepo: IUserRepository,
-		private readonly hashService: HashService,
-		private readonly tokenService: TokenService
+		private readonly hashService: IHashService,
+		private readonly tokenService: ITokenService
 	) {}
 
 	async execute(dto: LoginDTO): Promise<AuthResponseDTO> {

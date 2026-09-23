@@ -1,17 +1,15 @@
 import type { ICommentRepository } from '$lib/domain/repositories/ICommentRepository';
 import type { IPostRepository } from '$lib/domain/repositories/IPostRepository';
+import type { IEventDispatcher } from '$lib/application/interfaces/IEventDispatcher';
 import { Comment } from '$lib/domain/entities/Comment';
-import { db } from '$lib/infrastructure/database/client';
-import { posts } from '$lib/infrastructure/database/schema/posts';
-import { eq, sql } from 'drizzle-orm';
-import crypto from 'crypto';
-import { eventDispatcher } from '$lib/infrastructure/events/DomainEventDispatcher';
 import { PostCommentedEvent } from '$lib/domain/events/PostCommentedEvent';
+import crypto from 'crypto';
 
 export class AddCommentUseCase {
 	constructor(
 		private readonly commentRepository: ICommentRepository,
-		private readonly postRepository: IPostRepository
+		private readonly postRepository: IPostRepository,
+		private readonly eventDispatcher: IEventDispatcher
 	) {}
 
 	async execute(userId: string, postId: string, content: string, parentId?: string): Promise<Comment> {
@@ -25,14 +23,11 @@ export class AddCommentUseCase {
 		});
 
 		await this.commentRepository.addComment(comment);
-		
-		await db.update(posts)
-			.set({ commentsCount: sql`${posts.commentsCount} + 1` })
-			.where(eq(posts.id, postId));
+		await this.postRepository.incrementComments(postId);
 
 		const post = await this.postRepository.findById(postId);
 		if (post) {
-			await eventDispatcher.dispatch('PostCommentedEvent', new PostCommentedEvent(userId, post.authorId, postId, comment.id));
+			await this.eventDispatcher.dispatch('PostCommentedEvent', new PostCommentedEvent(userId, post.authorId, postId, comment.id));
 		}
 
 		return comment;

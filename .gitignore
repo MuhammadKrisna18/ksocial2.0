@@ -79,7 +79,11 @@ Desktop.ini
 /blob-report
 
 # ===========================
-# Misc
+# Misc & Uploads
 # ===========================
 *.tsbuildinfo
 .cache/
+check_result.txt
+/static/uploads/*
+!/static/uploads/.gitkeep
+!/static/uploads/posts/.gitkeep

@@ -2,20 +2,20 @@ import { randomUUID } from 'crypto';
 import { Email } from '$lib/domain/value-objects/Email';
 import { Password } from '$lib/domain/value-objects/Password';
 import { Username } from '$lib/domain/value-objects/Username';
+import { DEFAULT_USER_ROLE } from '$lib/domain/value-objects/RoleName';
 import type { IUserRepository } from '$lib/domain/repositories/IUserRepository';
 import type { IRoleRepository } from '$lib/domain/repositories/IRoleRepository';
-import type { HashService } from '$lib/infrastructure/external-services/HashService';
-import type { TokenService } from '$lib/infrastructure/external-services/TokenService';
+import type { IHashService } from '$lib/application/interfaces/IHashService';
+import type { ITokenService } from '$lib/application/interfaces/ITokenService';
 import type { RegisterDTO, AuthResponseDTO } from '$lib/application/dtos/auth.dto';
 import { ConflictError, NotFoundError } from '$lib/application/exceptions';
-import { DEFAULT_USER_ROLE } from '$lib/infrastructure/config/constants';
 
 export class RegisterUseCase {
 	constructor(
 		private readonly userRepo: IUserRepository,
 		private readonly roleRepo: IRoleRepository,
-		private readonly hashService: HashService,
-		private readonly tokenService: TokenService
+		private readonly hashService: IHashService,
+		private readonly tokenService: ITokenService
 	) {}
 
 	async execute(dto: RegisterDTO): Promise<AuthResponseDTO> {

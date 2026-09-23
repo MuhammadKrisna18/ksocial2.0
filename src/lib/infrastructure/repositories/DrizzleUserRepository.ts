@@ -1,27 +1,13 @@
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, or, ilike } from 'drizzle-orm';
 import { db } from '$lib/infrastructure/database/client';
 import { users, roles, userRoles } from '$lib/infrastructure/database/schema/index';
 import { User } from '$lib/domain/entities/User';
-import type { IUserRepository } from '$lib/domain/repositories/IUserRepository';
+import type { IUserRepository, CreateUserData, UserSearchResult } from '$lib/domain/repositories/IUserRepository';
 import type { RoleNameType } from '$lib/domain/value-objects/RoleName';
 import { Email } from '$lib/domain/value-objects/Email';
 import { Username } from '$lib/domain/value-objects/Username';
 
-export interface CreateUserData {
-	id: string;
-	fullName: string;
-	email: string;
-	username: string;
-	passwordHash: string;
-	dateOfBirth: Date;
-	roleIds: string[];
-	isPrivate?: boolean;
-	profilePictureUrl?: string | null;
-	coverPhotoUrl?: string | null;
-	location?: string | null;
-	relationshipStatus?: string | null;
-	requireFollowForMessage?: boolean;
-}
+export type { CreateUserData };
 
 export class DrizzleUserRepository implements IUserRepository {
 	private mapToEntity(row: typeof users.$inferSelect, roleNames: RoleNameType[]): User {
@@ -202,4 +188,29 @@ export class DrizzleUserRepository implements IUserRepository {
 			return this.mapToEntity(row, roleNames);
 		});
 	}
+
+	async search(query: string, currentUserId: string, limit = 10): Promise<UserSearchResult[]> {
+		if (!query || query.trim().length === 0) return [];
+
+		const searchPattern = `%${query.trim()}%`;
+
+		const results = await db
+			.select({
+				id: users.id,
+				username: users.username,
+				fullName: users.fullName,
+				profilePictureUrl: users.profilePictureUrl
+			})
+			.from(users)
+			.where(
+				or(
+					ilike(users.username, searchPattern),
+					ilike(users.fullName, searchPattern)
+				)
+			)
+			.limit(limit);
+
+		return results;
+	}
 }
+

@@ -1,8 +1,7 @@
 import type { IDomainEvent } from '$lib/domain/events/IDomainEvent';
+import type { IEventDispatcher, EventHandler } from '$lib/application/interfaces/IEventDispatcher';
 
-type EventHandler<T extends IDomainEvent> = (event: T) => void | Promise<void>;
-
-export class DomainEventDispatcher {
+export class DomainEventDispatcher implements IEventDispatcher {
 	private static instance: DomainEventDispatcher;
 	private handlers: Map<string, EventHandler<any>[]> = new Map();
 

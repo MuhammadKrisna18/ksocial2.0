@@ -1,6 +1,6 @@
 import type { User } from '$lib/domain/entities/User';
 
-interface CreateUserData {
+export interface CreateUserData {
 	id: string;
 	fullName: string;
 	email: string;
@@ -9,10 +9,18 @@ interface CreateUserData {
 	dateOfBirth: Date;
 	roleIds: string[];
 	isPrivate?: boolean;
+	requireFollowForMessage?: boolean;
 	profilePictureUrl?: string | null;
 	coverPhotoUrl?: string | null;
 	location?: string | null;
 	relationshipStatus?: string | null;
+}
+
+export interface UserSearchResult {
+	id: string;
+	username: string;
+	fullName: string;
+	profilePictureUrl: string | null;
 }
 
 export interface IUserRepository {
@@ -26,4 +34,5 @@ export interface IUserRepository {
 	delete(id: string): Promise<void>;
 	count(): Promise<number>;
 	findAll(): Promise<User[]>;
+	search(query: string, currentUserId: string, limit?: number): Promise<UserSearchResult[]>;
 }

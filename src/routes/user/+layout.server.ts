@@ -9,35 +9,19 @@ export const load = async ({ locals }) => {
 	let notifications: any[] = [];
 	let currentUser = null;
 	try {
-		const userEntity = await container.userRepository.findById(locals.user.sub);
+		const userEntity = await container.getUserByIdUseCase.execute(locals.user.sub);
 		if (userEntity) {
 			currentUser = {
 				id: userEntity.id,
-				username: userEntity.username.toString(),
+				username: userEntity.username,
 				fullName: userEntity.fullName,
 				profilePictureUrl: userEntity.profilePictureUrl
 			};
 		}
 
-		const rawNotifications = await container.getNotificationsUseCase.execute(locals.user.sub);
-		
-		notifications = await Promise.all(
-			rawNotifications.map(async (n) => {
-				const sender = await container.userRepository.findById(n.senderId);
-				return {
-					id: n.id,
-					type: n.type,
-					senderId: n.senderId,
-					senderUsername: sender?.username?.toString(),
-					senderName: sender?.fullName,
-					resourceId: n.resourceId,
-					read: n.read,
-					createdAt: n.createdAt
-				};
-			})
-		);
+		notifications = await container.getNotificationsUseCase.execute(locals.user.sub);
 	} catch (err) {
-		console.error('Failed to load notifications in layout:', err);
+		console.error('Failed to load user or notifications in layout:', err);
 	}
 
 	return {

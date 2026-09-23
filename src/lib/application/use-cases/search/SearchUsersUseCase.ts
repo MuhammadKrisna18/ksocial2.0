@@ -1,29 +1,10 @@
-import { db } from '$lib/infrastructure/database/client';
-import { users } from '$lib/infrastructure/database/schema/users';
-import { or, ilike, eq, not } from 'drizzle-orm';
+import type { IUserRepository, UserSearchResult } from '$lib/domain/repositories/IUserRepository';
 
 export class SearchUsersUseCase {
-	async execute(query: string, currentUserId: string): Promise<any[]> {
+	constructor(private readonly userRepository: IUserRepository) {}
+
+	async execute(query: string, currentUserId: string): Promise<UserSearchResult[]> {
 		if (!query || query.trim().length === 0) return [];
-		
-		const searchPattern = `%${query.trim()}%`;
-		
-		const results = await db
-			.select({
-				id: users.id,
-				username: users.username,
-				fullName: users.fullName,
-				profilePictureUrl: users.profilePictureUrl
-			})
-			.from(users)
-			.where(
-				or(
-					ilike(users.username, searchPattern),
-					ilike(users.fullName, searchPattern)
-				)
-			)
-			.limit(10);
-			
-		return results;
+		return this.userRepository.search(query, currentUserId, 10);
 	}
 }

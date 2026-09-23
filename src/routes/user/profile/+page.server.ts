@@ -6,42 +6,36 @@ import { localFileStorage, postFileStorage } from '$lib/infrastructure/storage/L
 import crypto from 'crypto';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	// User is guaranteed to exist due to hooks.server.ts protection
-	const user = await container.userRepository.findById(locals.user!.sub);
-	
-	if (!user) {
-		// Edge case: token is valid but user deleted from DB
+	let profile;
+	try {
+		profile = await container.getUserProfileUseCase.execute({
+			targetUserId: locals.user!.sub,
+			currentUserId: locals.user!.sub
+		});
+	} catch {
 		throw redirect(302, '/auth/login');
 	}
 
 	const posts = await container.getUserPostsUseCase.execute(locals.user!.sub, locals.user!.sub);
 
-	// Get followers and following counts
-	const followers = await container.followRepository.getFollowers(locals.user!.sub);
-	const following = await container.followRepository.getFollowing(locals.user!.sub);
-	const followersCount = followers.filter(f => f.status === 'accepted').length;
-	const followingCount = following.filter(f => f.status === 'accepted').length;
-
-	// Notifications are now loaded in the layout server
-
 	return {
 		user: locals.user,
 		profile: {
-			id: user.id,
-			fullName: user.fullName,
-			username: user.username.toString(),
-			email: user.email.toString(),
-			dateOfBirth: user.dateOfBirth.toISOString().split('T')[0], // Format for input type="date"
-			location: user.location,
-			relationshipStatus: user.relationshipStatus,
-			isPrivate: user.isPrivate,
-			profilePictureUrl: user.profilePictureUrl,
-			coverPhotoUrl: user.coverPhotoUrl,
-			followersCount,
-			followingCount
+			id: profile.id,
+			fullName: profile.fullName,
+			username: profile.username,
+			email: profile.email,
+			dateOfBirth: profile.dateOfBirth.toISOString().split('T')[0], // Format for input type="date"
+			location: profile.location,
+			relationshipStatus: profile.relationshipStatus,
+			isPrivate: profile.isPrivate,
+			profilePictureUrl: profile.profilePictureUrl,
+			coverPhotoUrl: profile.coverPhotoUrl,
+			followersCount: profile.followersCount,
+			followingCount: profile.followingCount
 		},
-		posts: posts.map(p => p.toJSON()),
-		isCurrentUser: locals.user?.sub === user.id
+		posts,
+		isCurrentUser: true
 	};
 };
 
@@ -170,7 +164,7 @@ export const actions: Actions = {
 
 	deleteProfilePicture: async ({ locals }) => {
 		try {
-			const user = await container.userRepository.findById(locals.user!.sub);
+			const user = await container.getUserByIdUseCase.execute(locals.user!.sub);
 			if (user?.profilePictureUrl) {
 				await localFileStorage.deleteFileByUrl(user.profilePictureUrl);
 			}
@@ -188,7 +182,7 @@ export const actions: Actions = {
 
 	deleteCoverPhoto: async ({ locals }) => {
 		try {
-			const user = await container.userRepository.findById(locals.user!.sub);
+			const user = await container.getUserByIdUseCase.execute(locals.user!.sub);
 			if (user?.coverPhotoUrl) {
 				await localFileStorage.deleteFileByUrl(user.coverPhotoUrl);
 			}

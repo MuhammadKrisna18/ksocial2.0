@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { container } from '$lib/infrastructure/config/container';
+import { handleApplicationError } from '$lib/presentation/utils/response';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params, request, locals }) => {
@@ -16,7 +17,7 @@ export const GET: RequestHandler = async ({ params, request, locals }) => {
 		const messages = await container.getMessagesUseCase.execute(locals.user.sub, targetUserId, limit, offset);
 		return json({ messages, limit, offset });
 	} catch (error) {
-		return json({ error: error instanceof Error ? error.message : 'Failed to fetch messages' }, { status: 400 });
+		return handleApplicationError(error, 'Failed to fetch messages');
 	}
 };
 
@@ -38,8 +39,6 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 		const message = await container.sendMessageUseCase.execute(locals.user.sub, params.userId, content);
 		return json({ message }, { status: 201 });
 	} catch (error) {
-		const message = error instanceof Error ? error.message : 'Failed to send message';
-		const status = message.includes('follow') || message.includes('accepted') ? 403 : 400;
-		return json({ error: message }, { status });
+		return handleApplicationError(error, 'Failed to send message');
 	}
 };

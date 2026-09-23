@@ -43,71 +43,78 @@ import { SearchUsersUseCase } from '$lib/application/use-cases/search/SearchUser
 import { GetMessagesUseCase } from '$lib/application/use-cases/chat/GetMessagesUseCase';
 import { SendMessageUseCase } from '$lib/application/use-cases/chat/SendMessageUseCase';
 import { GetChatContactsUseCase } from '$lib/application/use-cases/chat/GetChatContactsUseCase';
+import { UnfollowUserUseCase } from '$lib/application/use-cases/follow/UnfollowUserUseCase';
+import { GetUserProfileUseCase } from '$lib/application/use-cases/user/GetUserProfileUseCase';
+import { GetUserByIdUseCase } from '$lib/application/use-cases/user/GetUserByIdUseCase';
 
 class Container {
-	// --- Services & Repositories (Singletons) ---
+	constructor() {
+		this.initEventHandlers();
+	}
+
+	// --- Services & Repositories (Singletons, encapsulated) ---
 	private _hashService?: HashService;
-	get hashService(): HashService {
+	private get hashService(): HashService {
 		if (!this._hashService) this._hashService = new HashService();
 		return this._hashService;
 	}
 
 	private _tokenService?: TokenService;
-	get tokenService(): TokenService {
+	private get tokenService(): TokenService {
 		if (!this._tokenService) this._tokenService = new TokenService();
 		return this._tokenService;
 	}
 
 	private _userRepository?: DrizzleUserRepository;
-	get userRepository(): DrizzleUserRepository {
+	private get userRepository(): DrizzleUserRepository {
 		if (!this._userRepository) this._userRepository = new DrizzleUserRepository();
 		return this._userRepository;
 	}
 
 	private _roleRepository?: DrizzleRoleRepository;
-	get roleRepository(): DrizzleRoleRepository {
+	private get roleRepository(): DrizzleRoleRepository {
 		if (!this._roleRepository) this._roleRepository = new DrizzleRoleRepository();
 		return this._roleRepository;
 	}
 
 	private _postRepository?: DrizzlePostRepository;
-	get postRepository(): DrizzlePostRepository {
+	private get postRepository(): DrizzlePostRepository {
 		if (!this._postRepository) this._postRepository = new DrizzlePostRepository();
 		return this._postRepository;
 	}
 
 	private _followRepository?: DrizzleFollowRepository;
-	get followRepository(): DrizzleFollowRepository {
+	private get followRepository(): DrizzleFollowRepository {
 		if (!this._followRepository) this._followRepository = new DrizzleFollowRepository();
 		return this._followRepository;
 	}
 
 	private _notificationRepository?: DrizzleNotificationRepository;
-	get notificationRepository(): DrizzleNotificationRepository {
+	private get notificationRepository(): DrizzleNotificationRepository {
 		if (!this._notificationRepository) this._notificationRepository = new DrizzleNotificationRepository();
 		return this._notificationRepository;
 	}
 
 	private _likeRepository?: DrizzleLikeRepository;
-	get likeRepository(): DrizzleLikeRepository {
+	private get likeRepository(): DrizzleLikeRepository {
 		if (!this._likeRepository) this._likeRepository = new DrizzleLikeRepository();
 		return this._likeRepository;
 	}
 
 	private _commentRepository?: DrizzleCommentRepository;
-	get commentRepository(): DrizzleCommentRepository {
+	private get commentRepository(): DrizzleCommentRepository {
 		if (!this._commentRepository) this._commentRepository = new DrizzleCommentRepository();
 		return this._commentRepository;
 	}
 
 	private _messageRepository?: DrizzleMessageRepository;
-	get messageRepository(): DrizzleMessageRepository {
+	private get messageRepository(): DrizzleMessageRepository {
 		if (!this._messageRepository) this._messageRepository = new DrizzleMessageRepository();
 		return this._messageRepository;
 	}
 
 	private _notificationEventHandler?: NotificationEventHandler;
-	get notificationEventHandler(): NotificationEventHandler {
+	private initEventHandlers(): void {
 		if (!this._notificationEventHandler) {
 			this._notificationEventHandler = new NotificationEventHandler(this.notificationRepository);
 			
@@ -116,7 +123,6 @@ class Container {
 			eventDispatcher.register('PostLikedEvent', (event: any) => this._notificationEventHandler!.handlePostLiked(event));
 			eventDispatcher.register('PostCommentedEvent', (event: any) => this._notificationEventHandler!.handlePostCommented(event));
 		}
-		return this._notificationEventHandler;
 	}
 
 	// --- Use Cases (Lazy instantiated) ---
@@ -189,11 +195,11 @@ class Container {
 	}
 
 	get toggleLikeUseCase(): ToggleLikeUseCase {
-		return new ToggleLikeUseCase(this.likeRepository, this.postRepository);
+		return new ToggleLikeUseCase(this.likeRepository, this.postRepository, eventDispatcher);
 	}
 
 	get addCommentUseCase(): AddCommentUseCase {
-		return new AddCommentUseCase(this.commentRepository, this.postRepository);
+		return new AddCommentUseCase(this.commentRepository, this.postRepository, eventDispatcher);
 	}
 
 	get getCommentsUseCase(): GetCommentsUseCase {
@@ -217,11 +223,15 @@ class Container {
 	}
 
 	get followUserUseCase(): FollowUserUseCase {
-		return new FollowUserUseCase(this.followRepository, this.userRepository);
+		return new FollowUserUseCase(this.followRepository, this.userRepository, eventDispatcher);
+	}
+
+	get unfollowUserUseCase(): UnfollowUserUseCase {
+		return new UnfollowUserUseCase(this.followRepository, this.userRepository);
 	}
 
 	get acceptFollowUseCase(): AcceptFollowUseCase {
-		return new AcceptFollowUseCase(this.followRepository);
+		return new AcceptFollowUseCase(this.followRepository, eventDispatcher);
 	}
 
 	get rejectFollowUseCase(): RejectFollowUseCase {
@@ -232,8 +242,16 @@ class Container {
 		return new GetFollowStatusUseCase(this.followRepository);
 	}
 
+	get getUserProfileUseCase(): GetUserProfileUseCase {
+		return new GetUserProfileUseCase(this.userRepository, this.followRepository);
+	}
+
+	get getUserByIdUseCase(): GetUserByIdUseCase {
+		return new GetUserByIdUseCase(this.userRepository);
+	}
+
 	get getNotificationsUseCase(): GetNotificationsUseCase {
-		return new GetNotificationsUseCase(this.notificationRepository);
+		return new GetNotificationsUseCase(this.notificationRepository, this.userRepository);
 	}
 
 	get getMessagesUseCase(): GetMessagesUseCase {
@@ -241,7 +259,7 @@ class Container {
 	}
 
 	get sendMessageUseCase(): SendMessageUseCase {
-		return new SendMessageUseCase(this.messageRepository, this.userRepository, this.followRepository);
+		return new SendMessageUseCase(this.messageRepository, this.userRepository, this.followRepository, eventDispatcher);
 	}
 
 	get getChatContactsUseCase(): GetChatContactsUseCase {
@@ -249,12 +267,9 @@ class Container {
 	}
 
 	get searchUsersUseCase(): SearchUsersUseCase {
-		return new SearchUsersUseCase();
+		return new SearchUsersUseCase(this.userRepository);
 	}
 }
 
 export const container = new Container();
-
-// Initialize event handlers
-container.notificationEventHandler;
 

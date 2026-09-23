@@ -11,7 +11,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	try {
 		const userId = locals.user?.sub;
 		const comments = await container.getCommentsUseCase.execute(postId, userId);
-		return json({ comments: comments.map(c => c.toJSON()) });
+		return json({ comments });
 	} catch (error: any) {
 		console.error('Get comments error:', error);
 		return json({ error: 'Failed to get comments' }, { status: 500 });

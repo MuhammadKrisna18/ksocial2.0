@@ -1,10 +1,7 @@
-import { error, redirect } from '@sveltejs/kit';
+import { error, redirect, fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { container } from '$lib/infrastructure/config/container';
-import { db } from '$lib/infrastructure/database/client';
-import { users } from '$lib/infrastructure/database/schema/users';
-import { eq } from 'drizzle-orm';
-import { fail } from '@sveltejs/kit';
+import { handleActionError } from '$lib/presentation/utils/response';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const currentUserId = locals.user?.sub;
@@ -14,81 +11,73 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	const username = params.username;
 
-	// Check if the user is trying to view their own profile
-	const currentUser = await container.userRepository.findById(currentUserId);
-	if (currentUser?.username.toString() === username) {
-		throw redirect(302, '/user/profile');
-	}
-
-	const targetUser = await container.userRepository.findByUsername(username);
-	if (!targetUser) {
+	let targetProfile;
+	try {
+		targetProfile = await container.getUserProfileUseCase.execute({
+			targetUsername: username,
+			currentUserId
+		});
+	} catch (err) {
 		throw error(404, 'User not found');
 	}
 
-	const followStatus = await container.getFollowStatusUseCase.execute({
-		currentUser: currentUserId,
-		targetUser: targetUser.id
-	});
+	// Check if the user is trying to view their own profile
+	if (targetProfile.isCurrentUser) {
+		throw redirect(302, '/user/profile');
+	}
 
-	// Get posts (only if they are friends, or if targetUser is public, or we just want to show them anyway if they are friends)
-	// Usually, if private and not friends, posts are hidden.
-	const canViewPosts = !targetUser.isPrivate || followStatus.status === 'friends';
-	
 	let posts: any[] = [];
-	if (canViewPosts) {
-		posts = await container.getUserPostsUseCase.execute(currentUserId, targetUser.id);
+	if (targetProfile.canViewPosts) {
+		posts = await container.getUserPostsUseCase.execute(currentUserId, targetProfile.id);
 	}
 
 	return {
 		user: locals.user,
 		targetProfile: {
-			id: targetUser.id,
-			username: targetUser.username.toString(),
-			fullName: targetUser.fullName,
-			profilePictureUrl: targetUser.profilePictureUrl,
-			coverPhotoUrl: targetUser.coverPhotoUrl,
-			location: targetUser.location,
-			relationshipStatus: targetUser.relationshipStatus,
-			isPrivate: targetUser.isPrivate,
-			createdAt: targetUser.createdAt
+			id: targetProfile.id,
+			username: targetProfile.username,
+			fullName: targetProfile.fullName,
+			profilePictureUrl: targetProfile.profilePictureUrl,
+			coverPhotoUrl: targetProfile.coverPhotoUrl,
+			location: targetProfile.location,
+			relationshipStatus: targetProfile.relationshipStatus,
+			isPrivate: targetProfile.isPrivate,
+			createdAt: targetProfile.createdAt
 		},
-		followStatus: followStatus.status,
-		canViewPosts,
-		posts: posts.map(p => (typeof p.toJSON === 'function' ? p.toJSON() : p))
+		followStatus: targetProfile.followStatus,
+		canViewPosts: targetProfile.canViewPosts,
+		posts
 	};
 };
 
 export const actions: Actions = {
-	follow: async ({ request, locals, params }) => {
+	follow: async ({ locals, params }) => {
 		const currentUserId = locals.user?.sub;
 		if (!currentUserId) throw redirect(302, '/auth/login');
-
-		const targetUser = await container.userRepository.findByUsername(params.username);
-		if (!targetUser) return fail(404, { message: 'User not found' });
 
 		try {
 			await container.followUserUseCase.execute({
 				followerId: currentUserId,
-				followingId: targetUser.id
+				followingUsername: params.username
 			});
 			return { success: true };
 		} catch (e: any) {
-			return fail(400, { message: e.message });
+			return handleActionError(e, 'Failed to follow user');
 		}
 	},
 
-	unfollow: async ({ request, locals, params }) => {
+	unfollow: async ({ locals, params }) => {
 		const currentUserId = locals.user?.sub;
 		if (!currentUserId) throw redirect(302, '/auth/login');
 
-		const targetUser = await container.userRepository.findByUsername(params.username);
-		if (!targetUser) return fail(404, { message: 'User not found' });
-
 		try {
-			await container.followRepository.delete(currentUserId, targetUser.id);
+			await container.unfollowUserUseCase.execute({
+				followerId: currentUserId,
+				followingUsername: params.username
+			});
 			return { success: true };
 		} catch (e: any) {
-			return fail(400, { message: e.message });
+			return handleActionError(e, 'Failed to unfollow user');
 		}
 	},
 	
@@ -109,7 +98,7 @@ export const actions: Actions = {
 			await container.toggleSavePostUseCase.execute(user.sub, postId);
 			return { success: true };
 		} catch (err: any) {
-			return fail(400, { success: false, message: err.message });
+			return handleActionError(err, 'Failed to toggle save post');
 		}
 	}
 };

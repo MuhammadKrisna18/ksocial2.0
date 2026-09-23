@@ -1,15 +1,13 @@
 import type { ILikeRepository } from '$lib/domain/repositories/ILikeRepository';
 import type { IPostRepository } from '$lib/domain/repositories/IPostRepository';
-import { db } from '$lib/infrastructure/database/client';
-import { posts } from '$lib/infrastructure/database/schema/posts';
-import { eq, sql } from 'drizzle-orm';
-import { eventDispatcher } from '$lib/infrastructure/events/DomainEventDispatcher';
+import type { IEventDispatcher } from '$lib/application/interfaces/IEventDispatcher';
 import { PostLikedEvent } from '$lib/domain/events/PostLikedEvent';
 
 export class ToggleLikeUseCase {
 	constructor(
 		private readonly likeRepository: ILikeRepository,
-		private readonly postRepository: IPostRepository
+		private readonly postRepository: IPostRepository,
+		private readonly eventDispatcher: IEventDispatcher
 	) {}
 
 	async execute(userId: string, postId: string): Promise<{ liked: boolean }> {
@@ -17,19 +15,15 @@ export class ToggleLikeUseCase {
 
 		if (hasLiked) {
 			await this.likeRepository.removeLike(userId, postId);
-			await db.update(posts)
-				.set({ likesCount: sql`${posts.likesCount} - 1` })
-				.where(eq(posts.id, postId));
+			await this.postRepository.decrementLikes(postId);
 			return { liked: false };
 		} else {
 			await this.likeRepository.addLike(userId, postId);
-			await db.update(posts)
-				.set({ likesCount: sql`${posts.likesCount} + 1` })
-				.where(eq(posts.id, postId));
+			await this.postRepository.incrementLikes(postId);
 
 			const post = await this.postRepository.findById(postId);
 			if (post) {
-				await eventDispatcher.dispatch('PostLikedEvent', new PostLikedEvent(userId, post.authorId, postId));
+				await this.eventDispatcher.dispatch('PostLikedEvent', new PostLikedEvent(userId, post.authorId, postId));
 			}
 
 			return { liked: true };

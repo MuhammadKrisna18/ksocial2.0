@@ -1,5 +1,6 @@
 import type { ICommentRepository } from '$lib/domain/repositories/ICommentRepository';
 import type { IPostRepository } from '$lib/domain/repositories/IPostRepository';
+import { ValidationError, NotFoundError, AuthorizationError } from '$lib/application/exceptions';
 
 export class DeleteCommentUseCase {
 	constructor(
@@ -8,28 +9,25 @@ export class DeleteCommentUseCase {
 	) {}
 
 	async execute(commentId: string, userId: string): Promise<boolean> {
+		if (!commentId || !userId) {
+			throw new ValidationError('Comment ID and User ID are required');
+		}
+
 		const comment = await this.commentRepository.getCommentById(commentId);
 		
 		if (!comment) {
-			return false;
+			throw new NotFoundError('Comment not found');
 		}
 
 		// Authorization: Check if user is comment author
-		let isAuthorized = comment.userId === userId;
-
-		// If not comment author, check if user is post author
-		if (!isAuthorized) {
-			// We need to fetch the post to check the author
-			// However, since we don't have a getPostById, this might be tricky.
-			// Let's assume for now that authorization is handled in the controller or we only allow comment authors.
-			// Wait, let's just allow comment authors for simplicity unless post author is strictly needed.
-		}
+		const isAuthorized = comment.userId === userId;
 		
 		if (!isAuthorized) {
-			return false; // Unauthorized
+			throw new AuthorizationError('You are not authorized to delete this comment');
 		}
 
 		await this.commentRepository.deleteComment(commentId);
+		await this.postRepository.decrementComments(comment.postId);
 		return true;
 	}
 }

@@ -1,5 +1,6 @@
 import type { IFollowRepository } from '$lib/domain/repositories/IFollowRepository';
-import { eventDispatcher } from '$lib/infrastructure/events/DomainEventDispatcher';
+import type { IEventDispatcher } from '$lib/application/interfaces/IEventDispatcher';
+import { NotFoundError } from '$lib/application/exceptions';
 
 export interface AcceptFollowDTO {
 	followerId: string;
@@ -9,13 +10,14 @@ export interface AcceptFollowDTO {
 
 export class AcceptFollowUseCase {
 	constructor(
-		private followRepo: IFollowRepository
+		private followRepo: IFollowRepository,
+		private eventDispatcher: IEventDispatcher
 	) {}
 
 	async execute(dto: AcceptFollowDTO): Promise<void> {
 		const existingFollow = await this.followRepo.findByUsers(dto.followerId, dto.followingId);
 		if (!existingFollow || existingFollow.status !== 'pending') {
-			throw new Error('No pending follow request found');
+			throw new NotFoundError('No pending follow request found');
 		}
 
 		const event = existingFollow.accept();
@@ -25,6 +27,6 @@ export class AcceptFollowUseCase {
 		// Event dispatcher handles notifications deletion now
 		// We set notificationId manually just in case Event Handler needs it.
 		Object.assign(event, { notificationId: dto.notificationId });
-		await eventDispatcher.dispatch(event.constructor.name, event);
+		await this.eventDispatcher.dispatch(event.constructor.name, event);
 	}
 }

@@ -2,7 +2,7 @@ import { eq, desc, and, sql } from 'drizzle-orm';
 import { db } from '../database/client';
 import { comments, users, commentLikes, savedComments } from '../database/schema';
 import { Comment } from '$lib/domain/entities/Comment';
-import type { ICommentRepository } from '$lib/domain/repositories/ICommentRepository';
+import type { ICommentRepository, CommentViewData } from '$lib/domain/repositories/ICommentRepository';
 
 export class DrizzleCommentRepository implements ICommentRepository {
 	async addComment(comment: Comment): Promise<void> {
@@ -35,7 +35,7 @@ export class DrizzleCommentRepository implements ICommentRepository {
 		});
 	}
 
-	async getCommentsByPostId(postId: string, userId?: string): Promise<Comment[]> {
+	async getCommentsByPostId(postId: string, userId?: string): Promise<CommentViewData[]> {
 		const results = await db.select({
 			comment: comments,
 			authorName: users.fullName,
@@ -55,10 +55,10 @@ export class DrizzleCommentRepository implements ICommentRepository {
 		.orderBy(desc(comments.createdAt));
 
 		// Build a flat list first
-		const allCommentsMap = new Map<string, Comment>();
+		const allCommentsMap = new Map<string, CommentViewData>();
 		
-		const flatComments = results.map(row => {
-			const c = Comment.create({
+		const flatComments: CommentViewData[] = results.map(row => {
+			const c: CommentViewData = {
 				id: row.comment.id,
 				userId: row.comment.userId,
 				postId: row.comment.postId,
@@ -73,13 +73,13 @@ export class DrizzleCommentRepository implements ICommentRepository {
 				isSaved: row.isSaved,
 				repliesCount: row.repliesCount,
 				replies: []
-			});
+			};
 			allCommentsMap.set(c.id, c);
 			return c;
 		});
 		
 		// Build tree (assuming max 1 level of nesting as requested)
-		const rootComments: Comment[] = [];
+		const rootComments: CommentViewData[] = [];
 		for (const c of flatComments) {
 			if (c.parentId) {
 				let current = allCommentsMap.get(c.parentId);
@@ -159,7 +159,7 @@ export class DrizzleCommentRepository implements ICommentRepository {
 		}
 	}
 
-	async getSavedCommentsByUserId(userId: string): Promise<Comment[]> {
+	async getSavedCommentsByUserId(userId: string): Promise<CommentViewData[]> {
 		const results = await db.select({
 			comment: comments,
 			authorName: users.fullName,
@@ -177,7 +177,7 @@ export class DrizzleCommentRepository implements ICommentRepository {
 		.groupBy(comments.id, users.id, savedComments.createdAt)
 		.orderBy(desc(savedComments.createdAt));
 
-		return results.map(row => Comment.create({
+		return results.map((row): CommentViewData => ({
 			id: row.comment.id,
 			userId: row.comment.userId,
 			postId: row.comment.postId,

@@ -1,12 +1,13 @@
 import type { IMessageRepository } from '../../../domain/repositories/IMessageRepository';
 import { Message } from '../../../domain/entities/Message';
+import { ValidationError } from '$lib/application/exceptions';
 
 export class GetMessagesUseCase {
 	constructor(private messageRepo: IMessageRepository) {}
 
 	async execute(userId1: string, userId2: string, limit = 50, offset = 0): Promise<Message[]> {
 		if (!userId2 || userId1 === userId2) {
-			throw new Error('Invalid conversation.');
+			throw new ValidationError('Invalid conversation.');
 		}
 
 		const safeLimit = Math.min(Math.max(Math.trunc(limit) || 50, 1), 200);

@@ -7,9 +7,8 @@ import { postFileStorage } from '$lib/infrastructure/storage/LocalFileStorage';
 export const load: PageServerLoad = async ({ locals }) => {
 	const posts = await container.getFeedUseCase.execute(locals.user?.sub);
 	
-	// Convert entities to JSON objects
 	return {
-		posts: posts.map(p => p.toJSON())
+		posts
 	};
 };
 

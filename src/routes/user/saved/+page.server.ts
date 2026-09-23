@@ -13,8 +13,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const comments = await container.getSavedCommentsUseCase.execute(userId);
 	
 	return {
-		posts: posts.map(p => p.toJSON()),
-		comments: comments.map(c => c.toJSON())
+		posts,
+		comments
 	};
 };
 

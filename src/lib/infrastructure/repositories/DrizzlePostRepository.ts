@@ -5,7 +5,7 @@ import { savedPosts } from '../database/schema/savedPosts';
 import { likes } from '../database/schema/likes';
 import { users } from '../database/schema/users';
 import { Post } from '../../domain/entities/Post';
-import type { IPostRepository, CreatePostData } from '../../domain/repositories/IPostRepository';
+import type { IPostRepository, CreatePostData, PostViewData } from '../../domain/repositories/IPostRepository';
 
 export class DrizzlePostRepository implements IPostRepository {
 	async create(data: CreatePostData): Promise<Post> {
@@ -19,17 +19,9 @@ export class DrizzlePostRepository implements IPostRepository {
 			})
 			.returning();
 
-		// Fetch user to construct the entity
-		const [userRow] = await db.select().from(users).where(eq(users.id, data.userId));
-		if (!userRow) {
-			throw new Error('User not found');
-		}
-
 		return Post.create({
 			id: postRow.id,
 			authorId: postRow.userId,
-			authorName: userRow.fullName,
-			authorUsername: userRow.username,
 			content: postRow.content,
 			likesCount: postRow.likesCount,
 			commentsCount: postRow.commentsCount,
@@ -40,7 +32,7 @@ export class DrizzlePostRepository implements IPostRepository {
 		});
 	}
 
-	async getFeed(currentUserId?: string): Promise<Post[]> {
+	async getFeed(currentUserId?: string): Promise<PostViewData[]> {
 		const results = await db
 			.select({
 				post: posts,
@@ -63,23 +55,21 @@ export class DrizzlePostRepository implements IPostRepository {
 			))
 			.orderBy(desc(posts.createdAt));
 
-		return results.map((row) => {
-			return Post.create({
-				id: row.post.id,
-				authorId: row.post.userId,
-				authorName: row.author.fullName,
-				authorUsername: row.author.username,
-				content: row.post.content,
-				likesCount: row.post.likesCount,
-				commentsCount: row.post.commentsCount,
-				sharesCount: row.post.sharesCount,
-				media: row.post.media as any,
-				isSaved: !!row.savedByUserId,
-				isLiked: !!row.likedByUserId,
-				createdAt: row.post.createdAt,
-				updatedAt: row.post.updatedAt
-			});
-		});
+		return results.map((row): PostViewData => ({
+			id: row.post.id,
+			authorId: row.post.userId,
+			authorName: row.author.fullName,
+			authorUsername: row.author.username,
+			content: row.post.content,
+			likesCount: row.post.likesCount,
+			commentsCount: row.post.commentsCount,
+			sharesCount: row.post.sharesCount,
+			media: row.post.media as any,
+			isSaved: !!row.savedByUserId,
+			isLiked: !!row.likedByUserId,
+			createdAt: row.post.createdAt,
+			updatedAt: row.post.updatedAt
+		}));
 	}
 
 	async toggleSave(userId: string, postId: string): Promise<boolean> {
@@ -93,7 +83,7 @@ export class DrizzlePostRepository implements IPostRepository {
 		}
 	}
 
-	async getSavedPosts(userId: string): Promise<Post[]> {
+	async getSavedPosts(userId: string): Promise<PostViewData[]> {
 		const results = await db
 			.select({
 				post: posts,
@@ -108,31 +98,29 @@ export class DrizzlePostRepository implements IPostRepository {
 			.innerJoin(users, eq(posts.userId, users.id))
 			.leftJoin(likes, and(
 				eq(likes.postId, posts.id),
-				eq(likes.userId, userId) // userId is the current user since it's their saved posts
+				eq(likes.userId, userId)
 			))
 			.where(eq(savedPosts.userId, userId))
 			.orderBy(desc(savedPosts.createdAt));
 
-		return results.map((row) => {
-			return Post.create({
-				id: row.post.id,
-				authorId: row.post.userId,
-				authorName: row.author.fullName,
-				authorUsername: row.author.username,
-				content: row.post.content,
-				likesCount: row.post.likesCount,
-				commentsCount: row.post.commentsCount,
-				sharesCount: row.post.sharesCount,
-				media: row.post.media as any,
-				isSaved: true,
-				isLiked: !!row.likedByUserId,
-				createdAt: row.post.createdAt,
-				updatedAt: row.post.updatedAt
-			});
-		});
+		return results.map((row): PostViewData => ({
+			id: row.post.id,
+			authorId: row.post.userId,
+			authorName: row.author.fullName,
+			authorUsername: row.author.username,
+			content: row.post.content,
+			likesCount: row.post.likesCount,
+			commentsCount: row.post.commentsCount,
+			sharesCount: row.post.sharesCount,
+			media: row.post.media as any,
+			isSaved: true,
+			isLiked: !!row.likedByUserId,
+			createdAt: row.post.createdAt,
+			updatedAt: row.post.updatedAt
+		}));
 	}
 
-	async getUserPosts(userId: string, currentUserId?: string): Promise<Post[]> {
+	async getUserPosts(userId: string, currentUserId?: string): Promise<PostViewData[]> {
 		const results = await db
 			.select({
 				post: posts,
@@ -156,43 +144,7 @@ export class DrizzlePostRepository implements IPostRepository {
 			.where(eq(posts.userId, userId))
 			.orderBy(desc(posts.createdAt));
 
-		return results.map((row) => {
-			return Post.create({
-				id: row.post.id,
-				authorId: row.post.userId,
-				authorName: row.author.fullName,
-				authorUsername: row.author.username,
-				content: row.post.content,
-				likesCount: row.post.likesCount,
-				commentsCount: row.post.commentsCount,
-				sharesCount: row.post.sharesCount,
-				media: row.post.media as any,
-				isSaved: !!row.savedByUserId,
-				isLiked: !!row.likedByUserId,
-				createdAt: row.post.createdAt,
-				updatedAt: row.post.updatedAt
-			});
-		});
-	}
-
-	async findById(id: string): Promise<Post | null> {
-		const results = await db
-			.select({
-				post: posts,
-				author: {
-					fullName: users.fullName,
-					username: users.username
-				}
-			})
-			.from(posts)
-			.innerJoin(users, eq(posts.userId, users.id))
-			.where(eq(posts.id, id))
-			.limit(1);
-
-		if (results.length === 0) return null;
-
-		const row = results[0];
-		return Post.create({
+		return results.map((row): PostViewData => ({
 			id: row.post.id,
 			authorId: row.post.userId,
 			authorName: row.author.fullName,
@@ -202,23 +154,44 @@ export class DrizzlePostRepository implements IPostRepository {
 			commentsCount: row.post.commentsCount,
 			sharesCount: row.post.sharesCount,
 			media: row.post.media as any,
+			isSaved: !!row.savedByUserId,
+			isLiked: !!row.likedByUserId,
 			createdAt: row.post.createdAt,
 			updatedAt: row.post.updatedAt
+		}));
+	}
+
+	async findById(id: string): Promise<Post | null> {
+		const [row] = await db
+			.select()
+			.from(posts)
+			.where(eq(posts.id, id))
+			.limit(1);
+
+		if (!row) return null;
+
+		return Post.create({
+			id: row.id,
+			authorId: row.userId,
+			content: row.content,
+			likesCount: row.likesCount,
+			commentsCount: row.commentsCount,
+			sharesCount: row.sharesCount,
+			media: row.media as any,
+			createdAt: row.createdAt,
+			updatedAt: row.updatedAt
 		});
 	}
 
 	async deletePost(postId: string, userId: string): Promise<boolean> {
-		// First verify if the post exists and belongs to the user
 		const postExists = await db.select().from(posts).where(and(eq(posts.id, postId), eq(posts.userId, userId)));
 		
 		if (postExists.length === 0) {
 			return false;
 		}
 
-		// Delete from saved_posts first to avoid foreign key constraint violations
 		await db.delete(savedPosts).where(eq(savedPosts.postId, postId));
 		
-		// Then delete the post
 		const result = await db.delete(posts).where(eq(posts.id, postId)).returning({ id: posts.id });
 		return result.length > 0;
 	}
@@ -239,8 +212,6 @@ export class DrizzlePostRepository implements IPostRepository {
 		return Post.create({
 			id: post.id,
 			authorId: post.userId,
-			authorName: '', // we don't need it just to return
-			authorUsername: '',
 			content: post.content,
 			likesCount: post.likesCount,
 			commentsCount: post.commentsCount,
@@ -251,7 +222,31 @@ export class DrizzlePostRepository implements IPostRepository {
 		});
 	}
 
-	async getPostLikes(postId: string): Promise<{id: string; username: string; fullName: string; profilePictureUrl: string | null}[]> {
+	async incrementLikes(postId: string): Promise<void> {
+		await db.update(posts)
+			.set({ likesCount: sql`${posts.likesCount} + 1` })
+			.where(eq(posts.id, postId));
+	}
+
+	async decrementLikes(postId: string): Promise<void> {
+		await db.update(posts)
+			.set({ likesCount: sql`${posts.likesCount} - 1` })
+			.where(eq(posts.id, postId));
+	}
+
+	async incrementComments(postId: string): Promise<void> {
+		await db.update(posts)
+			.set({ commentsCount: sql`${posts.commentsCount} + 1` })
+			.where(eq(posts.id, postId));
+	}
+
+	async decrementComments(postId: string): Promise<void> {
+		await db.update(posts)
+			.set({ commentsCount: sql`${posts.commentsCount} - 1` })
+			.where(eq(posts.id, postId));
+	}
+
+	async getPostLikes(postId: string): Promise<{ id: string; username: string; fullName: string; profilePictureUrl: string | null }[]> {
 		const results = await db.select({
 			id: users.id,
 			username: users.username,

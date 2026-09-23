@@ -1,5 +1,5 @@
 import type { IUserRepository } from '$lib/domain/repositories/IUserRepository';
-import type { HashService } from '$lib/infrastructure/external-services/HashService';
+import type { IHashService } from '$lib/application/interfaces/IHashService';
 import { User } from '$lib/domain/entities/User';
 import { NotFoundError, ConflictError, AuthenticationError } from '$lib/application/exceptions';
 import { Username } from '$lib/domain/value-objects/Username';
@@ -41,7 +41,7 @@ export interface UpdatePhotosDTO {
 export class UpdateUserUseCase {
 	constructor(
 		private readonly userRepo: IUserRepository,
-		private readonly hashService: HashService
+		private readonly hashService: IHashService
 	) {}
 
 	async updateUsername(dto: UpdateUsernameDTO): Promise<void> {
