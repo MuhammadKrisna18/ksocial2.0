@@ -46,6 +46,7 @@ import { GetChatContactsUseCase } from '$lib/application/use-cases/chat/GetChatC
 import { UnfollowUserUseCase } from '$lib/application/use-cases/follow/UnfollowUserUseCase';
 import { GetUserProfileUseCase } from '$lib/application/use-cases/user/GetUserProfileUseCase';
 import { GetUserByIdUseCase } from '$lib/application/use-cases/user/GetUserByIdUseCase';
+import { GetFriendsUseCase } from '$lib/application/use-cases/follow/GetFriendsUseCase';
 
 class Container {
 	constructor() {
@@ -269,7 +270,12 @@ class Container {
 	get searchUsersUseCase(): SearchUsersUseCase {
 		return new SearchUsersUseCase(this.userRepository);
 	}
+
+	get getFriendsUseCase(): GetFriendsUseCase {
+		return new GetFriendsUseCase(this.followRepository);
+	}
 }
+
 
 export const container = new Container();
 

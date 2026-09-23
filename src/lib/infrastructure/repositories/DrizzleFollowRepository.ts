@@ -1,8 +1,8 @@
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { db } from '../database/client';
 import { follows } from '../database/schema/follows';
 import { Follow } from '$lib/domain/entities/Follow';
-import type { IFollowRepository, CreateFollowData } from '$lib/domain/repositories/IFollowRepository';
+import type { IFollowRepository, CreateFollowData, FriendUser } from '$lib/domain/repositories/IFollowRepository';
 
 export class DrizzleFollowRepository implements IFollowRepository {
 	private mapToEntity(row: typeof follows.$inferSelect): Follow {
@@ -120,4 +120,23 @@ export class DrizzleFollowRepository implements IFollowRepository {
 
 		return results as any;
 	}
+
+	async getFriends(userId: string): Promise<FriendUser[]> {
+		const query = sql`
+			SELECT u.id, u.username, u.full_name AS "fullName", u.profile_picture_url AS "profilePictureUrl"
+			FROM users u
+			INNER JOIN follows f1 ON f1.following_id = u.id AND f1.follower_id = ${userId} AND f1.status = 'accepted'
+			INNER JOIN follows f2 ON f2.follower_id = u.id AND f2.following_id = ${userId} AND f2.status = 'accepted'
+			ORDER BY u.full_name ASC
+		`;
+
+		const results = await db.execute(query);
+		return results.map((r: any) => ({
+			id: r.id as string,
+			username: r.username as string,
+			fullName: (r.fullName as string) || (r.username as string),
+			profilePictureUrl: (r.profilePictureUrl as string | null) ?? null
+		}));
+	}
 }
+
