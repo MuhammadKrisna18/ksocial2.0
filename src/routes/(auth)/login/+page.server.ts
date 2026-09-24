@@ -72,7 +72,19 @@ export const actions: Actions = {
 		throw redirect(302, redirectUrl);
 	},
 	logout: async ({ cookies }) => {
-		cookies.delete(ACCESS_TOKEN_COOKIE, getAuthCookieOptions(!dev));
+		const token = cookies.get(ACCESS_TOKEN_COOKIE);
+		if (token) {
+			container.tokenRevocationService.revoke(token);
+		}
+		cookies.delete(ACCESS_TOKEN_COOKIE, { path: '/' });
+		cookies.set(ACCESS_TOKEN_COOKIE, '', {
+			path: '/',
+			httpOnly: true,
+			sameSite: 'strict',
+			secure: !dev,
+			maxAge: 0,
+			expires: new Date(0)
+		});
 		throw redirect(302, '/login');
 	}
 };

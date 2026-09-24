@@ -1,5 +1,6 @@
 import { HashService } from '$lib/infrastructure/external-services/HashService';
 import { TokenService } from '$lib/infrastructure/external-services/TokenService';
+import { TokenRevocationService } from '$lib/infrastructure/security/TokenRevocationService';
 import { DrizzleUserRepository } from '$lib/infrastructure/repositories/DrizzleUserRepository';
 import { DrizzleRoleRepository } from '$lib/infrastructure/repositories/DrizzleRoleRepository';
 import { DrizzlePostRepository } from '$lib/infrastructure/repositories/DrizzlePostRepository';
@@ -144,8 +145,14 @@ class Container {
 		return new RegisterUseCase(this.userRepository, this.roleRepository, this.hashService, this.tokenService);
 	}
 
+	private _tokenRevocationService?: TokenRevocationService;
+	get tokenRevocationService(): TokenRevocationService {
+		if (!this._tokenRevocationService) this._tokenRevocationService = new TokenRevocationService(this.tokenService);
+		return this._tokenRevocationService;
+	}
+
 	get validateTokenUseCase(): ValidateTokenUseCase {
-		return new ValidateTokenUseCase(this.tokenService);
+		return new ValidateTokenUseCase(this.tokenService, this.tokenRevocationService);
 	}
 
 	get updateUserUseCase(): UpdateUserUseCase {

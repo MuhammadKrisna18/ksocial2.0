@@ -3,7 +3,7 @@ import { container } from '$lib/infrastructure/config/container';
 import type { RoleNameType } from '$lib/domain/value-objects/RoleName';
 import { apiRateLimiter, getClientIp } from '$lib/infrastructure/security/RateLimiter';
 
-const PUBLIC_ROUTES = new Set(['/', '/login', '/register']);
+const PUBLIC_ROUTES = new Set(['/', '/login', '/register', '/logout']);
 
 const PROTECTED_ROUTES: Array<{ pattern: RegExp; roles: RoleNameType[] }> = [
 	{ pattern: /^\/admin/, roles: ['admin'] },
@@ -111,6 +111,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 		response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
 		response.headers.set('Pragma', 'no-cache');
 		response.headers.set('Expires', '0');
+	}
+
+	if (pathname === '/logout' || event.url.search.includes('logout')) {
+		response.headers.set('Clear-Site-Data', '"cache", "cookies", "storage"');
 	}
 
 	return response;
