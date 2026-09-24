@@ -1,5 +1,8 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
+
 	let { data } = $props();
+	let loadingUserId = $state<string | null>(null);
 </script>
 
 <svelte:head>
@@ -19,38 +22,178 @@
 	<div class="max-w-7xl mx-auto px-6 lg:px-8 pb-16 pt-12 space-y-16">
 		
 		{#snippet userCard(user: any)}
-			<a href="/user/profile/{user.username}" class="block group bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 dark:hover:shadow-indigo-500/5 hover:border-indigo-100 dark:hover:border-indigo-500/30 transition-all duration-300 flex flex-col items-center text-center relative overflow-hidden">
+			<div class="group bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 dark:hover:shadow-indigo-500/5 hover:border-indigo-100 dark:hover:border-indigo-500/30 transition-all duration-300 flex flex-col items-center text-center relative overflow-hidden">
 				
-				<!-- Avatar -->
-				<div class="h-24 w-24 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-black text-3xl shadow-lg shadow-indigo-500/30 mb-4 group-hover:scale-105 transition-transform duration-300 overflow-hidden">
+				<!-- Avatar (Clickable) -->
+				<a href="/user/profile/{user.username}" class="h-24 w-24 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-black text-3xl shadow-lg shadow-indigo-500/30 mb-4 group-hover:scale-105 transition-transform duration-300 overflow-hidden">
 					{#if user.profilePictureUrl}
 						<img src={user.profilePictureUrl} alt={user.username} class="w-full h-full object-cover" />
 					{:else}
 						{user.fullName ? user.fullName.charAt(0).toUpperCase() : user.username.charAt(0).toUpperCase()}
 					{/if}
-				</div>
+				</a>
 				
-				<!-- User Info -->
-				<h3 class="text-xl font-bold text-slate-900 dark:text-white truncate w-full px-2" title={user.fullName || user.username}>
+				<!-- User Info (Clickable) -->
+				<a href="/user/profile/{user.username}" class="text-xl font-bold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors truncate w-full px-2" title={user.fullName || user.username}>
 					{user.fullName || user.username}
-				</h3>
+				</a>
 				<p class="text-slate-500 dark:text-slate-400 font-medium mt-1 truncate w-full px-2" title={`@${user.username}`}>
 					@{user.username}
 				</p>
 
-				<!-- Actions -->
-				<div class="mt-6 w-full pt-4 border-t border-slate-100 dark:border-slate-700">
-					{#if user.followStatus === 'follows_you'}
-						<button class="w-full py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition-colors duration-300 shadow-md shadow-indigo-500/20 active:scale-95">
-							Ikuti Balik
-						</button>
+				<!-- Actions: Lihat Profil & Follow Side-by-Side -->
+				<div class="mt-6 w-full pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center gap-2">
+					<a
+						href="/user/profile/{user.username}"
+						class="flex-1 py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors duration-200 text-center flex items-center justify-center"
+					>
+						Lihat Profil
+					</a>
+
+					{#if user.followStatus === 'none'}
+						<form
+							method="POST"
+							action="?/follow"
+							use:enhance={() => {
+								loadingUserId = user.id;
+								return async ({ update }) => {
+									await update({ reset: false });
+									loadingUserId = null;
+								};
+							}}
+							class="flex-1"
+						>
+							<input type="hidden" name="userId" value={user.id} />
+							<input type="hidden" name="username" value={user.username} />
+							<button
+								type="submit"
+								disabled={loadingUserId === user.id}
+								class="w-full py-2.5 px-3 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-colors duration-200 shadow-md shadow-blue-500/20 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-1"
+							>
+								{#if loadingUserId === user.id}
+									<span class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+								{:else}
+									<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+									</svg>
+									<span>Follow</span>
+								{/if}
+							</button>
+						</form>
+					{:else if user.followStatus === 'follows_you'}
+						<form
+							method="POST"
+							action="?/follow"
+							use:enhance={() => {
+								loadingUserId = user.id;
+								return async ({ update }) => {
+									await update({ reset: false });
+									loadingUserId = null;
+								};
+							}}
+							class="flex-1"
+						>
+							<input type="hidden" name="userId" value={user.id} />
+							<input type="hidden" name="username" value={user.username} />
+							<button
+								type="submit"
+								disabled={loadingUserId === user.id}
+								class="w-full py-2.5 px-3 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 transition-colors duration-200 shadow-md shadow-indigo-500/20 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-1"
+							>
+								{#if loadingUserId === user.id}
+									<span class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+								{:else}
+									<span>Ikuti Balik</span>
+								{/if}
+							</button>
+						</form>
+					{:else if user.followStatus === 'pending'}
+						<form
+							method="POST"
+							action="?/unfollow"
+							use:enhance={() => {
+								loadingUserId = user.id;
+								return async ({ update }) => {
+									await update({ reset: false });
+									loadingUserId = null;
+								};
+							}}
+							class="flex-1"
+						>
+							<input type="hidden" name="userId" value={user.id} />
+							<input type="hidden" name="username" value={user.username} />
+							<button
+								type="submit"
+								disabled={loadingUserId === user.id}
+								class="w-full py-2.5 px-3 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors duration-200 active:scale-95 disabled:opacity-50 flex items-center justify-center"
+							>
+								{#if loadingUserId === user.id}
+									<span class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-slate-600 border-t-transparent"></span>
+								{:else}
+									<span>Diminta</span>
+								{/if}
+							</button>
+						</form>
+					{:else if user.followStatus === 'friends'}
+						<form
+							method="POST"
+							action="?/unfollow"
+							use:enhance={() => {
+								loadingUserId = user.id;
+								return async ({ update }) => {
+									await update({ reset: false });
+									loadingUserId = null;
+								};
+							}}
+							class="flex-1"
+						>
+							<input type="hidden" name="userId" value={user.id} />
+							<input type="hidden" name="username" value={user.username} />
+							<button
+								type="submit"
+								disabled={loadingUserId === user.id}
+								class="w-full py-2.5 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-xs font-bold hover:bg-rose-50 hover:text-rose-600 hover:border-rose-300 dark:hover:bg-rose-950/40 dark:hover:text-rose-400 dark:hover:border-rose-800 transition-colors duration-200 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-1 group/btn"
+							>
+								{#if loadingUserId === user.id}
+									<span class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-emerald-600 border-t-transparent"></span>
+								{:else}
+									<span class="group-hover/btn:hidden">Teman</span>
+									<span class="hidden group-hover/btn:inline">Batal</span>
+								{/if}
+							</button>
+						</form>
 					{:else}
-						<button class="w-full py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-bold hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white transition-colors duration-300">
-							Lihat Profil
-						</button>
+						<!-- following -->
+						<form
+							method="POST"
+							action="?/unfollow"
+							use:enhance={() => {
+								loadingUserId = user.id;
+								return async ({ update }) => {
+									await update({ reset: false });
+									loadingUserId = null;
+								};
+							}}
+							class="flex-1"
+						>
+							<input type="hidden" name="userId" value={user.id} />
+							<input type="hidden" name="username" value={user.username} />
+							<button
+								type="submit"
+								disabled={loadingUserId === user.id}
+								class="w-full py-2.5 px-3 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-rose-50 hover:text-rose-600 hover:border-rose-300 dark:hover:bg-rose-950/40 dark:hover:text-rose-400 dark:hover:border-rose-800 transition-colors duration-200 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-1 group/btn"
+							>
+								{#if loadingUserId === user.id}
+									<span class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-slate-600 border-t-transparent"></span>
+								{:else}
+									<span class="group-hover/btn:hidden">Mengikuti</span>
+									<span class="hidden group-hover/btn:inline">Batal</span>
+								{/if}
+							</button>
+						</form>
 					{/if}
 				</div>
-			</a>
+			</div>
 		{/snippet}
 
 		<!-- Kategori: Ikuti Balik (Followers you don't follow) -->

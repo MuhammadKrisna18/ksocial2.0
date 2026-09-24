@@ -26,8 +26,11 @@ npm run db:seed
 
 > **Akun Pengujian Bawaan (dari Seeder):**
 > - **Admin**: `admin.ksocial.sveltekit@admin.co.id` (Password: `admin.ksocial.sveltekit`)
-> - **User 1**: `user1@example.com` (Password: password bawaan seeder)
-> - **User 2**: `user2@example.com` (Password: password bawaan seeder)
+> - **User 1**: `user1@example.com` (Password: `password123`)
+> - **User 2**: `user2@example.com` (Password: `password123`)
+> - **User 3**: `user3@example.com` (Password: `password123`)
+> - **User 4**: `user4@example.com` (Password: `password123`)
+> - **User 5**: `user5@example.com` (Password: `password123`)
 
 ### Menjalankan Server
 ```bash

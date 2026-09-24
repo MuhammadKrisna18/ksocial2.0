@@ -92,6 +92,21 @@ async function seedRegularUsers(): Promise<void> {
 			email: 'user2@example.com',
 			username: 'user2',
 			fullName: 'User Dua'
+		},
+		{
+			email: 'user3@example.com',
+			username: 'user3',
+			fullName: 'User Tiga'
+		},
+		{
+			email: 'user4@example.com',
+			username: 'user4',
+			fullName: 'User Empat'
+		},
+		{
+			email: 'user5@example.com',
+			username: 'user5',
+			fullName: 'User Lima'
 		}
 	];
 

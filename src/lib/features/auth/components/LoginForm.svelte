@@ -125,20 +125,43 @@
 			>
 				Login as Admin
 			</button>
-			<div class="flex gap-2">
+			<div class="grid grid-cols-3 gap-2">
 				<button 
 					type="button"
 					onclick={() => quickLogin('user1@example.com', 'password123')}
-					class="w-1/2 rounded-lg bg-indigo-100 px-3 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-200 transition-colors"
+					class="rounded-lg bg-indigo-100 px-2 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-200 transition-colors text-center"
 				>
-					Login as User 1
+					User 1
 				</button>
 				<button 
 					type="button"
 					onclick={() => quickLogin('user2@example.com', 'password123')}
-					class="w-1/2 rounded-lg bg-indigo-100 px-3 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-200 transition-colors"
+					class="rounded-lg bg-indigo-100 px-2 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-200 transition-colors text-center"
 				>
-					Login as User 2
+					User 2
+				</button>
+				<button 
+					type="button"
+					onclick={() => quickLogin('user3@example.com', 'password123')}
+					class="rounded-lg bg-indigo-100 px-2 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-200 transition-colors text-center"
+				>
+					User 3
+				</button>
+			</div>
+			<div class="grid grid-cols-2 gap-2">
+				<button 
+					type="button"
+					onclick={() => quickLogin('user4@example.com', 'password123')}
+					class="rounded-lg bg-indigo-100 px-3 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-200 transition-colors text-center"
+				>
+					User 4
+				</button>
+				<button 
+					type="button"
+					onclick={() => quickLogin('user5@example.com', 'password123')}
+					class="rounded-lg bg-indigo-100 px-3 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-200 transition-colors text-center"
+				>
+					User 5
 				</button>
 			</div>
 		</div>

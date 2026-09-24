@@ -1,6 +1,7 @@
-import { redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { container } from '$lib/infrastructure/config/container';
-import type { PageServerLoad } from './$types';
+import { handleActionError } from '$lib/presentation/utils/response';
+import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const userId = locals.user?.sub;
@@ -56,3 +57,54 @@ export const load: PageServerLoad = async ({ locals }) => {
 		};
 	}
 };
+
+export const actions: Actions = {
+	follow: async ({ request, locals }) => {
+		const currentUserId = locals.user?.sub;
+		if (!currentUserId) throw redirect(302, '/auth/login');
+
+		const formData = await request.formData();
+		const targetUserId = formData.get('userId')?.toString();
+		const targetUsername = formData.get('username')?.toString();
+
+		if (!targetUserId && !targetUsername) {
+			return fail(400, { error: 'Target user is required' });
+		}
+
+		try {
+			await container.followUserUseCase.execute({
+				followerId: currentUserId,
+				followingId: targetUserId,
+				followingUsername: targetUsername
+			});
+			return { success: true };
+		} catch (e: any) {
+			return handleActionError(e, 'Failed to follow user');
+		}
+	},
+
+	unfollow: async ({ request, locals }) => {
+		const currentUserId = locals.user?.sub;
+		if (!currentUserId) throw redirect(302, '/auth/login');
+
+		const formData = await request.formData();
+		const targetUserId = formData.get('userId')?.toString();
+		const targetUsername = formData.get('username')?.toString();
+
+		if (!targetUserId && !targetUsername) {
+			return fail(400, { error: 'Target user is required' });
+		}
+
+		try {
+			await container.unfollowUserUseCase.execute({
+				followerId: currentUserId,
+				followingId: targetUserId,
+				followingUsername: targetUsername
+			});
+			return { success: true };
+		} catch (e: any) {
+			return handleActionError(e, 'Failed to unfollow user');
+		}
+	}
+};
+
