@@ -18,6 +18,8 @@
 		"db:studio": "drizzle-kit studio",
 		"db:pull": "drizzle-kit introspect",
 		"db:seed": "tsx --tsconfig tsconfig.seed.json src/lib/infrastructure/database/seed.ts",
+		"db:seed-dummy": "tsx --tsconfig tsconfig.seed.json src/lib/infrastructure/database/seedDummyUsers.ts",
+		"db:clean-dummy": "tsx --tsconfig tsconfig.seed.json src/lib/infrastructure/database/cleanDummyUsers.ts",
 		"test": "vitest run",
 		"test:watch": "vitest"
 	},

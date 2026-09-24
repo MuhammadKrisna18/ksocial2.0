@@ -4,7 +4,10 @@ import { fail } from '@sveltejs/kit';
 import { handleActionError } from '$lib/presentation/utils/response';
 import { postFileStorage } from '$lib/infrastructure/storage/LocalFileStorage';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, setHeaders }) => {
+	setHeaders({
+		'cache-control': 'no-store, no-cache, must-revalidate, proxy-revalidate'
+	});
 	const posts = await container.getFeedUseCase.execute(locals.user?.sub);
 	
 	return {

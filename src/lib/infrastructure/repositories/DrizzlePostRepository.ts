@@ -50,7 +50,7 @@ export class DrizzlePostRepository implements IPostRepository {
 			})
 			.from(posts)
 			.innerJoin(users, eq(posts.userId, users.id))
-			.orderBy(desc(posts.createdAt));
+			.orderBy(sql`RANDOM()`);
 
 		return results.map((row): PostViewData => ({
 			id: row.post.id,
