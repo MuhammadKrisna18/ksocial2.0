@@ -42,6 +42,8 @@ import { SearchUsersUseCase } from '$lib/application/use-cases/search/SearchUser
 import { GetMessagesUseCase } from '$lib/application/use-cases/chat/GetMessagesUseCase';
 import { SendMessageUseCase } from '$lib/application/use-cases/chat/SendMessageUseCase';
 import { GetChatContactsUseCase } from '$lib/application/use-cases/chat/GetChatContactsUseCase';
+import { GetUnreadMessageCountUseCase } from '$lib/application/use-cases/chat/GetUnreadMessageCountUseCase';
+import { MarkMessagesAsReadUseCase } from '$lib/application/use-cases/chat/MarkMessagesAsReadUseCase';
 import { UnfollowUserUseCase } from '$lib/application/use-cases/follow/UnfollowUserUseCase';
 import { GetUserProfileUseCase } from '$lib/application/use-cases/user/GetUserProfileUseCase';
 import { GetUserByIdUseCase } from '$lib/application/use-cases/user/GetUserByIdUseCase';
@@ -269,6 +271,14 @@ class Container {
 
 	get getFriendsUseCase(): GetFriendsUseCase {
 		return new GetFriendsUseCase(this.followRepository);
+	}
+
+	get getUnreadMessageCountUseCase(): GetUnreadMessageCountUseCase {
+		return new GetUnreadMessageCountUseCase(this.messageRepository);
+	}
+
+	get markMessagesAsReadUseCase(): MarkMessagesAsReadUseCase {
+		return new MarkMessagesAsReadUseCase(this.messageRepository);
 	}
 }
 

@@ -42,3 +42,16 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 		return handleApplicationError(error, 'Failed to send message');
 	}
 };
+
+export const PATCH: RequestHandler = async ({ params, locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+
+	try {
+		// senderId is params.userId, receiverId is current user (locals.user.sub)
+		await container.markMessagesAsReadUseCase.execute(params.userId, locals.user.sub);
+		return json({ success: true });
+	} catch (error) {
+		return handleApplicationError(error, 'Failed to mark messages as read');
+	}
+};
+

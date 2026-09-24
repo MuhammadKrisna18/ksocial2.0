@@ -35,7 +35,19 @@ export class SendMessageUseCase {
 
 		const message = Message.create(senderId, receiverId, cleanContent);
 		await this.messageRepo.save(message);
-		await this.eventDispatcher.dispatch('MessageSentEvent', new MessageSentEvent(message));
+
+		const sender = await this.userRepo.findById(senderId);
+		const senderInfo = sender
+			? {
+					id: sender.id,
+					fullName: sender.fullName,
+					username: sender.username.toString(),
+					avatarUrl: sender.profilePictureUrl
+				}
+			: undefined;
+
+		await this.eventDispatcher.dispatch('MessageSentEvent', new MessageSentEvent(message, senderInfo));
 		return message;
 	}
+
 }

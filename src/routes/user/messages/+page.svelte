@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
+	import { page } from '$app/stores';
+	import { chatState } from '$lib/presentation/stores/chatState.svelte';
 
 	type Contact = {
 		userId: string;
@@ -41,7 +43,15 @@
 	let isLoadingMessages = $state(false);
 	let isSending = $state(false);
 	let messagesContainer: HTMLDivElement | null = $state(null);
-	let eventSource: EventSource | null = null;
+	let unsubscribeMessages: (() => void) | null = null;
+
+	// Synchronize activeContactId with global chatState
+	$effect(() => {
+		chatState.activeContactId = activeContactId;
+		return () => {
+			chatState.activeContactId = null;
+		};
+	});
 
 	const activeContact = $derived(
 		contacts.find((contact) => contact.userId === activeContactId) ||
@@ -77,12 +87,35 @@
 	);
 
 	onMount(() => {
-		void fetchContacts();
+		// Listen to incoming messages broadcast by the global chat stream
+		unsubscribeMessages = chatState.subscribeMessages((incomingRaw) => {
+			const incoming = mapMessage(incomingRaw);
+			const isCurrentConversation =
+				activeContactId &&
+				((incoming.senderId === activeContactId && incoming.isMine === false) ||
+					(incoming.senderId === currentUserId && activeContactId));
+			if (isCurrentConversation && !messages.some((message) => message.id === incoming.id)) {
+				messages = [...messages, incoming];
+				scrollToBottom();
+				if (incoming.senderId === activeContactId) {
+					void fetch(`/api/chat/${encodeURIComponent(activeContactId)}`, { method: 'PATCH' });
+				}
+			}
+			void fetchContacts();
+		});
+
+		void fetchContacts().then(() => {
+			const contactParam = $page.url.searchParams.get('contact');
+			if (contactParam) {
+				void selectContact(contactParam);
+			}
+		});
 		void fetchFriends();
-		connectSSE();
 	});
 
-	onDestroy(() => eventSource?.close());
+	onDestroy(() => {
+		unsubscribeMessages?.();
+	});
 
 	function formatTime(value: string | Date) {
 		return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -118,33 +151,17 @@
 			const response = await fetch('/api/chat/contacts');
 			if (!response.ok) throw new Error('Gagal memuat daftar percakapan.');
 			contacts = (await response.json()).contacts ?? [];
+
+			// If a contact is currently open, ensure its unread count is zeroed out
+			if (activeContactId) {
+				const current = contacts.find((c) => c.userId === activeContactId);
+				if (current) current.unreadCount = 0;
+			}
 		} catch (error) {
 			errorText = error instanceof Error ? error.message : 'Gagal memuat percakapan.';
 		} finally {
 			isLoadingContacts = false;
 		}
-	}
-
-	function connectSSE() {
-		eventSource?.close();
-		eventSource = new EventSource('/api/chat/stream');
-		eventSource.addEventListener('message', (event) => {
-			try {
-				const incoming = mapMessage(JSON.parse((event as MessageEvent).data));
-				const isCurrentConversation =
-					activeContactId &&
-					((incoming.senderId === activeContactId && incoming.isMine === false) ||
-						(incoming.senderId === currentUserId && activeContactId));
-				if (isCurrentConversation && !messages.some((message) => message.id === incoming.id)) {
-					messages = [...messages, incoming];
-					scrollToBottom();
-				}
-				void fetchContacts();
-			} catch (error) {
-				console.error('Invalid chat event', error);
-			}
-		});
-		eventSource.onerror = () => console.warn('Chat stream disconnected; browser will retry.');
 	}
 
 	async function selectContact(id: string) {
@@ -153,6 +170,14 @@
 		errorText = '';
 		messages = [];
 		isLoadingMessages = true;
+
+		// Immediately reduce unread count for this contact from global state
+		const targetContact = contacts.find((contact) => contact.userId === id);
+		if (targetContact && targetContact.unreadCount > 0) {
+			chatState.decrementUnread(targetContact.unreadCount);
+			targetContact.unreadCount = 0;
+		}
+
 		try {
 			const response = await fetch(`/api/chat/${encodeURIComponent(id)}?limit=200`);
 			const payload = await response.json();
@@ -166,6 +191,7 @@
 			isLoadingMessages = false;
 		}
 	}
+
 
 	function scrollToBottom() {
 		setTimeout(() => {
@@ -361,12 +387,13 @@
 									{contact.lastMessage ?? 'Memulai percakapan'}
 								</p>
 							</div>
-							{#if contact.unreadCount}
-								<span class="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-600 px-1 text-[10px] font-bold text-white">
-									{contact.unreadCount}
+							{#if contact.unreadCount > 0}
+								<span class="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-extrabold text-white shadow-sm shadow-red-500/30 animate-pulse">
+									{contact.unreadCount > 99 ? '99+' : contact.unreadCount}
 								</span>
 							{/if}
 						</button>
+
 					{/each}
 				{:else if search.trim() && searchMatchedFriends.length === 0}
 					<p class="mt-8 p-4 text-center text-xs text-slate-400">

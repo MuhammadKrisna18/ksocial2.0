@@ -52,7 +52,7 @@ export class DrizzleMessageRepository implements IMessageRepository {
 				WHERE receiver_id = ${userId} AND is_read = false
 				GROUP BY sender_id
 			)
-			SELECT u.id AS "userId", u.username, u.full_name AS "fullName", u.avatar_url AS "avatarUrl",
+			SELECT u.id AS "userId", u.username, u.full_name AS "fullName", u.profile_picture_url AS "avatarUrl",
 				rm.content AS "lastMessage", rm.created_at AS "lastMessageAt",
 				COALESCE(uc.unread_count, 0) AS "unreadCount"
 			FROM users u
@@ -79,4 +79,13 @@ export class DrizzleMessageRepository implements IMessageRepository {
 			.set({ isRead: true })
 			.where(and(eq(messages.senderId, senderId), eq(messages.receiverId, receiverId), eq(messages.isRead, false)));
 	}
+
+	async getUnreadCount(userId: string): Promise<number> {
+		const result = await db
+			.select({ count: sql<number>`count(*)::int` })
+			.from(messages)
+			.where(and(eq(messages.receiverId, userId), eq(messages.isRead, false)));
+		return Number(result[0]?.count ?? 0);
+	}
 }
+

@@ -8,6 +8,7 @@ export const load = async ({ locals }) => {
 
 	let notifications: any[] = [];
 	let currentUser = null;
+	let unreadMessagesCount = 0;
 	try {
 		const userEntity = await container.getUserByIdUseCase.execute(locals.user.sub);
 		if (userEntity) {
@@ -20,6 +21,7 @@ export const load = async ({ locals }) => {
 		}
 
 		notifications = await container.getNotificationsUseCase.execute(locals.user.sub);
+		unreadMessagesCount = await container.getUnreadMessageCountUseCase.execute(locals.user.sub);
 	} catch (err) {
 		console.error('Failed to load user or notifications in layout:', err);
 	}
@@ -27,6 +29,7 @@ export const load = async ({ locals }) => {
 	return {
 		user: locals.user,
 		currentUser,
-		notifications
+		notifications,
+		unreadMessagesCount
 	};
 };

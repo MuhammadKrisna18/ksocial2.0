@@ -1,5 +1,8 @@
 <script lang="ts">
+	import { onDestroy, onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { enhance } from '$app/forms';
+	import { chatState } from '$lib/presentation/stores/chatState.svelte';
 
 	let { data, children } = $props();
 
@@ -14,7 +17,32 @@
 		isNotifOpen = !isNotifOpen;
 	}
 
-	import { enhance } from '$app/forms';
+	// Initialize unread count from server
+	$effect(() => {
+		if (typeof data.unreadMessagesCount === 'number') {
+			chatState.init(data.unreadMessagesCount);
+		}
+	});
+
+	let eventSource: EventSource | null = null;
+	onMount(() => {
+		eventSource = new EventSource('/api/chat/stream');
+		eventSource.addEventListener('message', (event) => {
+			try {
+				const message = JSON.parse(event.data);
+				chatState.handleIncomingMessage(message, data.user?.sub ?? '');
+			} catch (e) {
+				console.error('Invalid SSE chat event', e);
+			}
+		});
+		eventSource.onerror = () => {
+			// Browser automatically attempts reconnect on error
+		};
+	});
+
+	onDestroy(() => {
+		eventSource?.close();
+	});
 
 	// --- Search State ---
 	let searchQuery = $state('');
@@ -73,25 +101,33 @@
 				{#each menuItems as item}
 					<a
 						href={item.path}
-						class="group flex items-center rounded-2xl px-4 py-3 text-sm font-bold transition-all
+						class="group flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-bold transition-all
 						{$page.url.pathname === item.path 
 							? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 dark:shadow-blue-900/30' 
 							: 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'}"
 					>
-						<svg
-							class="mr-4 h-5 w-5 flex-shrink-0 transition-transform {$page.url.pathname === item.path ? 'scale-110' : 'group-hover:scale-110'}"
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-							stroke-width="2"
-						>
-							<path stroke-linecap="round" stroke-linejoin="round" d={item.icon} />
-						</svg>
-						{item.name}
+						<div class="flex items-center min-w-0">
+							<svg
+								class="mr-4 h-5 w-5 flex-shrink-0 transition-transform {$page.url.pathname === item.path ? 'scale-110' : 'group-hover:scale-110'}"
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+								stroke-width="2"
+							>
+								<path stroke-linecap="round" stroke-linejoin="round" d={item.icon} />
+							</svg>
+							<span class="truncate">{item.name}</span>
+						</div>
+						{#if item.name === 'Messages' && chatState.totalUnread > 0}
+							<span class="ml-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-extrabold text-white shadow-sm shadow-red-500/30 animate-pulse">
+								{chatState.totalUnread > 99 ? '99+' : chatState.totalUnread}
+							</span>
+						{/if}
 					</a>
 				{/each}
 			</nav>
+
 
 			<!-- User Profile Footer -->
 			<div class="border-t border-slate-100 dark:border-slate-800 p-4">
@@ -277,4 +313,78 @@
 			{@render children()}
 		</main>
 	</div>
+
+	<!-- Floating Toast Notification for Incoming Messages -->
+	{#if chatState.activeToast}
+		<div
+			class="fixed top-5 right-5 z-[100] max-w-sm w-full animate-in slide-in-from-top-4 fade-in duration-300 pointer-events-auto"
+		>
+			<div class="flex items-start gap-3 rounded-2xl border border-blue-500/30 bg-white/95 dark:bg-slate-900/95 p-4 shadow-2xl backdrop-blur-xl ring-1 ring-black/5 dark:ring-white/10">
+				<!-- Avatar / Icon -->
+				<div class="relative shrink-0">
+					{#if chatState.activeToast.senderAvatar}
+						<img
+							src={chatState.activeToast.senderAvatar}
+							alt={chatState.activeToast.senderName}
+							class="h-11 w-11 rounded-full object-cover ring-2 ring-blue-500/30"
+						/>
+					{:else}
+						<div class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 font-bold text-white shadow-md shadow-blue-500/20">
+							{chatState.activeToast.senderName ? chatState.activeToast.senderName.charAt(0).toUpperCase() : 'U'}
+						</div>
+					{/if}
+					<div class="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[9px] text-white ring-2 ring-white dark:ring-slate-900">
+						💬
+					</div>
+				</div>
+
+				<!-- Content -->
+				<div class="min-w-0 flex-1">
+					<div class="flex items-center justify-between gap-1">
+						<p class="truncate text-xs font-bold text-slate-900 dark:text-white">
+							{chatState.activeToast.senderName}
+						</p>
+						<span class="rounded bg-blue-50 dark:bg-blue-900/40 px-1.5 py-0.5 text-[10px] font-semibold text-blue-600 dark:text-blue-400 shrink-0">
+							Pesan Baru
+						</span>
+					</div>
+					<p class="mt-1 line-clamp-2 text-xs text-slate-600 dark:text-slate-300">
+						{chatState.activeToast.content}
+					</p>
+					<div class="mt-2.5 flex items-center gap-2">
+						<a
+							href={`/user/messages?contact=${encodeURIComponent(chatState.activeToast.senderId)}`}
+							onclick={() => chatState.dismissToast()}
+							class="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-blue-700 transition active:scale-95"
+						>
+							<span>Buka Obrolan</span>
+							<svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+							</svg>
+						</a>
+						<button
+							type="button"
+							onclick={() => chatState.dismissToast()}
+							class="rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition"
+						>
+							Tutup
+						</button>
+					</div>
+				</div>
+
+				<!-- Close Button -->
+				<button
+					type="button"
+					onclick={() => chatState.dismissToast()}
+					class="shrink-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
+					aria-label="Tutup notifikasi"
+				>
+					<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+		</div>
+	{/if}
 </div>
+

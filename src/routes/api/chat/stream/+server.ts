@@ -19,11 +19,18 @@ export const GET: RequestHandler = ({ locals }) => {
 				const message = event.message;
 				if (message.senderId !== locals.user?.sub && message.receiverId !== locals.user?.sub) return;
 				try {
-					controller.enqueue(encoder.encode(`event: message\ndata: ${JSON.stringify(message)}\n\n`));
+					const payload = {
+						...message,
+						senderName: event.sender?.fullName || 'Pengguna',
+						senderUsername: event.sender?.username || '',
+						senderAvatar: event.sender?.avatarUrl || null
+					};
+					controller.enqueue(encoder.encode(`event: message\ndata: ${JSON.stringify(payload)}\n\n`));
 				} catch {
 					close();
 				}
 			};
+
 			eventDispatcher.register('MessageSentEvent', messageHandler);
 			const intervalId = setInterval(() => {
 				try {
