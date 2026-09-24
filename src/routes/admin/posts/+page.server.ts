@@ -21,6 +21,10 @@ export const actions: Actions = {
 			throw redirect(302, '/login');
 		}
 
+		if (!locals.user.roles?.includes('admin')) {
+			return fail(403, { error: true, message: 'Forbidden: Akses admin diperlukan' });
+		}
+
 		const data = await request.formData();
 		const postId = data.get('postId')?.toString();
 
@@ -31,8 +35,9 @@ export const actions: Actions = {
 		try {
 			await container.adminDeletePostUseCase.execute(postId, locals.user.sub);
 			return { success: true, message: 'Postingan berhasil dihapus dan pemberitahuan telah dikirimkan ke pengguna.' };
-		} catch (err: any) {
-			return fail(400, { error: true, message: err?.message || 'Gagal menghapus postingan' });
+		} catch (err) {
+			const message = err instanceof Error ? err.message : 'Gagal menghapus postingan';
+			return fail(400, { error: true, message });
 		}
 	}
 };

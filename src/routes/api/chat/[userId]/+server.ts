@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import { container } from '$lib/infrastructure/config/container';
 import { handleApplicationError } from '$lib/presentation/utils/response';
 import type { RequestHandler } from './$types';
+import { chatRateLimiter } from '$lib/infrastructure/security/RateLimiter';
 
 export const GET: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -23,6 +24,23 @@ export const GET: RequestHandler = async ({ params, request, locals }) => {
 
 export const POST: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+
+	// Anti-spam / message flood rate limiting
+	const rateCheck = chatRateLimiter.consume(locals.user.sub);
+	if (!rateCheck.allowed) {
+		return json(
+			{
+				error: `Terlalu banyak pesan terkirim. Mohon tunggu ${rateCheck.resetInSeconds} detik sebelum mengirim lagi.`
+			},
+			{
+				status: 429,
+				headers: {
+					'Retry-After': rateCheck.resetInSeconds.toString(),
+					...chatRateLimiter.getHeaders(rateCheck)
+				}
+			}
+		);
+	}
 
 	let body: unknown;
 	try {

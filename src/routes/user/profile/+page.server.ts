@@ -3,6 +3,7 @@ import { container } from '$lib/infrastructure/config/container';
 import { fail, redirect } from '@sveltejs/kit';
 import { handleActionError } from '$lib/presentation/utils/response';
 import { localFileStorage, postFileStorage } from '$lib/infrastructure/storage/LocalFileStorage';
+import { validateImageFile, validatePostMediaFile } from '$lib/infrastructure/storage/uploadValidator';
 import crypto from 'crypto';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -54,15 +55,17 @@ export const actions: Actions = {
 			return fail(400, { error: 'Post content cannot be empty', content });
 		}
 
-		let media: { url: string; type: 'image' | 'video' }[] = [];
+		const media: { url: string; type: 'image' | 'video' }[] = [];
 
 		if (files.length > 0 && files[0].size > 0) {
 			for (const file of files) {
-				const ext = file.name.split('.').pop() || '';
-				const filename = `post_${userId}_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
+				const validation = validatePostMediaFile(file);
+				if (!validation.isValid) {
+					return fail(400, { error: validation.error ?? 'File media tidak valid', content });
+				}
+				const filename = `post_${userId}_${Date.now()}_${Math.random().toString(36).substring(7)}.${validation.safeExtension}`;
 				const url = await postFileStorage.saveFile(file, filename);
-				const type = file.type.startsWith('video/') ? 'video' : 'image';
-				media.push({ url, type });
+				media.push({ url, type: validation.mediaType ?? 'image' });
 			}
 		}
 
@@ -107,7 +110,7 @@ export const actions: Actions = {
 			});
 
 			return { successProfile: true, message: 'Profil berhasil diperbarui!' };
-		} catch (error: any) {
+		} catch (error) {
 			return handleActionError(error, 'Terjadi kesalahan saat memperbarui profil.', { successProfile: false });
 		}
 	},
@@ -118,13 +121,13 @@ export const actions: Actions = {
 		const data = await request.formData();
 		const file = data.get('file') as File;
 
-		if (!file || !file.size) {
-			return fail(400, { successPhoto: false, message: 'File tidak ditemukan.' });
+		const validation = validateImageFile(file);
+		if (!validation.isValid) {
+			return fail(400, { successPhoto: false, message: validation.error ?? 'File foto profil tidak valid.' });
 		}
 
 		try {
-			const ext = file.name.split('.').pop() || 'png';
-			const filename = `avatar_${locals.user!.sub}_${crypto.randomBytes(4).toString('hex')}.${ext}`;
+			const filename = `avatar_${locals.user!.sub}_${crypto.randomBytes(4).toString('hex')}.${validation.safeExtension}`;
 			const url = await localFileStorage.saveFile(file, filename);
 
 			await container.updateUserUseCase.updatePhotos({
@@ -133,7 +136,7 @@ export const actions: Actions = {
 			});
 
 			return { successPhoto: true, message: 'Foto profil berhasil diperbarui!' };
-		} catch (error: any) {
+		} catch (error) {
 			return handleActionError(error, 'Gagal mengunggah foto profil.', { successPhoto: false });
 		}
 	},
@@ -142,13 +145,13 @@ export const actions: Actions = {
 		const data = await request.formData();
 		const file = data.get('file') as File;
 
-		if (!file || !file.size) {
-			return fail(400, { successPhoto: false, message: 'File tidak ditemukan.' });
+		const validation = validateImageFile(file);
+		if (!validation.isValid) {
+			return fail(400, { successPhoto: false, message: validation.error ?? 'File foto sampul tidak valid.' });
 		}
 
 		try {
-			const ext = file.name.split('.').pop() || 'png';
-			const filename = `cover_${locals.user!.sub}_${crypto.randomBytes(4).toString('hex')}.${ext}`;
+			const filename = `cover_${locals.user!.sub}_${crypto.randomBytes(4).toString('hex')}.${validation.safeExtension}`;
 			const url = await localFileStorage.saveFile(file, filename);
 
 			await container.updateUserUseCase.updatePhotos({
@@ -157,7 +160,7 @@ export const actions: Actions = {
 			});
 
 			return { successPhoto: true, message: 'Foto sampul berhasil diperbarui!' };
-		} catch (error: any) {
+		} catch (error) {
 			return handleActionError(error, 'Gagal mengunggah foto sampul.', { successPhoto: false });
 		}
 	},
@@ -175,7 +178,7 @@ export const actions: Actions = {
 			});
 
 			return { successPhoto: true, message: 'Foto profil berhasil dihapus!' };
-		} catch (error: any) {
+		} catch (error) {
 			return handleActionError(error, 'Gagal menghapus foto profil.', { successPhoto: false });
 		}
 	},
@@ -193,7 +196,7 @@ export const actions: Actions = {
 			});
 
 			return { successPhoto: true, message: 'Foto sampul berhasil dihapus!' };
-		} catch (error: any) {
+		} catch (error) {
 			return handleActionError(error, 'Gagal menghapus foto sampul.', { successPhoto: false });
 		}
 	},

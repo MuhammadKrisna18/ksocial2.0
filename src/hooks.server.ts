@@ -1,6 +1,7 @@
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 import { container } from '$lib/infrastructure/config/container';
 import type { RoleNameType } from '$lib/domain/value-objects/RoleName';
+import { apiRateLimiter, getClientIp } from '$lib/infrastructure/security/RateLimiter';
 
 const PUBLIC_ROUTES = new Set(['/', '/login', '/register']);
 
@@ -36,13 +37,34 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	const { pathname } = event.url;
 
+	const STATIC_ASSET_REGEX = /\.(css|js|png|jpg|jpeg|webp|gif|svg|ico|woff2?|map|txt|webmanifest)$/i;
 
-	if (pathname.startsWith('/_') || pathname.startsWith('/@') || pathname.includes('.')) {
+	if (pathname.startsWith('/_') || pathname.startsWith('/@') || STATIC_ASSET_REGEX.test(pathname)) {
 		return resolve(event);
 	}
 
-	if (!PUBLIC_ROUTES.has(pathname)) {
+	// Anti-DoS rate limiting for API routes
+	if (isApiRoute(pathname)) {
+		const clientIp = getClientIp(event);
+		const rateCheck = apiRateLimiter.consume(clientIp);
+		if (!rateCheck.allowed) {
+			return new Response(
+				JSON.stringify({
+					error: 'Too many requests. Please slow down.',
+					retryAfter: rateCheck.resetInSeconds
+				}),
+				{
+					status: 429,
+					headers: {
+						'Content-Type': 'application/json',
+						...apiRateLimiter.getHeaders(rateCheck)
+					}
+				}
+			);
+		}
+	}
 
+	if (!PUBLIC_ROUTES.has(pathname)) {
 		if (!event.locals.user) {
 			if (isApiRoute(pathname)) {
 				return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -52,7 +74,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 			}
 			return new Response(null, { status: 302, headers: { location: '/login' } });
 		}
-
 
 		const matchedRoute = PROTECTED_ROUTES.find(({ pattern }) => pattern.test(pathname));
 		if (matchedRoute) {
@@ -66,7 +87,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 						headers: { 'Content-Type': 'application/json' }
 					});
 				}
-				
+
 				const fallbackPath = userRoles.includes('admin') ? '/admin' : '/user';
 				return new Response(null, { status: 302, headers: { location: fallbackPath } });
 			}
@@ -80,6 +101,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const response = await resolve(event, {
 		transformPageChunk: ({ html }) => html.replace('%sveltekit.html.attributes%', `class="${theme}"`)
 	});
+
+	// Standard Security Headers
+	response.headers.set('X-Content-Type-Options', 'nosniff');
+	response.headers.set('X-Frame-Options', 'DENY');
+	response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
 	if (!PUBLIC_ROUTES.has(pathname)) {
 		response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');

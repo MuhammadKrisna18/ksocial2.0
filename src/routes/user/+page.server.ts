@@ -3,6 +3,8 @@ import { container } from '$lib/infrastructure/config/container';
 import { fail } from '@sveltejs/kit';
 import { handleActionError } from '$lib/presentation/utils/response';
 import { postFileStorage } from '$lib/infrastructure/storage/LocalFileStorage';
+import { validatePostMediaFile } from '$lib/infrastructure/storage/uploadValidator';
+import { postRateLimiter } from '$lib/infrastructure/security/RateLimiter';
 
 export const load: PageServerLoad = async ({ locals, setHeaders }) => {
 	setHeaders({
@@ -22,6 +24,14 @@ export const actions: Actions = {
 			return fail(401, { error: 'Unauthorized' });
 		}
 
+		// Anti-flood rate limiting for posts
+		const rateCheck = postRateLimiter.consume(userId);
+		if (!rateCheck.allowed) {
+			return fail(429, {
+				error: `Anda membuat postingan terlalu cepat. Silakan tunggu ${rateCheck.resetInSeconds} detik.`
+			});
+		}
+
 		const data = await request.formData();
 		const content = data.get('content')?.toString() || '';
 		const files = data.getAll('media') as File[];
@@ -30,15 +40,17 @@ export const actions: Actions = {
 			return fail(400, { error: 'Post content cannot be empty', content });
 		}
 
-		let media: { url: string; type: 'image' | 'video' }[] = [];
+		const media: { url: string; type: 'image' | 'video' }[] = [];
 
 		if (files.length > 0 && files[0].size > 0) {
 			for (const file of files) {
-				const ext = file.name.split('.').pop() || '';
-				const filename = `post_${userId}_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
+				const validation = validatePostMediaFile(file);
+				if (!validation.isValid) {
+					return fail(400, { error: validation.error ?? 'Invalid media file', content });
+				}
+				const filename = `post_${userId}_${Date.now()}_${Math.random().toString(36).substring(7)}.${validation.safeExtension}`;
 				const url = await postFileStorage.saveFile(file, filename);
-				const type = file.type.startsWith('video/') ? 'video' : 'image';
-				media.push({ url, type });
+				media.push({ url, type: validation.mediaType ?? 'image' });
 			}
 		}
 

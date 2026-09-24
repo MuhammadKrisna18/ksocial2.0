@@ -3,9 +3,9 @@ import type { Actions, PageServerLoad } from './$types';
 import { container } from '$lib/infrastructure/config/container';
 import { ACCESS_TOKEN_COOKIE, getAuthCookieOptions } from '$lib/presentation/utils/cookie';
 import { dev } from '$app/environment';
+import { registerRateLimiter, getClientIp } from '$lib/infrastructure/security/RateLimiter';
 
 export const load: PageServerLoad = async ({ locals }) => {
-
 	if (locals.user) {
 		const roles = locals.user.roles ?? [];
 		if (roles.includes('admin')) {
@@ -17,7 +17,19 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
+	default: async (event) => {
+		const { request, cookies } = event;
+		const clientIp = getClientIp(event);
+
+		// Anti-bot / spam account creation rate limiting
+		const rateCheck = registerRateLimiter.consume(clientIp);
+		if (!rateCheck.allowed) {
+			return fail(429, {
+				error: `Terlalu banyak permintaan pendaftaran. Silakan coba lagi dalam ${rateCheck.resetInSeconds} detik.`,
+				values: undefined
+			});
+		}
+
 		const formData = await request.formData();
 		const fullName = formData.get('fullName') as string;
 		const username = formData.get('username') as string;
@@ -32,7 +44,6 @@ export const actions: Actions = {
 			});
 		}
 
-
 		const email = `${emailPrefix}@user.sveltekit.co.id`;
 		const dateOfBirth = new Date(dateOfBirthStr);
 
@@ -46,10 +57,8 @@ export const actions: Actions = {
 			});
 
 			cookies.set(ACCESS_TOKEN_COOKIE, result.accessToken, getAuthCookieOptions(!dev));
-			
-		} catch (error: any) {
-			const message = error.message || 'Terjadi kesalahan saat pendaftaran.';
-			
+		} catch (error: unknown) {
+			const message = error instanceof Error ? error.message : 'Terjadi kesalahan saat pendaftaran.';
 
 			let friendlyError = message;
 			if (message.includes('Username already in use')) {
@@ -57,13 +66,13 @@ export const actions: Actions = {
 			} else if (message.includes('Email already in use')) {
 				friendlyError = 'Email tersebut sudah terdaftar.';
 			}
-			
+
 			return fail(400, {
 				error: friendlyError,
 				values: { fullName, username, emailPrefix, dateOfBirth: dateOfBirthStr }
 			});
 		}
-		
+
 		throw redirect(302, '/user');
 	}
 };

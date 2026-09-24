@@ -15,16 +15,30 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			currentUserId: locals.user?.sub
 		});
 
-		// Dapatkan postingan dari user tersebut
-		const userPosts = await container.getUserPostsUseCase.execute(profile.id, locals.user?.sub);
+		const isCurrentUser = profile.isCurrentUser;
+		const canViewPrivateContent =
+			isCurrentUser ||
+			!profile.isPrivate ||
+			profile.followStatus === 'following' ||
+			profile.followStatus === 'friends';
+
+		// Hanya muat postingan jika akun publik, pemilik akun, atau follower yang sudah diterima
+		const userPosts = canViewPrivateContent
+			? await container.getUserPostsUseCase.execute(profile.id, locals.user?.sub)
+			: [];
 
 		return {
 			profile: {
 				id: profile.id,
 				fullName: profile.fullName,
 				username: profile.username,
-				email: profile.email,
-				dateOfBirth: profile.dateOfBirth.toISOString().split('T')[0],
+				// Lindungi PII: Email hanya untuk pemilik akun
+				email: isCurrentUser ? profile.email : null,
+				// Tanggal lahir hanya jika diizinkan melihat konten pribadi
+				dateOfBirth:
+					(isCurrentUser || canViewPrivateContent) && profile.dateOfBirth
+						? profile.dateOfBirth.toISOString().split('T')[0]
+						: null,
 				location: profile.location,
 				relationshipStatus: profile.relationshipStatus,
 				isPrivate: profile.isPrivate,
@@ -56,9 +70,10 @@ export const actions: Actions = {
 			});
 
 			return { success: true };
-		} catch (err: any) {
+		} catch (err) {
 			console.error('Follow error:', err);
-			return { success: false, error: err.message || 'Failed to follow user' };
+			const message = err instanceof Error ? err.message : 'Failed to follow user';
+			return { success: false, error: message };
 		}
 	}
 };
