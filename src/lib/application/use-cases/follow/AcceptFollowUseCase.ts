@@ -16,17 +16,26 @@ export class AcceptFollowUseCase {
 
 	async execute(dto: AcceptFollowDTO): Promise<void> {
 		const existingFollow = await this.followRepo.findByUsers(dto.followerId, dto.followingId);
-		if (!existingFollow || existingFollow.status !== 'pending') {
-			throw new NotFoundError('No pending follow request found');
+		if (!existingFollow) {
+			throw new NotFoundError('No follow request found');
 		}
 
-		const event = existingFollow.accept();
-		
-		await this.followRepo.updateStatus(dto.followerId, dto.followingId, existingFollow.status);
+		if (existingFollow.status === 'pending') {
+			const event = existingFollow.accept();
+			await this.followRepo.updateStatus(dto.followerId, dto.followingId, existingFollow.status);
+			Object.assign(event, { notificationId: dto.notificationId });
+			await this.eventDispatcher.dispatch(event.constructor.name, event);
+			return;
+		}
 
-		// Event dispatcher handles notifications deletion now
-		// We set notificationId manually just in case Event Handler needs it.
-		Object.assign(event, { notificationId: dto.notificationId });
-		await this.eventDispatcher.dispatch(event.constructor.name, event);
+		if (existingFollow.status === 'accepted') {
+			// Already accepted (e.g. from a duplicate notification). Clean up any leftover notifications.
+			const event = {
+				followerId: dto.followerId,
+				followingId: dto.followingId,
+				notificationId: dto.notificationId
+			};
+			await this.eventDispatcher.dispatch('UserFollowAcceptedEvent', event as any);
+		}
 	}
 }

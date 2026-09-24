@@ -21,8 +21,7 @@ export class RejectFollowUseCase {
 
 		if (dto.notificationId) {
 			await this.notificationRepo.delete(dto.notificationId);
-		} else {
-			await this.notificationRepo.deleteByDetails(dto.followingId, dto.followerId, 'follow_request');
 		}
+		await this.notificationRepo.deleteByDetails(dto.followingId, dto.followerId, 'follow_request');
 	}
 }

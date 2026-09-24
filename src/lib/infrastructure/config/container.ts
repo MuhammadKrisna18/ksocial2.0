@@ -120,10 +120,10 @@ class Container {
 		if (!this._notificationEventHandler) {
 			this._notificationEventHandler = new NotificationEventHandler(this.notificationRepository);
 			
-			eventDispatcher.register('UserFollowRequestedEvent', (event: any) => this._notificationEventHandler!.handleFollowRequested(event));
-			eventDispatcher.register('UserFollowAcceptedEvent', (event: any) => this._notificationEventHandler!.handleFollowAccepted(event));
-			eventDispatcher.register('PostLikedEvent', (event: any) => this._notificationEventHandler!.handlePostLiked(event));
-			eventDispatcher.register('PostCommentedEvent', (event: any) => this._notificationEventHandler!.handlePostCommented(event));
+			eventDispatcher.register('UserFollowRequestedEvent', (event: any) => this._notificationEventHandler!.handleFollowRequested(event), 'NotificationEventHandler_handleFollowRequested');
+			eventDispatcher.register('UserFollowAcceptedEvent', (event: any) => this._notificationEventHandler!.handleFollowAccepted(event), 'NotificationEventHandler_handleFollowAccepted');
+			eventDispatcher.register('PostLikedEvent', (event: any) => this._notificationEventHandler!.handlePostLiked(event), 'NotificationEventHandler_handlePostLiked');
+			eventDispatcher.register('PostCommentedEvent', (event: any) => this._notificationEventHandler!.handlePostCommented(event), 'NotificationEventHandler_handlePostCommented');
 		}
 	}
 

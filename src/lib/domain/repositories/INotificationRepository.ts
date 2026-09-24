@@ -15,4 +15,5 @@ export interface INotificationRepository {
 	markAsRead(id: string): Promise<void>;
 	delete(id: string): Promise<void>;
 	deleteByDetails(userId: string, senderId: string, type: string): Promise<void>;
+	findExisting(userId: string, senderId: string, type: string): Promise<Notification | null>;
 }

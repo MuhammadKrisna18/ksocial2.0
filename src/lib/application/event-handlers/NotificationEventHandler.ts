@@ -8,6 +8,12 @@ export class NotificationEventHandler {
 	constructor(private notificationRepo: INotificationRepository) {}
 
 	async handleFollowRequested(event: UserFollowRequestedEvent): Promise<void> {
+		// Prevent creating duplicate follow_request notification
+		const existing = await this.notificationRepo.findExisting(event.followingId, event.followerId, 'follow_request');
+		if (existing) {
+			return;
+		}
+
 		const id = `notif_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 		await this.notificationRepo.create({
 			id,
@@ -18,10 +24,10 @@ export class NotificationEventHandler {
 	}
 
 	async handleFollowAccepted(event: UserFollowAcceptedEvent): Promise<void> {
+		// Always delete ALL follow_request notifications between these users
+		await this.notificationRepo.deleteByDetails(event.followingId, event.followerId, 'follow_request');
 		if (event.notificationId) {
 			await this.notificationRepo.delete(event.notificationId);
-		} else {
-			await this.notificationRepo.deleteByDetails(event.followingId, event.followerId, 'follow_request');
 		}
 	}
 

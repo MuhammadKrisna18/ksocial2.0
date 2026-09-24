@@ -76,4 +76,21 @@ export class DrizzleNotificationRepository implements INotificationRepository {
 				)
 			);
 	}
+
+	async findExisting(userId: string, senderId: string, type: string): Promise<Notification | null> {
+		const rows = await db
+			.select()
+			.from(notifications)
+			.where(
+				and(
+					eq(notifications.userId, userId),
+					eq(notifications.senderId, senderId),
+					eq(notifications.type, type)
+				)
+			)
+			.limit(1);
+
+		if (!rows.length) return null;
+		return this.mapToEntity(rows[0]);
+	}
 }

@@ -14,7 +14,20 @@ export class GetNotificationsUseCase {
 			return [];
 		}
 
-		const senderIds = Array.from(new Set(rawNotifications.map((n) => n.senderId)));
+		// Deduplicate: if there are multiple follow_requests from the same sender, keep only the latest one
+		const seenFollowRequests = new Set<string>();
+		const uniqueNotifications = rawNotifications.filter((n) => {
+			if (n.type === 'follow_request') {
+				if (seenFollowRequests.has(n.senderId)) {
+					void this.notificationRepo.delete(n.id);
+					return false;
+				}
+				seenFollowRequests.add(n.senderId);
+			}
+			return true;
+		});
+
+		const senderIds = Array.from(new Set(uniqueNotifications.map((n) => n.senderId)));
 		const sendersMap = new Map<string, { username: string; fullName: string }>();
 
 		await Promise.all(
@@ -29,7 +42,7 @@ export class GetNotificationsUseCase {
 			})
 		);
 
-		return rawNotifications.map((n) => {
+		return uniqueNotifications.map((n) => {
 			const sender = sendersMap.get(n.senderId);
 			return {
 				id: n.id,
