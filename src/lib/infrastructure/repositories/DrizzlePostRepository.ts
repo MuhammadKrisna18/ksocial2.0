@@ -3,6 +3,7 @@ import { db } from '../database/client';
 import { posts } from '../database/schema/posts';
 import { savedPosts } from '../database/schema/savedPosts';
 import { likes } from '../database/schema/likes';
+import { comments } from '../database/schema/comments';
 import { users } from '../database/schema/users';
 import { Post } from '../../domain/entities/Post';
 import type { IPostRepository, CreatePostData, PostViewData } from '../../domain/repositories/IPostRepository';
@@ -40,19 +41,15 @@ export class DrizzlePostRepository implements IPostRepository {
 					fullName: users.fullName,
 					username: users.username
 				},
-				savedByUserId: savedPosts.userId,
-				likedByUserId: likes.userId
+				isSaved: currentUserId
+					? sql<boolean>`exists(select 1 from ${savedPosts} where ${savedPosts.postId} = ${posts.id} and ${savedPosts.userId} = ${currentUserId})`
+					: sql<boolean>`false`,
+				isLiked: currentUserId
+					? sql<boolean>`exists(select 1 from ${likes} where ${likes.postId} = ${posts.id} and ${likes.userId} = ${currentUserId})`
+					: sql<boolean>`false`
 			})
 			.from(posts)
 			.innerJoin(users, eq(posts.userId, users.id))
-			.leftJoin(savedPosts, and(
-				eq(savedPosts.postId, posts.id),
-				currentUserId ? eq(savedPosts.userId, currentUserId) : undefined
-			))
-			.leftJoin(likes, and(
-				eq(likes.postId, posts.id),
-				currentUserId ? eq(likes.userId, currentUserId) : undefined
-			))
 			.orderBy(desc(posts.createdAt));
 
 		return results.map((row): PostViewData => ({
@@ -65,8 +62,8 @@ export class DrizzlePostRepository implements IPostRepository {
 			commentsCount: row.post.commentsCount,
 			sharesCount: row.post.sharesCount,
 			media: row.post.media as any,
-			isSaved: !!row.savedByUserId,
-			isLiked: !!row.likedByUserId,
+			isSaved: row.isSaved,
+			isLiked: row.isLiked,
 			createdAt: row.post.createdAt,
 			updatedAt: row.post.updatedAt
 		}));
@@ -91,15 +88,11 @@ export class DrizzlePostRepository implements IPostRepository {
 					fullName: users.fullName,
 					username: users.username
 				},
-				likedByUserId: likes.userId
+				isLiked: sql<boolean>`exists(select 1 from ${likes} where ${likes.postId} = ${posts.id} and ${likes.userId} = ${userId})`
 			})
 			.from(savedPosts)
 			.innerJoin(posts, eq(savedPosts.postId, posts.id))
 			.innerJoin(users, eq(posts.userId, users.id))
-			.leftJoin(likes, and(
-				eq(likes.postId, posts.id),
-				eq(likes.userId, userId)
-			))
 			.where(eq(savedPosts.userId, userId))
 			.orderBy(desc(savedPosts.createdAt));
 
@@ -114,7 +107,7 @@ export class DrizzlePostRepository implements IPostRepository {
 			sharesCount: row.post.sharesCount,
 			media: row.post.media as any,
 			isSaved: true,
-			isLiked: !!row.likedByUserId,
+			isLiked: row.isLiked,
 			createdAt: row.post.createdAt,
 			updatedAt: row.post.updatedAt
 		}));
@@ -128,19 +121,15 @@ export class DrizzlePostRepository implements IPostRepository {
 					fullName: users.fullName,
 					username: users.username
 				},
-				savedByUserId: savedPosts.userId,
-				likedByUserId: likes.userId
+				isSaved: currentUserId
+					? sql<boolean>`exists(select 1 from ${savedPosts} where ${savedPosts.postId} = ${posts.id} and ${savedPosts.userId} = ${currentUserId})`
+					: sql<boolean>`false`,
+				isLiked: currentUserId
+					? sql<boolean>`exists(select 1 from ${likes} where ${likes.postId} = ${posts.id} and ${likes.userId} = ${currentUserId})`
+					: sql<boolean>`false`
 			})
 			.from(posts)
 			.innerJoin(users, eq(posts.userId, users.id))
-			.leftJoin(savedPosts, and(
-				eq(savedPosts.postId, posts.id),
-				currentUserId ? eq(savedPosts.userId, currentUserId) : undefined
-			))
-			.leftJoin(likes, and(
-				eq(likes.postId, posts.id),
-				currentUserId ? eq(likes.userId, currentUserId) : undefined
-			))
 			.where(eq(posts.userId, userId))
 			.orderBy(desc(posts.createdAt));
 
@@ -154,8 +143,8 @@ export class DrizzlePostRepository implements IPostRepository {
 			commentsCount: row.post.commentsCount,
 			sharesCount: row.post.sharesCount,
 			media: row.post.media as any,
-			isSaved: !!row.savedByUserId,
-			isLiked: !!row.likedByUserId,
+			isSaved: row.isSaved,
+			isLiked: row.isLiked,
 			createdAt: row.post.createdAt,
 			updatedAt: row.post.updatedAt
 		}));
@@ -259,5 +248,18 @@ export class DrizzlePostRepository implements IPostRepository {
 		.orderBy(desc(likes.createdAt));
 
 		return results;
+	}
+
+	async count(): Promise<number> {
+		const result = await db.select({ count: sql<number>`count(*)::int` }).from(posts);
+		return Number(result[0]?.count ?? 0);
+	}
+
+	async deleteByAdmin(postId: string): Promise<boolean> {
+		await db.delete(savedPosts).where(eq(savedPosts.postId, postId));
+		await db.delete(likes).where(eq(likes.postId, postId));
+		await db.delete(comments).where(eq(comments.postId, postId));
+		const result = await db.delete(posts).where(eq(posts.id, postId)).returning({ id: posts.id });
+		return result.length > 0;
 	}
 }

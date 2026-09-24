@@ -289,6 +289,39 @@
 														</div>
 													</div>
 												</a>
+											{:else if notif.type === 'post_deleted_by_admin'}
+												<div class="p-4 bg-red-50/60 dark:bg-red-950/20 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
+													<div class="flex gap-3">
+														<div class="mt-1 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 p-2 rounded-full h-fit shrink-0">
+															<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+																<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+															</svg>
+														</div>
+														<div class="flex-1 min-w-0">
+															<div class="flex items-center justify-between gap-2">
+																<p class="text-sm font-bold text-red-700 dark:text-red-400">
+																	Postingan Dihapus oleh Admin
+																</p>
+																<form method="POST" action="/user/notifications?/dismiss" use:enhance>
+																	<input type="hidden" name="notificationId" value={notif.id} />
+																	<button
+																		type="submit"
+																		class="rounded p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+																		title="Tutup pemberitahuan"
+																	>
+																		<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+																			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+																		</svg>
+																	</button>
+																</form>
+															</div>
+															<p class="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
+																Salah satu postingan Anda telah dihapus oleh administrator karena melanggar panduan komunitas atau kebijakan platform.
+															</p>
+															<p class="text-[11px] text-slate-400 mt-1.5">{new Date(notif.createdAt).toLocaleString()}</p>
+														</div>
+													</div>
+												</div>
 											{/if}
 										{/each}
 									</div>

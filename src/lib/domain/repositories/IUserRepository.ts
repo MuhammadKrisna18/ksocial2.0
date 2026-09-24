@@ -35,4 +35,5 @@ export interface IUserRepository {
 	count(): Promise<number>;
 	findAll(): Promise<User[]>;
 	search(query: string, currentUserId: string, limit?: number): Promise<UserSearchResult[]>;
+	getRecentUsers(limit?: number): Promise<{ id: string; username: string; fullName: string; createdAt: Date }[]>;
 }

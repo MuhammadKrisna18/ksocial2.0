@@ -25,4 +25,6 @@ export interface ICommentRepository {
 	toggleLike(userId: string, commentId: string): Promise<boolean>;
 	toggleSave(userId: string, commentId: string): Promise<boolean>;
 	getSavedCommentsByUserId(userId: string): Promise<CommentViewData[]>;
+	count(): Promise<number>;
+	getRecentComments(limit?: number): Promise<{ id: string; authorUsername: string; content: string; createdAt: Date }[]>;
 }

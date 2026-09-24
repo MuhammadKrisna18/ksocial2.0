@@ -16,6 +16,7 @@ import { GetFeedUseCase } from '$lib/application/use-cases/post/GetFeedUseCase';
 import { ToggleSavePostUseCase } from '$lib/application/use-cases/post/ToggleSavePostUseCase';
 import { GetSavedPostsUseCase } from '$lib/application/use-cases/post/GetSavedPostsUseCase';
 import { DeletePostUseCase } from '$lib/application/use-cases/post/DeletePostUseCase';
+import { AdminDeletePostUseCase } from '$lib/application/use-cases/post/AdminDeletePostUseCase';
 import { SharePostUseCase } from '$lib/application/use-cases/post/SharePostUseCase';
 import { GetFollowersDetailsUseCase } from '$lib/application/use-cases/follow/GetFollowersDetailsUseCase';
 import { GetFollowingDetailsUseCase } from '$lib/application/use-cases/follow/GetFollowingDetailsUseCase';
@@ -26,6 +27,7 @@ import { AcceptFollowUseCase } from '$lib/application/use-cases/follow/AcceptFol
 import { RejectFollowUseCase } from '$lib/application/use-cases/follow/RejectFollowUseCase';
 import { GetFollowStatusUseCase } from '$lib/application/use-cases/follow/GetFollowStatusUseCase';
 import { GetNotificationsUseCase } from '$lib/application/use-cases/notification/GetNotificationsUseCase';
+import { DismissNotificationUseCase } from '$lib/application/use-cases/notification/DismissNotificationUseCase';
 import { DrizzleLikeRepository } from '$lib/infrastructure/repositories/DrizzleLikeRepository';
 import { DrizzleCommentRepository } from '$lib/infrastructure/repositories/DrizzleCommentRepository';
 import { DrizzleMessageRepository } from '$lib/infrastructure/repositories/DrizzleMessageRepository';
@@ -124,6 +126,7 @@ class Container {
 			eventDispatcher.register('UserFollowAcceptedEvent', (event: any) => this._notificationEventHandler!.handleFollowAccepted(event), 'NotificationEventHandler_handleFollowAccepted');
 			eventDispatcher.register('PostLikedEvent', (event: any) => this._notificationEventHandler!.handlePostLiked(event), 'NotificationEventHandler_handlePostLiked');
 			eventDispatcher.register('PostCommentedEvent', (event: any) => this._notificationEventHandler!.handlePostCommented(event), 'NotificationEventHandler_handlePostCommented');
+			eventDispatcher.register('PostDeletedByAdminEvent', (event: any) => this._notificationEventHandler!.handlePostDeletedByAdmin(event), 'NotificationEventHandler_handlePostDeletedByAdmin');
 		}
 	}
 
@@ -145,7 +148,20 @@ class Container {
 	}
 
 	get getDashboardStatsUseCase(): GetDashboardStatsUseCase {
-		return new GetDashboardStatsUseCase(this.userRepository);
+		return new GetDashboardStatsUseCase(
+			this.userRepository,
+			this.postRepository,
+			this.commentRepository,
+			this.messageRepository
+		);
+	}
+
+	get adminDeletePostUseCase(): AdminDeletePostUseCase {
+		return new AdminDeletePostUseCase(this.postRepository, eventDispatcher);
+	}
+
+	get dismissNotificationUseCase(): DismissNotificationUseCase {
+		return new DismissNotificationUseCase(this.notificationRepository);
 	}
 
 	get getUsersUseCase(): GetUsersUseCase {

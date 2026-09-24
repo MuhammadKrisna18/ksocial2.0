@@ -194,4 +194,25 @@ export class DrizzleCommentRepository implements ICommentRepository {
 			replies: []
 		}));
 	}
+
+	async count(): Promise<number> {
+		const result = await db.select({ count: sql<number>`count(*)::int` }).from(comments);
+		return Number(result[0]?.count ?? 0);
+	}
+
+	async getRecentComments(limit = 5): Promise<{ id: string; authorUsername: string; content: string; createdAt: Date }[]> {
+		const rows = await db
+			.select({
+				id: comments.id,
+				authorUsername: users.username,
+				content: comments.content,
+				createdAt: comments.createdAt
+			})
+			.from(comments)
+			.innerJoin(users, eq(comments.userId, users.id))
+			.orderBy(desc(comments.createdAt))
+			.limit(limit);
+
+		return rows;
+	}
 }

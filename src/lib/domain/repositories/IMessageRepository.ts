@@ -21,5 +21,6 @@ export interface IMessageRepository {
 	getContacts(userId: string): Promise<ChatContact[]>;
 	markAsRead(senderId: string, receiverId: string): Promise<void>;
 	getUnreadCount(userId: string): Promise<number>;
+	count(): Promise<number>;
 }
 

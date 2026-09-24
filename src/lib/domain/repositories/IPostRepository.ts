@@ -37,4 +37,6 @@ export interface IPostRepository {
 	incrementComments(postId: string): Promise<void>;
 	decrementComments(postId: string): Promise<void>;
 	getPostLikes(postId: string): Promise<{ id: string; username: string; fullName: string; profilePictureUrl: string | null }[]>;
+	count(): Promise<number>;
+	deleteByAdmin(postId: string): Promise<boolean>;
 }

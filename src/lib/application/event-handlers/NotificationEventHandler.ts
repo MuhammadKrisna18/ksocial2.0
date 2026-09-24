@@ -3,6 +3,7 @@ import { UserFollowRequestedEvent } from '$lib/domain/events/UserFollowRequested
 import { UserFollowAcceptedEvent } from '$lib/domain/events/UserFollowAcceptedEvent';
 import { PostLikedEvent } from '$lib/domain/events/PostLikedEvent';
 import { PostCommentedEvent } from '$lib/domain/events/PostCommentedEvent';
+import { PostDeletedByAdminEvent } from '$lib/domain/events/PostDeletedByAdminEvent';
 
 export class NotificationEventHandler {
 	constructor(private notificationRepo: INotificationRepository) {}
@@ -53,6 +54,17 @@ export class NotificationEventHandler {
 			userId: event.authorId,
 			senderId: event.commenterId,
 			type: 'comment',
+			resourceId: event.postId
+		});
+	}
+
+	async handlePostDeletedByAdmin(event: PostDeletedByAdminEvent): Promise<void> {
+		const id = `notif_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+		await this.notificationRepo.create({
+			id,
+			userId: event.authorId,
+			senderId: event.adminId,
+			type: 'post_deleted_by_admin',
 			resourceId: event.postId
 		});
 	}

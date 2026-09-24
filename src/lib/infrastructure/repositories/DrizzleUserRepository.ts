@@ -1,4 +1,4 @@
-import { eq, inArray, or, ilike } from 'drizzle-orm';
+import { eq, inArray, or, ilike, desc } from 'drizzle-orm';
 import { db } from '$lib/infrastructure/database/client';
 import { users, roles, userRoles } from '$lib/infrastructure/database/schema/index';
 import { User } from '$lib/domain/entities/User';
@@ -211,6 +211,21 @@ export class DrizzleUserRepository implements IUserRepository {
 			.limit(limit);
 
 		return results;
+	}
+
+	async getRecentUsers(limit = 5): Promise<{ id: string; username: string; fullName: string; createdAt: Date }[]> {
+		const rows = await db
+			.select({
+				id: users.id,
+				username: users.username,
+				fullName: users.fullName,
+				createdAt: users.createdAt
+			})
+			.from(users)
+			.orderBy(desc(users.createdAt))
+			.limit(limit);
+
+		return rows;
 	}
 }
 

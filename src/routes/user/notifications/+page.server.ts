@@ -56,5 +56,25 @@ export const actions = {
 			console.error('Reject follow error:', err);
 			return { success: false, error: err.message || 'Failed to reject follow' };
 		}
+	},
+	dismiss: async ({ request, locals }) => {
+		if (!locals.user?.sub) {
+			return { success: false, error: 'Unauthorized' };
+		}
+
+		const formData = await request.formData();
+		const notificationId = formData.get('notificationId') as string;
+
+		if (!notificationId) {
+			return { success: false, error: 'Notification ID is required' };
+		}
+
+		try {
+			await container.dismissNotificationUseCase.execute(notificationId, locals.user.sub);
+			return { success: true };
+		} catch (err: any) {
+			console.error('Dismiss notification error:', err);
+			return { success: false, error: err.message || 'Failed to dismiss notification' };
+		}
 	}
 };

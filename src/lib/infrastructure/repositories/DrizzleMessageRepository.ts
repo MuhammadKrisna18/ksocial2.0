@@ -87,5 +87,10 @@ export class DrizzleMessageRepository implements IMessageRepository {
 			.where(and(eq(messages.receiverId, userId), eq(messages.isRead, false)));
 		return Number(result[0]?.count ?? 0);
 	}
+
+	async count(): Promise<number> {
+		const result = await db.select({ count: sql<number>`count(*)::int` }).from(messages);
+		return Number(result[0]?.count ?? 0);
+	}
 }
 
