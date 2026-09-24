@@ -27,7 +27,7 @@ export class DrizzlePostRepository implements IPostRepository {
 			likesCount: postRow.likesCount,
 			commentsCount: postRow.commentsCount,
 			sharesCount: postRow.sharesCount,
-			media: postRow.media as any,
+			media: postRow.media ?? undefined,
 			createdAt: postRow.createdAt,
 			updatedAt: postRow.updatedAt
 		});
@@ -61,7 +61,7 @@ export class DrizzlePostRepository implements IPostRepository {
 			likesCount: row.post.likesCount,
 			commentsCount: row.post.commentsCount,
 			sharesCount: row.post.sharesCount,
-			media: row.post.media as any,
+			media: row.post.media ?? undefined,
 			isSaved: row.isSaved,
 			isLiked: row.isLiked,
 			createdAt: row.post.createdAt,
@@ -105,7 +105,7 @@ export class DrizzlePostRepository implements IPostRepository {
 			likesCount: row.post.likesCount,
 			commentsCount: row.post.commentsCount,
 			sharesCount: row.post.sharesCount,
-			media: row.post.media as any,
+			media: row.post.media ?? undefined,
 			isSaved: true,
 			isLiked: row.isLiked,
 			createdAt: row.post.createdAt,
@@ -142,7 +142,7 @@ export class DrizzlePostRepository implements IPostRepository {
 			likesCount: row.post.likesCount,
 			commentsCount: row.post.commentsCount,
 			sharesCount: row.post.sharesCount,
-			media: row.post.media as any,
+			media: row.post.media ?? undefined,
 			isSaved: row.isSaved,
 			isLiked: row.isLiked,
 			createdAt: row.post.createdAt,
@@ -166,7 +166,7 @@ export class DrizzlePostRepository implements IPostRepository {
 			likesCount: row.likesCount,
 			commentsCount: row.commentsCount,
 			sharesCount: row.sharesCount,
-			media: row.media as any,
+			media: row.media ?? undefined,
 			createdAt: row.createdAt,
 			updatedAt: row.updatedAt
 		});
@@ -205,7 +205,7 @@ export class DrizzlePostRepository implements IPostRepository {
 			likesCount: post.likesCount,
 			commentsCount: post.commentsCount,
 			sharesCount: post.sharesCount,
-			media: post.media || undefined,
+			media: post.media ?? undefined,
 			createdAt: post.createdAt,
 			updatedAt: post.updatedAt
 		});

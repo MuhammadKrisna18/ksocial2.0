@@ -247,7 +247,7 @@
 					<span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
 						Teman
 					</span>
-					<span class="rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-bold text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+					<span class="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-bold text-slate-500 dark:text-slate-400">
 						{friends.length}
 					</span>
 				</div>
@@ -377,21 +377,21 @@
 								</div>
 							{/if}
 							<div class="min-w-0 flex-1">
-								<div class="flex items-center justify-between">
-									<b class="truncate text-sm text-slate-800 dark:text-white">{contact.fullName}</b>
-									<small class="text-[11px] text-slate-400">
-										{contact.lastMessageAt ? new Date(contact.lastMessageAt).toLocaleDateString([], { month: 'short', day: 'numeric' }) : ''}
-									</small>
-								</div>
-								<p class={`truncate text-xs ${contact.unreadCount ? 'font-bold text-slate-900 dark:text-white' : 'text-slate-500'}`}>
+								<b class="truncate text-sm text-slate-800 dark:text-white block">{contact.fullName}</b>
+								<p class={`truncate text-xs mt-0.5 ${contact.unreadCount ? 'font-bold text-slate-900 dark:text-white' : 'text-slate-500'}`}>
 									{contact.lastMessage ?? 'Memulai percakapan'}
 								</p>
 							</div>
-							{#if contact.unreadCount > 0}
-								<span class="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-extrabold text-white shadow-sm shadow-red-500/30 animate-pulse">
-									{contact.unreadCount > 99 ? '99+' : contact.unreadCount}
-								</span>
-							{/if}
+							<div class="flex flex-col items-end justify-between self-stretch shrink-0 py-0.5">
+								<small class={`text-[11px] ${contact.unreadCount ? 'font-bold text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
+									{contact.lastMessageAt ? new Date(contact.lastMessageAt).toLocaleDateString([], { month: 'short', day: 'numeric' }) : ''}
+								</small>
+								{#if contact.unreadCount > 0}
+									<span class="flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1.5 text-[10px] font-bold text-white shadow-xs">
+										{contact.unreadCount > 99 ? '99+' : contact.unreadCount}
+									</span>
+								{/if}
+							</div>
 						</button>
 
 					{/each}

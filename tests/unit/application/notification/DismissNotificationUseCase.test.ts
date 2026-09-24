@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DismissNotificationUseCase } from '$lib/application/use-cases/notification/DismissNotificationUseCase';
 import { Notification } from '$lib/domain/entities/Notification';
-import { ValidationError } from '$lib/application/exceptions';
 import type { INotificationRepository } from '$lib/domain/repositories/INotificationRepository';
 
 describe('DismissNotificationUseCase', () => {

@@ -50,6 +50,11 @@ import { UnfollowUserUseCase } from '$lib/application/use-cases/follow/UnfollowU
 import { GetUserProfileUseCase } from '$lib/application/use-cases/user/GetUserProfileUseCase';
 import { GetUserByIdUseCase } from '$lib/application/use-cases/user/GetUserByIdUseCase';
 import { GetFriendsUseCase } from '$lib/application/use-cases/follow/GetFriendsUseCase';
+import type { UserFollowRequestedEvent } from '$lib/domain/events/UserFollowRequestedEvent';
+import type { UserFollowAcceptedEvent } from '$lib/domain/events/UserFollowAcceptedEvent';
+import type { PostLikedEvent } from '$lib/domain/events/PostLikedEvent';
+import type { PostCommentedEvent } from '$lib/domain/events/PostCommentedEvent';
+import type { PostDeletedByAdminEvent } from '$lib/domain/events/PostDeletedByAdminEvent';
 
 class Container {
 	constructor() {
@@ -122,11 +127,11 @@ class Container {
 		if (!this._notificationEventHandler) {
 			this._notificationEventHandler = new NotificationEventHandler(this.notificationRepository);
 			
-			eventDispatcher.register('UserFollowRequestedEvent', (event: any) => this._notificationEventHandler!.handleFollowRequested(event), 'NotificationEventHandler_handleFollowRequested');
-			eventDispatcher.register('UserFollowAcceptedEvent', (event: any) => this._notificationEventHandler!.handleFollowAccepted(event), 'NotificationEventHandler_handleFollowAccepted');
-			eventDispatcher.register('PostLikedEvent', (event: any) => this._notificationEventHandler!.handlePostLiked(event), 'NotificationEventHandler_handlePostLiked');
-			eventDispatcher.register('PostCommentedEvent', (event: any) => this._notificationEventHandler!.handlePostCommented(event), 'NotificationEventHandler_handlePostCommented');
-			eventDispatcher.register('PostDeletedByAdminEvent', (event: any) => this._notificationEventHandler!.handlePostDeletedByAdmin(event), 'NotificationEventHandler_handlePostDeletedByAdmin');
+			eventDispatcher.register('UserFollowRequestedEvent', (event: UserFollowRequestedEvent) => this._notificationEventHandler!.handleFollowRequested(event), 'NotificationEventHandler_handleFollowRequested');
+			eventDispatcher.register('UserFollowAcceptedEvent', (event: UserFollowAcceptedEvent) => this._notificationEventHandler!.handleFollowAccepted(event), 'NotificationEventHandler_handleFollowAccepted');
+			eventDispatcher.register('PostLikedEvent', (event: PostLikedEvent) => this._notificationEventHandler!.handlePostLiked(event), 'NotificationEventHandler_handlePostLiked');
+			eventDispatcher.register('PostCommentedEvent', (event: PostCommentedEvent) => this._notificationEventHandler!.handlePostCommented(event), 'NotificationEventHandler_handlePostCommented');
+			eventDispatcher.register('PostDeletedByAdminEvent', (event: PostDeletedByAdminEvent) => this._notificationEventHandler!.handlePostDeletedByAdmin(event), 'NotificationEventHandler_handlePostDeletedByAdmin');
 		}
 	}
 

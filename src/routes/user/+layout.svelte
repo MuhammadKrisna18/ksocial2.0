@@ -120,7 +120,12 @@
 							<span class="truncate">{item.name}</span>
 						</div>
 						{#if item.name === 'Messages' && chatState.totalUnread > 0}
-							<span class="ml-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-extrabold text-white shadow-sm shadow-red-500/30 animate-pulse">
+							<span
+								class="ml-2 flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-bold transition-colors
+								{$page.url.pathname === item.path
+									? 'bg-white text-blue-600 shadow-sm'
+									: 'bg-blue-600 text-white shadow-sm'}"
+							>
 								{chatState.totalUnread > 99 ? '99+' : chatState.totalUnread}
 							</span>
 						{/if}
@@ -209,7 +214,7 @@
 					<button onclick={toggleNotif} class="relative rounded-full p-2 text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-600 dark:hover:text-slate-300 transition focus:outline-none">
 						<span class="sr-only">View notifications</span>
 						{#if data.notifications && data.notifications.length > 0}
-							<div class="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-white dark:border-slate-900 animate-pulse"></div>
+							<div class="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-blue-600 border-2 border-white dark:border-slate-900 shadow-xs"></div>
 						{/if}
 						<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
