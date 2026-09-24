@@ -1,8 +1,17 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import CommentItem from './CommentItem.svelte';
+	import { isOwnPost } from '$lib/features/post/utils';
 
 	let { post, currentUser } = $props();
+
+	let isAuthorMe = $derived(
+		isOwnPost({
+			authorId: post.authorId,
+			authorUsername: post.authorUsername,
+			currentUser
+		})
+	);
 
 	// Optimistic state
 	let isLiked = $state(post.isLiked);
@@ -206,10 +215,17 @@
 				{post.authorName?.charAt(0) || post.authorUsername?.charAt(0)}
 			</div>
 			<div>
-				<p class="text-sm font-bold text-slate-900 dark:text-white group-hover/author:underline">
-					{post.authorName}
-					<span class="ml-1 text-xs font-normal text-slate-500 dark:text-slate-400 no-underline">@{post.authorUsername}</span>
-				</p>
+				<div class="flex items-center gap-1.5 flex-wrap">
+					<p class="text-sm font-bold text-slate-900 dark:text-white group-hover/author:underline">
+						{post.authorName}
+					</p>
+					<span class="text-xs font-normal text-slate-500 dark:text-slate-400 no-underline">@{post.authorUsername}</span>
+					{#if isAuthorMe}
+						<span class="inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900 leading-none">
+							Saya
+						</span>
+					{/if}
+				</div>
 				<p class="text-xs text-slate-400 dark:text-slate-500">{formatTimeAgo(post.createdAt)}</p>
 			</div>
 		</a>
