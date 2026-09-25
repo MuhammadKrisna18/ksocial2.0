@@ -10,17 +10,21 @@ function requireEnv(key: string): string {
 
 const VALID_JWT_EXPIRES_PATTERN = /^\d+[smhdw]$/;
 
-function parseJwtExpiry(raw: string): string {
-	if (!VALID_JWT_EXPIRES_PATTERN.test(raw)) {
+function parseJwtExpiry(raw?: string): string {
+	const trimmed = raw?.trim();
+	if (!trimmed) {
+		return '7d';
+	}
+	if (!VALID_JWT_EXPIRES_PATTERN.test(trimmed)) {
 		throw new Error(
 			`Invalid JWT_EXPIRES_IN value: "${raw}". Expected format: e.g. 7d, 24h, 3600s`
 		);
 	}
-	return raw;
+	return trimmed;
 }
 
 export const serverEnv = {
 	DATABASE_URL: requireEnv('DATABASE_URL'),
 	JWT_SECRET: requireEnv('JWT_SECRET'),
-	JWT_EXPIRES_IN: parseJwtExpiry(env['JWT_EXPIRES_IN'] ?? '7d')
+	JWT_EXPIRES_IN: parseJwtExpiry(env['JWT_EXPIRES_IN'])
 } as const;
