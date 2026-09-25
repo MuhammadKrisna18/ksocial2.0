@@ -5,6 +5,12 @@ import { apiRateLimiter, getClientIp } from '$lib/infrastructure/security/RateLi
 
 const PUBLIC_ROUTES = new Set(['/', '/login', '/register', '/logout']);
 
+function isPublicRoute(pathname: string): boolean {
+	if (PUBLIC_ROUTES.has(pathname)) return true;
+	if (pathname.startsWith('/api/auth/')) return true;
+	return false;
+}
+
 const PROTECTED_ROUTES: Array<{ pattern: RegExp; roles: RoleNameType[] }> = [
 	{ pattern: /^\/admin/, roles: ['admin'] },
 	{ pattern: /^\/user/, roles: ['user', 'admin'] }
@@ -64,7 +70,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	}
 
-	if (!PUBLIC_ROUTES.has(pathname)) {
+	if (!isPublicRoute(pathname)) {
 		if (!event.locals.user) {
 			if (isApiRoute(pathname)) {
 				return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -107,7 +113,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	response.headers.set('X-Frame-Options', 'DENY');
 	response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-	if (!PUBLIC_ROUTES.has(pathname)) {
+	if (!isPublicRoute(pathname)) {
 		response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
 		response.headers.set('Pragma', 'no-cache');
 		response.headers.set('Expires', '0');

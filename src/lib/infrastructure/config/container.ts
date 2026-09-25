@@ -8,6 +8,7 @@ import { DrizzleFollowRepository } from '$lib/infrastructure/repositories/Drizzl
 import { DrizzleNotificationRepository } from '$lib/infrastructure/repositories/DrizzleNotificationRepository';
 import { LoginUseCase } from '$lib/application/use-cases/auth/LoginUseCase';
 import { RegisterUseCase } from '$lib/application/use-cases/auth/RegisterUseCase';
+import { FirebaseAuthUseCase } from '$lib/application/use-cases/auth/FirebaseAuthUseCase';
 import { ValidateTokenUseCase } from '$lib/application/use-cases/auth/ValidateTokenUseCase';
 import { UpdateUserUseCase } from '$lib/application/use-cases/user/UpdateUserUseCase';
 import { GetDashboardStatsUseCase } from '$lib/application/use-cases/user/GetDashboardStatsUseCase';
@@ -143,6 +144,10 @@ class Container {
 
 	get registerUseCase(): RegisterUseCase {
 		return new RegisterUseCase(this.userRepository, this.roleRepository, this.hashService, this.tokenService);
+	}
+
+	get firebaseAuthUseCase(): FirebaseAuthUseCase {
+		return new FirebaseAuthUseCase(this.userRepository, this.roleRepository, this.hashService, this.tokenService);
 	}
 
 	private _tokenRevocationService?: TokenRevocationService;

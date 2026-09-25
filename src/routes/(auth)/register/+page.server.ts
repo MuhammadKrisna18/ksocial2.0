@@ -33,18 +33,17 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const fullName = formData.get('fullName') as string;
 		const username = formData.get('username') as string;
-		const emailPrefix = formData.get('emailPrefix') as string;
+		const email = (formData.get('email') as string)?.trim().toLowerCase();
 		const password = formData.get('password') as string;
 		const dateOfBirthStr = formData.get('dateOfBirth') as string;
 
-		if (!fullName || !username || !emailPrefix || !password || !dateOfBirthStr) {
+		if (!fullName || !username || !email || !password || !dateOfBirthStr) {
 			return fail(400, {
 				error: 'Semua kolom wajib diisi.',
-				values: { fullName, username, emailPrefix, dateOfBirth: dateOfBirthStr }
+				values: { fullName, username, email, dateOfBirth: dateOfBirthStr }
 			});
 		}
 
-		const email = `${emailPrefix}@user.sveltekit.co.id`;
 		const dateOfBirth = new Date(dateOfBirthStr);
 
 		try {
@@ -65,11 +64,13 @@ export const actions: Actions = {
 				friendlyError = 'Nama panggilan (Username) tersebut sudah dipakai oleh orang lain.';
 			} else if (message.includes('Email already in use')) {
 				friendlyError = 'Email tersebut sudah terdaftar.';
+			} else if (message.includes('Invalid email address')) {
+				friendlyError = 'Format email tidak valid. Gunakan format email yang benar (misal: user@gmail.com).';
 			}
 
 			return fail(400, {
 				error: friendlyError,
-				values: { fullName, username, emailPrefix, dateOfBirth: dateOfBirthStr }
+				values: { fullName, username, email, dateOfBirth: dateOfBirthStr }
 			});
 		}
 
