@@ -188,7 +188,7 @@
 							</div>
 							<input
 								type="text"
-								placeholder="Cari pengguna..."
+								placeholder="Search users..."
 								bind:value={searchQuery}
 								oninput={handleSearch}
 								class="block w-full sm:w-64 pl-10 pr-3 py-2 border border-slate-200 dark:border-slate-700 rounded-full leading-5 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all"
@@ -241,7 +241,7 @@
 							<div class="max-h-[400px] overflow-y-auto">
 								{#if !data.notifications || data.notifications.length === 0}
 									<div class="p-6 text-center text-slate-500 dark:text-slate-400">
-										<p>Tidak ada notifikasi baru.</p>
+										<p>No new notifications.</p>
 									</div>
 								{:else}
 									<div class="divide-y divide-slate-100 dark:divide-slate-700/50">
@@ -257,7 +257,7 @@
 														<div class="flex-1 min-w-0">
 															<p class="text-sm text-slate-800 dark:text-slate-200">
 																<a href="/user/profile/{notif.senderUsername}" class="font-bold hover:underline">{notif.senderName}</a>
-																ingin mengikuti Anda.
+																wants to follow you.
 															</p>
 															<p class="text-xs text-slate-500 mt-1">{new Date(notif.createdAt).toLocaleString()}</p>
 															
@@ -265,12 +265,12 @@
 																<form method="POST" action="/user/notifications?/acceptFollow" use:enhance>
 																	<input type="hidden" name="followerId" value={notif.senderId} />
 																	<input type="hidden" name="notificationId" value={notif.id} />
-																	<button class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-colors shadow-sm">Terima</button>
+																	<button class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-colors shadow-sm">Accept</button>
 																</form>
 																<form method="POST" action="/user/notifications?/rejectFollow" use:enhance>
 																	<input type="hidden" name="followerId" value={notif.senderId} />
 																	<input type="hidden" name="notificationId" value={notif.id} />
-																	<button class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-lg transition-colors">Tolak</button>
+																	<button class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-lg transition-colors">Decline</button>
 																</form>
 															</div>
 														</div>
@@ -293,7 +293,7 @@
 														<div class="flex-1 min-w-0">
 															<p class="text-sm text-slate-800 dark:text-slate-200">
 																<span class="font-bold">{notif.senderName}</span>
-																{notif.type === 'like' ? 'menyukai postingan Anda.' : 'mengomentari postingan Anda.'}
+																{notif.type === 'like' ? 'liked your post.' : 'commented on your post.'}
 															</p>
 															<p class="text-xs text-slate-500 mt-1">{new Date(notif.createdAt).toLocaleString()}</p>
 														</div>
@@ -310,14 +310,14 @@
 														<div class="flex-1 min-w-0">
 															<div class="flex items-center justify-between gap-2">
 																<p class="text-sm font-bold text-red-700 dark:text-red-400">
-																	Postingan Dihapus oleh Admin
+																	Post Deleted by Admin
 																</p>
 																<form method="POST" action="/user/notifications?/dismiss" use:enhance>
 																	<input type="hidden" name="notificationId" value={notif.id} />
 																	<button
 																		type="submit"
 																		class="rounded p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-																		title="Tutup pemberitahuan"
+																		title="Dismiss notification"
 																	>
 																		<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 																			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -326,7 +326,7 @@
 																</form>
 															</div>
 															<p class="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
-																Salah satu postingan Anda telah dihapus oleh administrator karena melanggar panduan komunitas atau kebijakan platform.
+																One of your posts was removed by an administrator for violating community guidelines or platform policy.
 															</p>
 															<p class="text-[11px] text-slate-400 mt-1.5">{new Date(notif.createdAt).toLocaleString()}</p>
 														</div>
@@ -388,7 +388,7 @@
 							{chatState.activeToast.senderName}
 						</p>
 						<span class="rounded bg-blue-50 dark:bg-blue-900/40 px-1.5 py-0.5 text-[10px] font-semibold text-blue-600 dark:text-blue-400 shrink-0">
-							Pesan Baru
+							New Message
 						</span>
 					</div>
 					<p class="mt-1 line-clamp-2 text-xs text-slate-600 dark:text-slate-300">
@@ -400,7 +400,7 @@
 							onclick={() => chatState.dismissToast()}
 							class="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-blue-700 transition active:scale-95"
 						>
-							<span>Buka Obrolan</span>
+							<span>Open Chat</span>
 							<svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
 							</svg>
@@ -410,7 +410,7 @@
 							onclick={() => chatState.dismissToast()}
 							class="rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition"
 						>
-							Tutup
+							Close
 						</button>
 					</div>
 				</div>
@@ -420,7 +420,7 @@
 					type="button"
 					onclick={() => chatState.dismissToast()}
 					class="shrink-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
-					aria-label="Tutup notifikasi"
+					aria-label="Dismiss notification"
 				>
 					<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

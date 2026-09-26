@@ -157,7 +157,7 @@
 		}
 		const yesterday = new Date(Date.now() - 86400000);
 		if (date.toDateString() === yesterday.toDateString()) {
-			return 'Kemarin';
+			return 'Yesterday';
 		}
 		return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 	}
@@ -169,17 +169,17 @@
 	function formatChatSeparatorDate(dateStr: string) {
 		const date = new Date(dateStr);
 		const now = new Date();
-		if (date.toDateString() === now.toDateString()) return 'Hari Ini';
+		if (date.toDateString() === now.toDateString()) return 'Today';
 		const yesterday = new Date(Date.now() - 86400000);
-		if (date.toDateString() === yesterday.toDateString()) return 'Kemarin';
-		return date.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short' });
+		if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
+		return date.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'short' });
 	}
 
 	function isDifferentDay(d1: string, d2: string) {
 		return new Date(d1).toDateString() !== new Date(d2).toDateString();
 	}
 
-	const quickGreetings = ['Halo! 👋', 'Lagi santai nih?', 'Bisa ngobrol sebentar?', 'Pe gelud 👊'];
+	const quickGreetings = ['Hello! 👋', 'How are you doing?', 'Free to chat for a moment?', 'Hey there! 😊'];
 
 	onMount(() => {
 		// Listen to incoming messages broadcast by the global chat stream
@@ -240,7 +240,7 @@
 		isLoadingContacts = true;
 		try {
 			const response = await fetch('/api/chat/contacts');
-			if (!response.ok) throw new Error('Gagal memuat daftar percakapan.');
+			if (!response.ok) throw new Error('Failed to load conversation list.');
 			contacts = (await response.json()).contacts ?? [];
 
 			// If a contact is currently open, ensure its unread count is zeroed out
@@ -249,7 +249,7 @@
 				if (current) current.unreadCount = 0;
 			}
 		} catch (error) {
-			errorText = error instanceof Error ? error.message : 'Gagal memuat percakapan.';
+			errorText = error instanceof Error ? error.message : 'Failed to load conversations.';
 		} finally {
 			isLoadingContacts = false;
 		}
@@ -272,12 +272,12 @@
 		try {
 			const response = await fetch(`/api/chat/${encodeURIComponent(id)}?limit=200`);
 			const payload = await response.json();
-			if (!response.ok) throw new Error(payload.error ?? 'Gagal memuat pesan.');
+			if (!response.ok) throw new Error(payload.error ?? 'Failed to load messages.');
 			messages = (payload.messages ?? []).map(mapMessage);
 			await fetchContacts();
 			scrollToBottom();
 		} catch (error) {
-			errorText = error instanceof Error ? error.message : 'Gagal memuat pesan.';
+			errorText = error instanceof Error ? error.message : 'Failed to load messages.';
 		} finally {
 			isLoadingMessages = false;
 		}
@@ -302,7 +302,7 @@
 				body: JSON.stringify({ content })
 			});
 			const payload = await response.json();
-			if (!response.ok) throw new Error(payload.error ?? 'Pesan gagal dikirim.');
+			if (!response.ok) throw new Error(payload.error ?? 'Failed to send message.');
 			const sent = mapMessage(payload.message);
 			if (!messages.some((message) => message.id === sent.id)) messages = [...messages, sent];
 			await fetchContacts();
@@ -321,7 +321,7 @@
 <div
 	class="m-2 sm:m-4 flex h-[calc(100vh-4.5rem)] overflow-hidden rounded-3xl border border-slate-200/80 bg-white/75 shadow-2xl shadow-slate-200/40 backdrop-blur-2xl dark:border-slate-800/80 dark:bg-slate-900/75 dark:shadow-none"
 >
-	<!-- Sidebar Percakapan & Teman -->
+	<!-- Sidebar Conversations & Friends -->
 	<aside
 		class={`${showChatList ? 'flex' : 'hidden'} w-full flex-col border-r border-slate-200/70 bg-white/90 backdrop-blur-xl dark:border-slate-800/70 dark:bg-slate-900/90 md:flex md:w-80 lg:w-96 shrink-0 transition-all duration-300`}
 	>
@@ -329,21 +329,21 @@
 		<div class="flex items-center justify-between px-5 pt-5 pb-3 border-b border-slate-100 dark:border-slate-800/60">
 			<div class="flex items-center gap-2.5">
 				<h1 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-					Pesan
+					Messages
 				</h1>
 				{#if totalUnreadCount > 0}
 					<span
 						class="inline-flex items-center gap-1 rounded-full bg-blue-500/10 px-2.5 py-0.5 text-xs font-bold text-blue-600 dark:bg-blue-400/15 dark:text-blue-400"
 					>
 						<span class="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-						{totalUnreadCount} baru
+						{totalUnreadCount} new
 					</span>
 				{:else}
 					<span
 						class="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-600 dark:bg-emerald-400/15 dark:text-emerald-400"
 					>
 						<span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-						Aktif
+						Active
 					</span>
 				{/if}
 			</div>
@@ -353,8 +353,8 @@
 				type="button"
 				onclick={() => { void fetchContacts(); void fetchFriends(); }}
 				class="rounded-xl p-2 text-slate-400 transition-all hover:bg-slate-100 hover:text-slate-700 active:scale-90 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-				title="Muat ulang pesan"
-				aria-label="Muat ulang pesan"
+				title="Reload messages"
+				aria-label="Reload messages"
 			>
 				<svg class={`h-4 w-4 ${isLoadingContacts ? 'animate-spin text-blue-500' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -362,7 +362,7 @@
 			</button>
 		</div>
 
-		<!-- Segment Tabs Filter (Semua, Belum Dibaca, Teman) -->
+		<!-- Segment Tabs Filter (All, Unread, Friends) -->
 		<div class="px-4 pt-3 pb-1">
 			<div class="flex rounded-2xl bg-slate-100/80 p-1 dark:bg-slate-800/60 text-xs font-semibold">
 				<button
@@ -374,7 +374,7 @@
 							: 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
 					}`}
 				>
-					<span>Semua</span>
+					<span>All</span>
 					{#if contacts.length > 0}
 						<span class="rounded-full bg-slate-200/70 px-1.5 py-0.2 text-[10px] text-slate-600 dark:bg-slate-600 dark:text-slate-300">
 							{contacts.length}
@@ -390,7 +390,7 @@
 							: 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
 					}`}
 				>
-					<span>Belum Dibaca</span>
+					<span>Unread</span>
 					{#if totalUnreadCount > 0}
 						<span class="rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-1.5 py-0.2 text-[10px] font-black text-white shadow-xs">
 							{totalUnreadCount}
@@ -406,7 +406,7 @@
 							: 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
 					}`}
 				>
-					<span>Teman</span>
+					<span>Friends</span>
 					{#if friends.length > 0}
 						<span class="rounded-full bg-slate-200/70 px-1.5 py-0.2 text-[10px] text-slate-600 dark:bg-slate-600 dark:text-slate-300">
 							{friends.length}
@@ -416,14 +416,14 @@
 			</div>
 		</div>
 
-		<!-- Friends Quick Start Carousel (Jika ada teman & bukan di tab 'friends') -->
+		<!-- Friends Quick Start Carousel (If friends exist & not in 'friends' tab) -->
 		{#if friends.length > 0 && activeFilter !== 'friends'}
 			<div class="px-4 py-3 border-b border-slate-100/80 dark:border-slate-800/50">
 				<div class="mb-2.5 flex items-center justify-between">
 					<div class="flex items-center gap-1.5">
 						<span class="h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20"></span>
 						<span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
-							Teman Aktif
+							Active Friends
 						</span>
 					</div>
 					<span class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
@@ -436,7 +436,7 @@
 							type="button"
 							onclick={() => selectContact(friend.id)}
 							class="group flex flex-shrink-0 flex-col items-center gap-1.5 focus:outline-none transition-transform duration-200 hover:-translate-y-1 active:scale-95"
-							title={`Mulai obrolan dengan ${friend.fullName}`}
+							title={`Start chat with ${friend.fullName}`}
 						>
 							<div class="relative">
 								<div
@@ -489,8 +489,8 @@
 				</svg>
 				<input
 					bind:value={search}
-					aria-label="Cari obrolan atau teman"
-					placeholder="Cari obrolan atau teman..."
+					aria-label="Search chats or friends"
+					placeholder="Search chats or friends..."
 					class="w-full bg-transparent py-2.5 pl-2.5 pr-8 text-sm outline-none text-slate-800 dark:text-white placeholder:text-slate-400"
 				/>
 				{#if search.trim()}
@@ -498,7 +498,7 @@
 						type="button"
 						onclick={() => (search = '')}
 						class="mr-2.5 rounded-full p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-						aria-label="Hapus pencarian"
+						aria-label="Clear search"
 					>
 						<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -513,7 +513,7 @@
 			{#if isLoadingContacts}
 				<div class="flex flex-col items-center justify-center py-12 text-slate-400">
 					<div class="h-6 w-6 animate-spin rounded-full border-2 border-blue-500 border-t-transparent mb-2.5"></div>
-					<p class="text-xs font-medium">Memuat percakapan...</p>
+					<p class="text-xs font-medium">Loading conversations...</p>
 				</div>
 			{:else}
 				<!-- Tab 'friends': Show direct friend list to chat -->
@@ -521,8 +521,8 @@
 					<div class="space-y-1 py-1">
 						{#if friends.length === 0}
 							<div class="px-4 py-10 text-center text-slate-400">
-								<p class="text-sm font-semibold">Belum ada teman terhubung</p>
-								<p class="mt-1 text-xs">Cari dan tambahkan teman di halaman Teman.</p>
+								<p class="text-sm font-semibold">No connected friends yet</p>
+								<p class="mt-1 text-xs">Find and add friends on the Friends page.</p>
 							</div>
 						{:else}
 							{#each friends as friend (friend.id)}
@@ -568,7 +568,7 @@
 					<!-- Search matched friends section -->
 					{#if searchMatchedFriends.length > 0}
 						<div class="px-3 pt-2 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-							Teman Baru
+							New Friends
 						</div>
 						{#each searchMatchedFriends as friend (friend.id)}
 							<button
@@ -592,7 +592,7 @@
 									<p class="truncate text-xs text-slate-400">@{friend.username}</p>
 								</div>
 								<span class="rounded-xl bg-blue-500/10 px-2.5 py-1 text-xs font-bold text-blue-600 dark:bg-blue-400/15 dark:text-blue-400">
-									Mulai Chat
+									Start Chat
 								</span>
 							</button>
 						{/each}
@@ -602,7 +602,7 @@
 					{#if filteredContacts.length > 0}
 						{#if searchMatchedFriends.length > 0}
 							<div class="px-3 pt-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-								Obrolan
+								Chats
 							</div>
 						{/if}
 
@@ -651,7 +651,7 @@
 										</div>
 										<div class="flex items-center justify-between gap-2">
 											<p class={`truncate text-xs ${contact.unreadCount ? 'font-bold text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}>
-												{contact.lastMessage ?? 'Memulai percakapan baru'}
+												{contact.lastMessage ?? 'Started a new conversation'}
 											</p>
 											{#if contact.unreadCount > 0}
 												<span class="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-1.5 text-[10px] font-black text-white shadow-xs shadow-blue-500/30 shrink-0">
@@ -664,13 +664,13 @@
 							{/each}
 						</div>
 
-						<!-- Section Teman Lainnya (Ketika ada sisa teman yang belum pernah diajak chat) -->
+						<!-- Other Friends Section (When there are friends not yet chatted with) -->
 						{#if !search.trim() && activeFilter === 'all' && uncontactedFriends.length > 0}
 							<div class="pt-5 pb-2">
 								<div class="flex items-center gap-2 px-3 mb-2">
 									<div class="h-px flex-1 bg-slate-200/60 dark:bg-slate-800/60"></div>
 									<span class="text-[10px] font-black uppercase tracking-wider text-slate-400">
-										Mulai Obrolan Baru
+										Start a New Chat
 									</span>
 									<div class="h-px flex-1 bg-slate-200/60 dark:bg-slate-800/60"></div>
 								</div>
@@ -697,7 +697,7 @@
 												<p class="truncate text-[10px] text-slate-400">@{friend.username}</p>
 											</div>
 											<span class="rounded-lg bg-blue-500/10 px-2 py-0.5 text-[11px] font-bold text-blue-600 dark:bg-blue-400/15 dark:text-blue-400">
-												Sapa 👋
+												Say Hi 👋
 											</span>
 										</button>
 									{/each}
@@ -710,7 +710,7 @@
 							<svg class="mx-auto h-8 w-8 text-slate-300 dark:text-slate-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
 							</svg>
-							<p class="text-xs font-medium">Tidak ada percakapan atau teman yang cocok dengan "{search}".</p>
+							<p class="text-xs font-medium">No conversations or friends match "{search}".</p>
 						</div>
 
 					{:else if activeFilter === 'unread'}
@@ -720,12 +720,12 @@
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
 								</svg>
 							</div>
-							<p class="text-sm font-bold text-slate-800 dark:text-slate-200">Semua pesan sudah dibaca</p>
-							<p class="mt-1 text-xs text-slate-400">Tidak ada pesan yang belum dibaca saat ini.</p>
+							<p class="text-sm font-bold text-slate-800 dark:text-slate-200">All messages read</p>
+							<p class="mt-1 text-xs text-slate-400">No unread messages at this time.</p>
 						</div>
 
 					{:else if !search.trim()}
-						<!-- Empty State: Belum ada obrolan sama sekali -->
+						<!-- Empty State: No chats yet -->
 						<div class="p-4 text-center">
 							<div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-3xl bg-blue-500/10 text-blue-600 dark:bg-blue-400/15 dark:text-blue-400 shadow-inner">
 								<svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -737,9 +737,9 @@
 									/>
 								</svg>
 							</div>
-							<p class="text-sm font-bold text-slate-800 dark:text-slate-100">Belum ada obrolan</p>
+							<p class="text-sm font-bold text-slate-800 dark:text-slate-100">No chats yet</p>
 							<p class="mt-1 mb-4 text-xs text-slate-500 dark:text-slate-400">
-								Pilih teman di bawah untuk memulai percakapan baru.
+								Choose a friend below to start a new conversation.
 							</p>
 
 							{#if friends.length > 0}
@@ -775,11 +775,11 @@
 								</div>
 							{:else}
 								<div class="rounded-2xl bg-slate-50 p-4 text-xs text-slate-500 dark:bg-slate-800/50 dark:text-slate-400">
-									Anda belum memiliki teman. Kunjungi halaman
+									You don't have any friends yet. Visit the
 									<a href={resolve('/user/friends')} class="font-bold text-blue-600 hover:underline dark:text-blue-400">
-										Teman
+										Friends
 									</a>
-									untuk terhubung dengan pengguna lain.
+									page to connect with other users.
 								</div>
 							{/if}
 						</div>
@@ -794,7 +794,7 @@
 				<svg class="h-3 w-3 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
 					<path fill-rule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zM11 14a1 1 0 11-2 0 1 1 0 012 0zm0-7a1 1 0 10-2 0v3a1 1 0 102 0V7z" clip-rule="evenodd" />
 				</svg>
-				Pesan terenkripsi secara aman
+				End-to-end encrypted messaging
 			</p>
 		</div>
 	</aside>
@@ -817,7 +817,7 @@
 							showChatList = true;
 							activeContactId = null;
 						}}
-						aria-label="Kembali ke daftar pesan"
+						aria-label="Back to messages"
 					>
 						<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
@@ -846,7 +846,7 @@
 						</b>
 						<p class="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
 							<span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-							Aktif sekarang
+							Active now
 						</p>
 					</div>
 				</div>
@@ -856,12 +856,12 @@
 					<a
 						href={resolve('/user/profile/[username]', { username: activeContact.username })}
 						class="flex items-center gap-1.5 rounded-xl border border-slate-200/80 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-xs transition-all hover:border-blue-400 hover:text-blue-600 hover:shadow-sm dark:border-slate-700/80 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:text-blue-400"
-						title="Lihat Profil"
+						title="View Profile"
 					>
 						<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
 						</svg>
-						<span class="hidden sm:inline">Profil</span>
+						<span class="hidden sm:inline">Profile</span>
 					</a>
 				</div>
 			</header>
@@ -880,7 +880,7 @@
 				{#if isLoadingMessages}
 					<div class="flex flex-col items-center justify-center py-16 text-slate-400">
 						<div class="h-7 w-7 animate-spin rounded-full border-2 border-blue-500 border-t-transparent mb-2.5"></div>
-						<p class="text-xs font-medium">Memuat percakapan...</p>
+						<p class="text-xs font-medium">Loading conversation...</p>
 					</div>
 				{:else if messages.length === 0}
 					<div class="flex flex-col items-center justify-center py-16 text-center text-slate-400 max-w-sm mx-auto" in:fade>
@@ -895,10 +895,10 @@
 							</svg>
 						</div>
 						<p class="text-base font-extrabold text-slate-800 dark:text-slate-100">
-							Mulai obrolan dengan {activeContact.fullName}
+							Start a chat with {activeContact.fullName}
 						</p>
 						<p class="mt-1 text-xs text-slate-400 leading-relaxed">
-							Kirim pesan pertama atau pilih sapaan cepat di bawah ini untuk memulai obrolan.
+							Send the first message or pick a quick greeting below to start chatting.
 						</p>
 
 						<!-- Quick Greeting Buttons -->
@@ -968,8 +968,8 @@
 						bind:value={newMessage}
 						maxlength="1000"
 						autocomplete="off"
-						aria-label="Ketik pesan"
-						placeholder={`Ketik pesan untuk ${activeContact.fullName}...`}
+						aria-label="Type a message"
+						placeholder={`Type a message for ${activeContact.fullName}...`}
 						class="min-w-0 flex-1 bg-transparent px-3 py-1.5 text-sm text-slate-800 outline-none placeholder:text-slate-400 dark:text-white"
 					/>
 					<button
@@ -980,7 +980,7 @@
 						{#if isSending}
 							<div class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
 						{:else}
-							<span>Kirim</span>
+							<span>Send</span>
 							<svg class="h-3.5 w-3.5 rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
 							</svg>
@@ -1006,9 +1006,9 @@
 						<span class="h-2 w-2 rounded-full bg-white"></span>
 					</div>
 				</div>
-				<h2 class="text-xl font-black text-slate-800 dark:text-white tracking-tight">Pesan K-Social</h2>
+				<h2 class="text-xl font-black text-slate-800 dark:text-white tracking-tight">K-Social Messages</h2>
 				<p class="mt-1.5 max-w-sm text-xs text-slate-400 leading-relaxed">
-					Pilih salah satu teman atau percakapan di sebelah kiri untuk mulai berkirim pesan secara instan dan aman.
+					Select a friend or conversation on the left to start messaging instantly and securely.
 				</p>
 
 				{#if friends.length > 0}

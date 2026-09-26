@@ -14,7 +14,7 @@ export class AdminDeletePostUseCase {
 			throw new ValidationError('Post ID is required');
 		}
 
-		// Cari postingan terlebih dahulu untuk mendapatkan data pemilik (authorId)
+		// Find the post first to get the owner's data (authorId)
 		const post = await this.postRepository.findById(postId);
 		if (!post) {
 			throw new NotFoundError('Post not found');
@@ -28,7 +28,7 @@ export class AdminDeletePostUseCase {
 			throw new NotFoundError('Post could not be deleted');
 		}
 
-		// Pemicu event domain agar notifikasi otomatis dikirimkan ke pemilik postingan
+		// Trigger domain event so notification is automatically sent to the post owner
 		await this.eventDispatcher.dispatch(
 			'PostDeletedByAdminEvent',
 			new PostDeletedByAdminEvent(postId, authorId, adminId, snippet)

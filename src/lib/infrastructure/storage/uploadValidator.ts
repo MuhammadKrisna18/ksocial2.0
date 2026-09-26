@@ -29,19 +29,19 @@ export const MAX_MEDIA_SIZE_BYTES = 25 * 1024 * 1024; // 25 MB for post attachme
  */
 export function validateImageFile(file: File, maxSizeBytes = MAX_PHOTO_SIZE_BYTES): ValidatedFileResult {
 	if (!file || file.size === 0) {
-		return { isValid: false, error: 'File tidak ditemukan atau kosong.' };
+		return { isValid: false, error: 'File not found or empty.' };
 	}
 
 	if (file.size > maxSizeBytes) {
 		const maxMb = Math.round(maxSizeBytes / (1024 * 1024));
-		return { isValid: false, error: `Ukuran file melebihi batas maksimal (${maxMb}MB).` };
+		return { isValid: false, error: `File size exceeds the maximum limit (${maxMb}MB).` };
 	}
 
 	const safeExt = ALLOWED_IMAGE_MIME_TYPES.get(file.type.toLowerCase());
 	if (!safeExt) {
 		return {
 			isValid: false,
-			error: 'Format file tidak didukung. Hanya JPEG, PNG, dan WebP yang diizinkan.'
+			error: 'Unsupported file format. Only JPEG, PNG, and WebP are allowed.'
 		};
 	}
 
@@ -56,19 +56,19 @@ export function validatePostMediaFile(
 	maxSizeBytes = MAX_MEDIA_SIZE_BYTES
 ): ValidatedFileResult & { mediaType?: 'image' | 'video' } {
 	if (!file || file.size === 0) {
-		return { isValid: false, error: 'File tidak ditemukan atau kosong.' };
+		return { isValid: false, error: 'File not found or empty.' };
 	}
 
 	if (file.size > maxSizeBytes) {
 		const maxMb = Math.round(maxSizeBytes / (1024 * 1024));
-		return { isValid: false, error: `Ukuran file media melebihi batas maksimal (${maxMb}MB).` };
+		return { isValid: false, error: `Media file size exceeds the maximum limit (${maxMb}MB).` };
 	}
 
 	const match = ALLOWED_POST_MEDIA_MIME_TYPES.get(file.type.toLowerCase());
 	if (!match) {
 		return {
 			isValid: false,
-			error: 'Format media tidak didukung. Hanya JPG, PNG, WebP, MP4, dan WebM yang diizinkan.'
+			error: 'Unsupported media format. Only JPG, PNG, WebP, MP4, and WebM are allowed.'
 		};
 	}
 

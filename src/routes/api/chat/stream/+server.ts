@@ -21,7 +21,7 @@ export const GET: RequestHandler = ({ locals }) => {
 				try {
 					const payload = {
 						...message,
-						senderName: event.sender?.fullName || 'Pengguna',
+						senderName: event.sender?.fullName || 'User',
 						senderUsername: event.sender?.username || '',
 						senderAvatar: event.sender?.avatarUrl || null
 					};

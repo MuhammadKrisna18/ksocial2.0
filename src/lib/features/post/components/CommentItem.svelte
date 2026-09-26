@@ -53,7 +53,7 @@
 
 	async function deleteComment(e: Event) {
 		e.preventDefault();
-		if (!confirm('Apakah kamu yakin ingin menghapus komentar ini?')) return;
+		if (!confirm('Are you sure you want to delete this comment?')) return;
 		
 		try {
 			const res = await fetch(`/api/comments/${comment.id}`, { method: 'DELETE' });
@@ -93,20 +93,20 @@
 			<span class="text-xs text-slate-500">{formatTimeAgo(comment.createdAt)}</span>
 			
 			<button type="button" onclick={toggleLike} class="text-xs font-semibold {isLiked ? 'text-red-500' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'} transition-colors">
-				{likesCount > 0 ? `${likesCount} ` : ''}Suka
+				{likesCount > 0 ? `${likesCount} ` : ''}Like
 			</button>
 			
 			<button type="button" onclick={() => onReply(comment)} class="text-xs font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
-				Balas
+				Reply
 			</button>
 			
 			<button type="button" onclick={toggleSave} class="text-xs font-semibold {isSaved ? 'text-blue-500' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'} transition-colors">
-				Simpan
+				Save
 			</button>
 
 			{#if currentUser?.sub === comment.userId}
 				<button type="button" onclick={deleteComment} class="text-xs font-semibold text-red-500 hover:text-red-700 transition-colors">
-					Hapus
+					Delete
 				</button>
 			{/if}
 		</div>
@@ -116,12 +116,12 @@
 				{#if !showReplies}
 					<button type="button" onclick={() => showReplies = true} class="flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
 						<div class="w-6 h-px bg-slate-300 dark:bg-slate-600"></div>
-						Lihat balasan ({comment.replies.length})
+						View replies ({comment.replies.length})
 					</button>
 				{:else}
 					<button type="button" onclick={() => showReplies = false} class="flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors mb-3">
 						<div class="w-6 h-px bg-slate-300 dark:bg-slate-600"></div>
-						Sembunyikan balasan
+						Hide replies
 					</button>
 					<div class="space-y-3">
 						{#each comment.replies as reply}

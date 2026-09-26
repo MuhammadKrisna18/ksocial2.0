@@ -13,9 +13,9 @@ const db = drizzle(queryClient, { schema });
 const DUMMY_EMAIL_PATTERN = '%@dummy.ksocial.test';
 
 async function cleanDummyUsers(): Promise<void> {
-	console.log('Mencari akun dummy dengan pola email:', DUMMY_EMAIL_PATTERN);
+	console.log('Searching for dummy accounts with email pattern:', DUMMY_EMAIL_PATTERN);
 
-	// Cari akun dummy yang ada
+	// Find existing dummy accounts
 	const dummyUsers = await db
 		.select({
 			id: schema.users.id,
@@ -26,30 +26,30 @@ async function cleanDummyUsers(): Promise<void> {
 		.where(like(schema.users.email, DUMMY_EMAIL_PATTERN));
 
 	if (dummyUsers.length === 0) {
-		console.log('Tidak ada akun dummy yang ditemukan. Database bersih.');
+		console.log('No dummy accounts found. Database is clean.');
 		return;
 	}
 
-	console.log(`Ditemukan ${dummyUsers.length} akun dummy.`);
+	console.log(`Found ${dummyUsers.length} dummy accounts.`);
 	
-	// Hapus seluruh akun dummy (ON DELETE CASCADE akan otomatis menghapus postingan, relasi role, komentar, dan like terkait)
+	// Delete all dummy accounts (ON DELETE CASCADE will automatically delete related posts, roles, comments, and likes)
 	const deleted = await db
 		.delete(schema.users)
 		.where(like(schema.users.email, DUMMY_EMAIL_PATTERN))
 		.returning({ id: schema.users.id, username: schema.users.username });
 
-	console.log(`\nBerhasil menghapus ${deleted.length} akun dummy beserta seluruh postingannya:`);
+	console.log(`\nSuccessfully deleted ${deleted.length} dummy accounts along with all related posts:`);
 	for (const u of deleted) {
-		console.log(`- Terhapus: @${u.username}`);
+		console.log(`- Deleted: @${u.username}`);
 	}
-	console.log('\nDatabase kembali bersih seperti semula.');
+	console.log('\nDatabase is clean again.');
 }
 
 async function main(): Promise<void> {
 	try {
 		await cleanDummyUsers();
 	} catch (err) {
-		console.error('Gagal menghapus akun dummy:', err);
+		console.error('Failed to clean dummy accounts:', err);
 		process.exit(1);
 	} finally {
 		await queryClient.end();

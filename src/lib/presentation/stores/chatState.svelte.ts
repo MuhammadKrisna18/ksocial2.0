@@ -76,7 +76,7 @@ class ChatState {
 				this.showToast({
 					id: message.id,
 					senderId: message.senderId,
-					senderName: message.senderName || 'Pengguna',
+					senderName: message.senderName || 'User',
 					senderUsername: message.senderUsername || '',
 					senderAvatar: message.senderAvatar ?? null,
 					content: message.content,

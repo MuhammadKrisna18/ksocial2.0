@@ -61,8 +61,8 @@
 	<!-- Full Width Header -->
 	<div class="relative w-full bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 pt-8 pb-12 px-6 lg:px-8">
 		<div class="max-w-4xl mx-auto">
-			<h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Pengaturan Akun</h1>
-			<p class="mt-2 text-slate-500 dark:text-slate-400 font-medium text-xl">Kelola preferensi visual aplikasi Anda.</p>
+			<h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Account Settings</h1>
+			<p class="mt-2 text-slate-500 dark:text-slate-400 font-medium text-xl">Manage your privacy, security, and appearance settings.</p>
 		</div>
 	</div>
 
@@ -77,9 +77,9 @@
 						<svg class="w-7 h-7 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
 						</svg>
-						Privasi Akun
+						Account Privacy
 					</h2>
-					<p class="mt-2 text-slate-500 dark:text-slate-400">Atur siapa saja yang dapat melihat profil dan aktivitas Anda.</p>
+					<p class="mt-2 text-slate-500 dark:text-slate-400">Manage who can see your profile and activity.</p>
 				</div>
 
 				<div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 md:p-8 shadow-sm">
@@ -89,9 +89,9 @@
 								<svg class="w-5 h-5 text-slate-500 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
 								</svg>
-								Akun Privat (Private Profile)
+								Private Account
 							</h3>
-							<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Jika diaktifkan, hanya pengikut yang disetujui yang dapat melihat feed Anda.</p>
+							<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">When enabled, only approved followers can see your feed.</p>
 						</div>
 						
 						<form 
@@ -142,9 +142,9 @@
 								<svg class="w-5 h-5 text-slate-500 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
 								</svg>
-								Batasi Pesan Masuk
+								Restrict Incoming Messages
 							</h3>
-							<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Jika diaktifkan, hanya pengikut yang telah disetujui yang dapat mengirim pesan kepada Anda. (Khusus Akun Privat)</p>
+							<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">When enabled, only approved followers can send you messages. (Private Accounts only)</p>
 						</div>
 						
 						<form 
@@ -196,9 +196,9 @@
 						<svg class="w-7 h-7 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
 						</svg>
-						Keamanan & Password
+						Security & Password
 					</h2>
-					<p class="mt-2 text-slate-500 dark:text-slate-400">Pastikan akun Anda tetap aman dengan menggunakan kata sandi yang kuat.</p>
+					<p class="mt-2 text-slate-500 dark:text-slate-400">Keep your account secure by using a strong password.</p>
 				</div>
 
 				<!-- Form result feedback -->
@@ -224,19 +224,18 @@
 						};
 					}}
 					class="space-y-6 max-w-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 md:p-8 shadow-sm"
-				>
-					<div>
-						<label for="oldPassword" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Password Lama</label>
+									<div>
+						<label for="oldPassword" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Current Password</label>
 						<input type="password" id="oldPassword" name="oldPassword" required class="mt-1.5 block w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" />
 					</div>
 
 					<div>
-						<label for="newPassword" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Password Baru</label>
+						<label for="newPassword" class="block text-sm font-bold text-slate-700 dark:text-slate-300">New Password</label>
 						<input type="password" id="newPassword" name="newPassword" required class="mt-1.5 block w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" />
 					</div>
 
 					<div>
-						<label for="confirmPassword" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Konfirmasi Password Baru</label>
+						<label for="confirmPassword" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Confirm New Password</label>
 						<input type="password" id="confirmPassword" name="confirmPassword" required class="mt-1.5 block w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" />
 					</div>
 
@@ -247,9 +246,9 @@
 									<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 									<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 								</svg>
-								Menyimpan...
+								Saving...
 							{:else}
-								Ubah Password
+								Update Password
 							{/if}
 						</button>
 					</div>
@@ -263,9 +262,9 @@
 						<svg class="w-7 h-7 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
 						</svg>
-						Preferensi Visual
+						Appearance
 					</h2>
-					<p class="mt-2 text-slate-500 dark:text-slate-400">Sesuaikan tampilan antarmuka sesuai dengan kenyamanan mata Anda.</p>
+					<p class="mt-2 text-slate-500 dark:text-slate-400">Customize the interface appearance for your visual comfort.</p>
 				</div>
 
 				<div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 md:p-8 shadow-sm">
@@ -275,9 +274,9 @@
 								<svg class="w-5 h-5 text-slate-500 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
 								</svg>
-								Mode Gelap (Dark Mode)
+								Dark Mode
 							</h3>
-							<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Aktifkan tema gelap untuk kenyamanan mata saat berada di ruangan yang redup.</p>
+							<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Enable dark theme for eye comfort in low-light environments.</p>
 						</div>
 						<!-- Toggle Switch -->
 						<button 
@@ -315,31 +314,31 @@
 			<svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
 			</svg>
-			<h3 class="text-xl font-bold text-slate-900">Konfirmasi Perubahan</h3>
+			<h3 class="text-xl font-bold text-slate-900">Confirm Change</h3>
 		</div>
 		<p class="text-slate-600 mb-8 leading-relaxed">
-			Apakah Anda yakin ingin mengubah status profil Anda menjadi 
-			<strong class="text-slate-900">{pendingPrivacyState ? 'Privat' : 'Publik'}</strong>? 
+			Are you sure you want to change your profile privacy to 
+			<strong class="text-slate-900">{pendingPrivacyState ? 'Private' : 'Public'}</strong>? 
 			{#if pendingPrivacyState}
-				Jika privat, hanya pengikut yang disetujui yang dapat berinteraksi dengan Anda.
+				If private, only approved followers can interact with you.
 			{:else}
-				Jika publik, semua orang dapat melihat profil dan postingan Anda.
+				If public, anyone can view your profile and posts.
 			{/if}
 		</p>
 		<div class="flex justify-end gap-3">
 			<button 
-				type="button"
-				onclick={() => showPrivacyModal = false}
+				type="button" 
+				onclick={() => showPrivacyModal = false} 
 				class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
 			>
-				Batal
+				Cancel
 			</button>
 			<button 
-				type="button"
-				onclick={confirmPrivacyToggle}
+				type="button" 
+				onclick={confirmPrivacyToggle} 
 				class="px-5 py-2.5 rounded-xl text-sm font-bold bg-green-600 text-white hover:bg-green-700 transition-colors shadow-md shadow-green-500/20 active:scale-95"
 			>
-				Ya, Lanjutkan
+				Yes, Continue
 			</button>
 		</div>
 	</div>
@@ -354,31 +353,31 @@
 			<svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
 			</svg>
-			<h3 class="text-xl font-bold text-slate-900">Konfirmasi Perubahan</h3>
+			<h3 class="text-xl font-bold text-slate-900">Confirm Change</h3>
 		</div>
 		<p class="text-slate-600 mb-8 leading-relaxed">
-			Apakah Anda yakin ingin mengubah pengaturan pesan menjadi 
-			<strong class="text-slate-900">{pendingMessagePrivacyState ? 'Dibatasi' : 'Tidak Dibatasi'}</strong>? 
+			Are you sure you want to change message privacy to 
+			<strong class="text-slate-900">{pendingMessagePrivacyState ? 'Restricted' : 'Unrestricted'}</strong>? 
 			{#if pendingMessagePrivacyState}
-				Jika dibatasi, hanya pengikut yang telah disetujui yang dapat mengirim pesan kepada Anda.
+				If restricted, only approved followers can send you messages.
 			{:else}
-				Jika tidak dibatasi, semua orang (walaupun Anda tidak mengikuti/di-acc mereka) dapat mengirimi Anda pesan secara langsung.
+				If unrestricted, anyone can message you directly.
 			{/if}
 		</p>
 		<div class="flex justify-end gap-3">
 			<button 
-				type="button"
-				onclick={() => showMessagePrivacyModal = false}
+				type="button" 
+				onclick={() => showMessagePrivacyModal = false} 
 				class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
 			>
-				Batal
+				Cancel
 			</button>
 			<button 
-				type="button"
-				onclick={confirmMessagePrivacyToggle}
+				type="button" 
+				onclick={confirmMessagePrivacyToggle} 
 				class="px-5 py-2.5 rounded-xl text-sm font-bold bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-md shadow-blue-500/20 active:scale-95"
 			>
-				Ya, Lanjutkan
+				Yes, Continue
 			</button>
 		</div>
 	</div>

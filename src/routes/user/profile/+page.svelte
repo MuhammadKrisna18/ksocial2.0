@@ -117,7 +117,7 @@
 	}
 
 	function deletePhoto(type: 'profile'|'cover') {
-		if (!confirm('Apakah Anda yakin ingin menghapus foto ini?')) return;
+		if (!confirm('Are you sure you want to delete this photo?')) return;
 		const form = document.createElement('form');
 		form.method = 'POST';
 		form.action = type === 'profile' ? '?/deleteProfilePicture' : '?/deleteCoverPhoto';
@@ -143,11 +143,11 @@
 		<div class="absolute inset-0 h-64 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 z-10">
 			<label class="cursor-pointer bg-white/20 hover:bg-white/30 backdrop-blur text-white px-4 py-2 rounded-full font-medium transition-colors">
 				<input type="file" class="hidden" accept="image/*" onchange={(e) => onFileSelected(e, 'cover')} />
-				Ubah Sampul
+				Change Cover
 			</label>
 			{#if profile?.coverPhotoUrl}
 				<button type="button" onclick={() => deletePhoto('cover')} class="cursor-pointer bg-red-500/80 hover:bg-red-500 backdrop-blur text-white px-4 py-2 rounded-full font-medium transition-colors">
-					Hapus
+					Delete
 				</button>
 			{/if}
 		</div>
@@ -164,11 +164,11 @@
 				<div class="absolute inset-0 bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
 					<label class="cursor-pointer text-white text-sm font-bold hover:underline">
 						<input type="file" class="hidden" accept="image/*" onchange={(e) => onFileSelected(e, 'profile')} />
-						Ubah
+						Change
 					</label>
 					{#if profile?.profilePictureUrl}
 						<button type="button" onclick={() => deletePhoto('profile')} class="cursor-pointer text-red-200 text-sm font-bold hover:underline">
-							Hapus
+							Delete
 						</button>
 					{/if}
 				</div>
@@ -177,7 +177,7 @@
 		
 		<!-- Profile Info Text -->
 		<div class="pt-24 pb-8 px-6 text-center">
-			<h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{profile?.fullName || 'Profile Anda'}</h1>
+			<h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{profile?.fullName || 'Your Profile'}</h1>
 			<p class="mt-2 text-slate-500 dark:text-slate-400 font-medium text-xl">@{profile?.username || 'username'}</p>
 		</div>
 	</div>
@@ -186,7 +186,7 @@
 	<div class="max-w-7xl mx-auto px-6 lg:px-8 pb-16 pt-8">
 		{#if !profile}
 			<div class="rounded-xl bg-red-50 p-4 border border-red-200 text-red-600 font-medium shadow-sm">
-				Data profile tidak ditemukan. Silakan login kembali.
+				Profile data not found. Please log in again.
 			</div>
 		{:else}
 			<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -198,12 +198,12 @@
 					<div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex justify-around text-center">
 						<button class="flex flex-col items-center hover:opacity-80 focus:outline-none" onclick={fetchFollowers}>
 							<span class="text-2xl font-black text-slate-900 dark:text-white">{profile.followersCount || 0}</span>
-							<span class="text-sm font-medium text-slate-500">Pengikut</span>
+							<span class="text-sm font-medium text-slate-500">Followers</span>
 						</button>
 						<div class="w-px bg-slate-200 dark:bg-slate-800 my-2"></div>
 						<button class="flex flex-col items-center hover:opacity-80 focus:outline-none" onclick={fetchFollowing}>
 							<span class="text-2xl font-black text-slate-900 dark:text-white">{profile.followingCount || 0}</span>
-							<span class="text-sm font-medium text-slate-500">Diikuti</span>
+							<span class="text-sm font-medium text-slate-500">Following</span>
 						</button>
 					</div>
 
@@ -281,9 +281,9 @@
 							<svg class="w-7 h-7 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
 							</svg>
-							Postingan Anda
+							Your Posts
 						</h2>
-						<p class="mt-2 text-slate-500 dark:text-slate-400">Kelola semua postingan yang pernah Anda buat.</p>
+						<p class="mt-2 text-slate-500 dark:text-slate-400">Manage all posts you have created.</p>
 					</div>
 
 					<!-- Create Post -->
@@ -294,7 +294,7 @@
 					<div class="space-y-6">
 						{#if data.posts.length === 0}
 							<div class="text-center py-12 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
-								<p class="text-slate-500 dark:text-slate-400 text-lg">Belum ada postingan. Mulai berbagi momen Anda!</p>
+								<p class="text-slate-500 dark:text-slate-400 text-lg">No posts yet. Start sharing your moments!</p>
 							</div>
 						{:else}
 							{#each data.posts as post}
@@ -340,7 +340,7 @@
 					class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6"
 				>
 					<div class="md:col-span-2">
-						<label for="fullName" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Nama Lengkap</label>
+						<label for="fullName" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Full Name</label>
 						<input type="text" id="fullName" name="fullName" value={profile.fullName} required class="mt-1.5 block w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all" />
 					</div>
 
@@ -350,19 +350,19 @@
 					</div>
 
 					<div>
-						<label for="dateOfBirth" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Tanggal Lahir</label>
+						<label for="dateOfBirth" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Date of Birth</label>
 						<input type="date" id="dateOfBirth" name="dateOfBirth" value={profile.dateOfBirth} required class="mt-1.5 block w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all" />
 					</div>
 
 					<div class="md:col-span-2">
-						<label for="location" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Lokasi (Kota, Negara)</label>
-						<input type="text" id="location" name="location" value={profile.location || ''} placeholder="Contoh: Surabaya, Indonesia" class="mt-1.5 block w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all" />
+						<label for="location" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Location (City, Country)</label>
+						<input type="text" id="location" name="location" value={profile.location || ''} placeholder="e.g. New York, USA" class="mt-1.5 block w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all" />
 					</div>
 
 					<div class="md:col-span-2">
-						<label for="relationshipStatus" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Status Hubungan</label>
+						<label for="relationshipStatus" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Relationship Status</label>
 						<select id="relationshipStatus" name="relationshipStatus" class="mt-1.5 block w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all">
-							<option value="">Pilih status</option>
+							<option value="">Select status</option>
 							<option value="Single" selected={profile.relationshipStatus === 'Single'}>Single</option>
 							<option value="In a relationship" selected={profile.relationshipStatus === 'In a relationship'}>In a relationship</option>
 							<option value="Engaged" selected={profile.relationshipStatus === 'Engaged'}>Engaged</option>
@@ -381,7 +381,7 @@
 
 					<div class="md:col-span-2 pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-end gap-3">
 						<button type="button" onclick={() => isEditProfileModalOpen = false} class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors disabled:opacity-50">
-							Batal
+							Cancel
 						</button>
 						<button type="submit" disabled={profileLoading} class="px-5 flex justify-center py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
 							{#if profileLoading}
@@ -389,9 +389,9 @@
 									<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 									<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 								</svg>
-								Menyimpan...
+								Saving...
 							{:else}
-								Simpan Perubahan
+								Save Changes
 							{/if}
 						</button>
 					</div>
@@ -430,7 +430,7 @@
 <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-200">
 	<div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
 		<div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-			<h3 class="text-xl font-bold text-slate-900 dark:text-white">Sesuaikan Foto {targetType === 'profile' ? 'Profil' : 'Sampul'}</h3>
+			<h3 class="text-xl font-bold text-slate-900 dark:text-white">Adjust {targetType === 'profile' ? 'Profile Picture' : 'Cover Photo'}</h3>
 			<button onclick={cancelCrop} class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" disabled={isUploading}>
 				<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -447,17 +447,17 @@
 		
 		<div class="p-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-3 bg-slate-50 dark:bg-slate-800/50">
 			<button 
-				type="button"
-				onclick={cancelCrop}
-				disabled={isUploading}
+				type="button" 
+				onclick={cancelCrop} 
+				disabled={isUploading} 
 				class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
 			>
-				Batal
+				Cancel
 			</button>
 			<button 
-				type="button"
-				onclick={saveCrop}
-				disabled={isUploading}
+				type="button" 
+				onclick={saveCrop} 
+				disabled={isUploading} 
 				class="px-5 py-2.5 rounded-xl text-sm font-bold bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-md shadow-blue-500/20 active:scale-95 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
 			>
 				{#if isUploading}
@@ -465,9 +465,9 @@
 						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 					</svg>
-					Menyimpan...
+					Saving...
 				{:else}
-					Simpan Foto
+					Save Photo
 				{/if}
 			</button>
 		</div>
@@ -483,7 +483,7 @@
 		<div class="fixed inset-0" onclick={() => showFollowersModal = false}></div>
 		<div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md flex flex-col max-h-[80vh] relative z-10">
 			<div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-				<h3 class="text-xl font-bold text-slate-900 dark:text-white">Pengikut</h3>
+				<h3 class="text-xl font-bold text-slate-900 dark:text-white">Followers</h3>
 				<button onclick={() => showFollowersModal = false} class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
 					<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -500,7 +500,7 @@
 					</div>
 				{:else if followersList.length === 0}
 					<div class="text-center p-8 text-slate-500 dark:text-slate-400">
-						Belum ada pengikut.
+						No followers yet.
 					</div>
 				{:else}
 					<div class="flex flex-col gap-4">
@@ -538,7 +538,7 @@
 		<div class="fixed inset-0" onclick={() => showFollowingModal = false}></div>
 		<div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md flex flex-col max-h-[80vh] relative z-10">
 			<div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-				<h3 class="text-xl font-bold text-slate-900 dark:text-white">Diikuti</h3>
+				<h3 class="text-xl font-bold text-slate-900 dark:text-white">Following</h3>
 				<button onclick={() => showFollowingModal = false} class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
 					<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -555,7 +555,7 @@
 					</div>
 				{:else if followingList.length === 0}
 					<div class="text-center p-8 text-slate-500 dark:text-slate-400">
-						Belum mengikuti siapapun.
+						Not following anyone yet.
 					</div>
 				{:else}
 					<div class="flex flex-col gap-4">

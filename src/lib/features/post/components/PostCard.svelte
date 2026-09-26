@@ -222,7 +222,7 @@
 					<span class="text-xs font-normal text-slate-500 dark:text-slate-400 no-underline">@{post.authorUsername}</span>
 					{#if isAuthorMe}
 						<span class="inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900 leading-none">
-							Saya
+							You
 						</span>
 					{/if}
 				</div>
@@ -342,7 +342,7 @@
 			{#if replyToComment}
 				<div class="mb-2 flex items-center justify-between bg-slate-100 dark:bg-slate-800 px-3 py-2 rounded-xl text-xs">
 					<span class="text-slate-600 dark:text-slate-400">
-						Membalas <span class="font-bold">@{replyToComment.authorUsername}</span>
+						Replying to <span class="font-bold">@{replyToComment.authorUsername}</span>
 					</span>
 					<button type="button" onclick={cancelReply} class="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
 						<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -363,7 +363,7 @@
 					<textarea 
 						bind:this={commentInputRef}
 						bind:value={newComment} 
-						placeholder={replyToComment ? `Balas @${replyToComment.authorUsername}...` : "Tulis komentar..."} 
+						placeholder={replyToComment ? `Reply to @${replyToComment.authorUsername}...` : "Write a comment..."} 
 						class="w-full bg-transparent border-none focus:ring-0 resize-none text-sm px-3 py-1.5 max-h-32 min-h-[36px] text-slate-900 dark:text-white"
 						rows="1"
 						oninput={(e) => {
@@ -390,7 +390,7 @@
 						<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
 					</div>
 				{:else if comments.length === 0}
-					<p class="text-center text-sm text-slate-500 py-4">Belum ada komentar.</p>
+					<p class="text-center text-sm text-slate-500 py-4">No comments yet.</p>
 				{:else}
 					{#each comments as comment}
 						<CommentItem {comment} {currentUser} {post} onReply={handleReply} />
@@ -408,7 +408,7 @@
 	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200" onclick={closeLikesModal}>
 		<div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col max-h-[80vh]" onclick={e => e.stopPropagation()}>
 			<div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-				<h3 class="font-bold text-lg text-slate-900 dark:text-white">Menyukai</h3>
+				<h3 class="font-bold text-lg text-slate-900 dark:text-white">Likes</h3>
 				<button type="button" onclick={closeLikesModal} class="p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
 					<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -421,7 +421,7 @@
 						<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
 					</div>
 				{:else if likesList.length === 0}
-					<p class="text-center text-slate-500 dark:text-slate-400 py-8">Belum ada yang menyukai.</p>
+					<p class="text-center text-slate-500 dark:text-slate-400 py-8">No likes yet.</p>
 				{:else}
 					<div class="space-y-4">
 						{#each likesList as user}

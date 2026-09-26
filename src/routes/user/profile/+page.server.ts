@@ -61,7 +61,7 @@ export const actions: Actions = {
 			for (const file of files) {
 				const validation = validatePostMediaFile(file);
 				if (!validation.isValid) {
-					return fail(400, { error: validation.error ?? 'File media tidak valid', content });
+					return fail(400, { error: validation.error ?? 'Invalid media file', content });
 				}
 				const filename = `post_${userId}_${Date.now()}_${Math.random().toString(36).substring(7)}.${validation.safeExtension}`;
 				const url = await postFileStorage.saveFile(file, filename);
@@ -93,7 +93,7 @@ export const actions: Actions = {
 		if (!fullName || !username || !dateOfBirthStr) {
 			return fail(400, {
 				success: false,
-				message: 'Semua field (Nama, Username, Tanggal Lahir) harus diisi.'
+				message: 'All fields (Full Name, Username, Date of Birth) are required.'
 			});
 		}
 
@@ -109,9 +109,9 @@ export const actions: Actions = {
 				isPrivate
 			});
 
-			return { successProfile: true, message: 'Profil berhasil diperbarui!' };
+			return { successProfile: true, message: 'Profile updated successfully!' };
 		} catch (error) {
-			return handleActionError(error, 'Terjadi kesalahan saat memperbarui profil.', { successProfile: false });
+			return handleActionError(error, 'An error occurred while updating profile.', { successProfile: false });
 		}
 	},
 
@@ -123,7 +123,7 @@ export const actions: Actions = {
 
 		const validation = validateImageFile(file);
 		if (!validation.isValid) {
-			return fail(400, { successPhoto: false, message: validation.error ?? 'File foto profil tidak valid.' });
+			return fail(400, { successPhoto: false, message: validation.error ?? 'Invalid profile picture file.' });
 		}
 
 		try {
@@ -135,9 +135,9 @@ export const actions: Actions = {
 				profilePictureUrl: url
 			});
 
-			return { successPhoto: true, message: 'Foto profil berhasil diperbarui!' };
+			return { successPhoto: true, message: 'Profile picture updated successfully!' };
 		} catch (error) {
-			return handleActionError(error, 'Gagal mengunggah foto profil.', { successPhoto: false });
+			return handleActionError(error, 'Failed to upload profile picture.', { successPhoto: false });
 		}
 	},
 
@@ -147,7 +147,7 @@ export const actions: Actions = {
 
 		const validation = validateImageFile(file);
 		if (!validation.isValid) {
-			return fail(400, { successPhoto: false, message: validation.error ?? 'File foto sampul tidak valid.' });
+			return fail(400, { successPhoto: false, message: validation.error ?? 'Invalid cover photo file.' });
 		}
 
 		try {
@@ -159,9 +159,9 @@ export const actions: Actions = {
 				coverPhotoUrl: url
 			});
 
-			return { successPhoto: true, message: 'Foto sampul berhasil diperbarui!' };
+			return { successPhoto: true, message: 'Cover photo updated successfully!' };
 		} catch (error) {
-			return handleActionError(error, 'Gagal mengunggah foto sampul.', { successPhoto: false });
+			return handleActionError(error, 'Failed to upload cover photo.', { successPhoto: false });
 		}
 	},
 
@@ -177,9 +177,9 @@ export const actions: Actions = {
 				profilePictureUrl: null
 			});
 
-			return { successPhoto: true, message: 'Foto profil berhasil dihapus!' };
+			return { successPhoto: true, message: 'Profile picture deleted successfully!' };
 		} catch (error) {
-			return handleActionError(error, 'Gagal menghapus foto profil.', { successPhoto: false });
+			return handleActionError(error, 'Failed to delete profile picture.', { successPhoto: false });
 		}
 	},
 
@@ -195,9 +195,9 @@ export const actions: Actions = {
 				coverPhotoUrl: null
 			});
 
-			return { successPhoto: true, message: 'Foto sampul berhasil dihapus!' };
+			return { successPhoto: true, message: 'Cover photo deleted successfully!' };
 		} catch (error) {
-			return handleActionError(error, 'Gagal menghapus foto sampul.', { successPhoto: false });
+			return handleActionError(error, 'Failed to delete cover photo.', { successPhoto: false });
 		}
 	},
 

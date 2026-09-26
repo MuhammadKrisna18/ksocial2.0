@@ -9,7 +9,7 @@ export interface PostAuthorCheckParams {
 }
 
 /**
- * Memeriksa apakah postingan dibuat oleh pengguna yang sedang aktif (logged-in user)
+ * Checks whether the post was created by the currently logged-in user
  */
 export function isOwnPost(params: PostAuthorCheckParams): boolean {
 	const { authorId, authorUsername, currentUser } = params;

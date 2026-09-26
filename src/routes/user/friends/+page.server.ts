@@ -10,10 +10,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 	}
 
 	try {
-		// Dapatkan daftar semua user selain user yang sedang login
+		// Get list of all users other than the logged-in user
 		const allUsers = await container.getUsersUseCase.execute(userId);
 		
-		// Filter profil admin agar tidak tampil di halaman user
+		// Filter out admin profiles from appearing on the user page
 		const users = allUsers.filter(u => !u.roles.includes('admin'));
 
 		const followersToFollowBack: any[] = [];

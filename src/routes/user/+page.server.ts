@@ -28,7 +28,7 @@ export const actions: Actions = {
 		const rateCheck = postRateLimiter.consume(userId);
 		if (!rateCheck.allowed) {
 			return fail(429, {
-				error: `Anda membuat postingan terlalu cepat. Silakan tunggu ${rateCheck.resetInSeconds} detik.`
+				error: `You are posting too quickly. Please wait ${rateCheck.resetInSeconds} second${rateCheck.resetInSeconds === 1 ? '' : 's'}.`
 			});
 		}
 

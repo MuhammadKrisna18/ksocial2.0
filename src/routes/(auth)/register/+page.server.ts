@@ -25,7 +25,7 @@ export const actions: Actions = {
 		const rateCheck = registerRateLimiter.consume(clientIp);
 		if (!rateCheck.allowed) {
 			return fail(429, {
-				error: `Terlalu banyak permintaan pendaftaran. Silakan coba lagi dalam ${rateCheck.resetInSeconds} detik.`,
+				error: `Too many registration requests. Please try again in ${rateCheck.resetInSeconds} seconds.`,
 				values: undefined
 			});
 		}
@@ -39,7 +39,7 @@ export const actions: Actions = {
 
 		if (!fullName || !username || !email || !password || !dateOfBirthStr) {
 			return fail(400, {
-				error: 'Semua kolom wajib diisi.',
+				error: 'All fields are required.',
 				values: { fullName, username, email, dateOfBirth: dateOfBirthStr }
 			});
 		}
@@ -57,15 +57,15 @@ export const actions: Actions = {
 
 			cookies.set(ACCESS_TOKEN_COOKIE, result.accessToken, getAuthCookieOptions(!dev));
 		} catch (error: unknown) {
-			const message = error instanceof Error ? error.message : 'Terjadi kesalahan saat pendaftaran.';
+			const message = error instanceof Error ? error.message : 'An error occurred during registration.';
 
 			let friendlyError = message;
 			if (message.includes('Username already in use')) {
-				friendlyError = 'Nama panggilan (Username) tersebut sudah dipakai oleh orang lain.';
+				friendlyError = 'This username is already taken.';
 			} else if (message.includes('Email already in use')) {
-				friendlyError = 'Email tersebut sudah terdaftar.';
+				friendlyError = 'This email is already registered.';
 			} else if (message.includes('Invalid email address')) {
-				friendlyError = 'Format email tidak valid. Gunakan format email yang benar (misal: user@gmail.com).';
+				friendlyError = 'Invalid email format. Please use a valid email address (e.g. user@gmail.com).';
 			}
 
 			return fail(400, {

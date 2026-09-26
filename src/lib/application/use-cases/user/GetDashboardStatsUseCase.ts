@@ -51,7 +51,7 @@ export class GetDashboardStatsUseCase {
 			id: `user-${u.id}`,
 			user: u.username,
 			fullName: u.fullName,
-			action: 'bergabung ke K-Social',
+			action: 'joined K-Social',
 			type: 'user',
 			createdAt: u.createdAt
 		}));
@@ -63,7 +63,7 @@ export class GetDashboardStatsUseCase {
 				id: `post-${p.id}`,
 				user: p.authorUsername,
 				fullName: p.authorName,
-				action: `membuat postingan: "${snippet}"`,
+				action: `created a post: "${snippet}"`,
 				type: 'post',
 				createdAt: p.createdAt
 			};
@@ -75,7 +75,7 @@ export class GetDashboardStatsUseCase {
 			return {
 				id: `comment-${c.id}`,
 				user: c.authorUsername,
-				action: `menulis komentar: "${snippet}"`,
+				action: `commented: "${snippet}"`,
 				type: 'comment',
 				createdAt: c.createdAt
 			};

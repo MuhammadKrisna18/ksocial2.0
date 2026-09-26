@@ -90,7 +90,7 @@
 			<div class="mt-4 sm:mt-0 w-full sm:w-auto">
 				{#if isCurrentUser}
 					<a href="/user/profile" class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-						Edit Profil
+						Edit Profile
 					</a>
 				{:else}
 					<form method="POST" action="?/follow" use:enhance={() => {
@@ -107,17 +107,17 @@
 						>
 							{#if isFollowingState}
 								<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-								Memproses...
+								Processing...
 							{:else if followStatus === 'pending'}
-								Menunggu Konfirmasi
+								Requested
 							{:else if followStatus === 'following'}
-								Mengikuti
+								Following
 							{:else if followStatus === 'friends'}
-								Berteman
+								Friends
 							{:else if followStatus === 'follows_you'}
-								Ikuti Balik
+								Follow Back
 							{:else}
-								Ikuti (Follow)
+								Follow
 							{/if}
 						</button>
 					</form>
@@ -134,12 +134,12 @@
 				<div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex justify-around text-center">
 					<button class="flex flex-col items-center hover:opacity-80 focus:outline-none" onclick={fetchFollowers}>
 						<span class="text-2xl font-black text-slate-900 dark:text-white">{profile.followersCount || 0}</span>
-						<span class="text-sm font-medium text-slate-500">Pengikut</span>
+						<span class="text-sm font-medium text-slate-500">Followers</span>
 					</button>
 					<div class="w-px bg-slate-200 dark:bg-slate-800 my-2"></div>
 					<button class="flex flex-col items-center hover:opacity-80 focus:outline-none" onclick={fetchFollowing}>
 						<span class="text-2xl font-black text-slate-900 dark:text-white">{profile.followingCount || 0}</span>
-						<span class="text-sm font-medium text-slate-500">Diikuti</span>
+						<span class="text-sm font-medium text-slate-500">Following</span>
 					</button>
 				</div>
 
@@ -195,8 +195,8 @@
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
 						</svg>
 					</div>
-					<h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Akun ini bersifat Privat</h3>
-					<p class="text-slate-500 dark:text-slate-400 text-lg max-w-md mx-auto">Ikuti akun ini untuk melihat foto dan aktivitasnya.</p>
+					<h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">This Account is Private</h3>
+					<p class="text-slate-500 dark:text-slate-400 text-lg max-w-md mx-auto">Follow this account to see their photos and activity.</p>
 				</div>
 			{:else}
 				<!-- Feed Posts -->
@@ -204,7 +204,7 @@
 					<svg class="w-6 h-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-.586-1.414l-4.5-4.5A2 2 0 0012.586 3H12" />
 					</svg>
-					Aktivitas Terbaru
+					Recent Activity
 				</h2>
 
 				{#if posts.length > 0}
@@ -215,7 +215,7 @@
 					</div>
 				{:else}
 					<div class="bg-slate-50/50 dark:bg-slate-900/50 rounded-2xl p-8 border border-dashed border-slate-200 dark:border-slate-800 text-center">
-						<p class="text-slate-500 dark:text-slate-400 font-medium">Belum ada aktivitas.</p>
+						<p class="text-slate-500 dark:text-slate-400 font-medium">No activity yet.</p>
 					</div>
 				{/if}
 			{/if}
@@ -232,7 +232,7 @@
 		<div class="fixed inset-0" onclick={() => showFollowersModal = false}></div>
 		<div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md flex flex-col max-h-[80vh] relative z-10">
 			<div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-				<h3 class="text-xl font-bold text-slate-900 dark:text-white">Pengikut</h3>
+				<h3 class="text-xl font-bold text-slate-900 dark:text-white">Followers</h3>
 				<button onclick={() => showFollowersModal = false} class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
 					<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -249,7 +249,7 @@
 					</div>
 				{:else if followersList.length === 0}
 					<div class="text-center p-8 text-slate-500 dark:text-slate-400">
-						Belum ada pengikut.
+						No followers yet.
 					</div>
 				{:else}
 					<div class="flex flex-col gap-4">
@@ -287,7 +287,7 @@
 		<div class="fixed inset-0" onclick={() => showFollowingModal = false}></div>
 		<div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md flex flex-col max-h-[80vh] relative z-10">
 			<div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-				<h3 class="text-xl font-bold text-slate-900 dark:text-white">Diikuti</h3>
+				<h3 class="text-xl font-bold text-slate-900 dark:text-white">Following</h3>
 				<button onclick={() => showFollowingModal = false} class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
 					<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -304,7 +304,7 @@
 					</div>
 				{:else if followingList.length === 0}
 					<div class="text-center p-8 text-slate-500 dark:text-slate-400">
-						Belum mengikuti siapapun.
+						Not following anyone yet.
 					</div>
 				{:else}
 					<div class="flex flex-col gap-4">

@@ -30,7 +30,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 	if (!rateCheck.allowed) {
 		return json(
 			{
-				error: `Terlalu banyak pesan terkirim. Mohon tunggu ${rateCheck.resetInSeconds} detik sebelum mengirim lagi.`
+				error: `Too many messages sent. Please wait ${rateCheck.resetInSeconds} second${rateCheck.resetInSeconds === 1 ? '' : 's'} before sending again.`
 			},
 			{
 				status: 429,

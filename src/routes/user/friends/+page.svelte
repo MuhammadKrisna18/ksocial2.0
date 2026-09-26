@@ -6,15 +6,15 @@
 </script>
 
 <svelte:head>
-	<title>Teman & Pengguna Lain — K-Social</title>
+	<title>Friends & People — K-Social</title>
 </svelte:head>
 
 <div class="min-h-full">
 	<!-- Full Width Header -->
 	<div class="relative w-full bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 pt-8 pb-12 px-6 lg:px-8">
 		<div class="max-w-7xl mx-auto">
-			<h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Temukan Teman</h1>
-			<p class="mt-2 text-slate-500 dark:text-slate-400 font-medium text-xl">Cari dan ikuti pengguna lain di K-Social untuk melihat aktivitas mereka.</p>
+			<h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Find Friends</h1>
+			<p class="mt-2 text-slate-500 dark:text-slate-400 font-medium text-xl">Find and follow other users on K-Social to see their activity.</p>
 		</div>
 	</div>
 
@@ -41,13 +41,13 @@
 					@{user.username}
 				</p>
 
-				<!-- Actions: Lihat Profil & Follow Side-by-Side -->
+				<!-- Actions: View Profile & Follow Side-by-Side -->
 				<div class="mt-6 w-full pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center gap-2">
 					<a
 						href="/user/profile/{user.username}"
 						class="flex-1 py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors duration-200 text-center flex items-center justify-center"
 					>
-						Lihat Profil
+						View Profile
 					</a>
 
 					{#if user.followStatus === 'none'}
@@ -103,7 +103,7 @@
 								{#if loadingUserId === user.id}
 									<span class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
 								{:else}
-									<span>Ikuti Balik</span>
+									<span>Follow Back</span>
 								{/if}
 							</button>
 						</form>
@@ -130,7 +130,7 @@
 								{#if loadingUserId === user.id}
 									<span class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-slate-600 border-t-transparent"></span>
 								{:else}
-									<span>Diminta</span>
+									<span>Requested</span>
 								{/if}
 							</button>
 						</form>
@@ -157,8 +157,8 @@
 								{#if loadingUserId === user.id}
 									<span class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-emerald-600 border-t-transparent"></span>
 								{:else}
-									<span class="group-hover/btn:hidden">Teman</span>
-									<span class="hidden group-hover/btn:inline">Batal</span>
+									<span class="group-hover/btn:hidden">Friends</span>
+									<span class="hidden group-hover/btn:inline">Unfriend</span>
 								{/if}
 							</button>
 						</form>
@@ -186,8 +186,8 @@
 								{#if loadingUserId === user.id}
 									<span class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-slate-600 border-t-transparent"></span>
 								{:else}
-									<span class="group-hover/btn:hidden">Mengikuti</span>
-									<span class="hidden group-hover/btn:inline">Batal</span>
+									<span class="group-hover/btn:hidden">Following</span>
+									<span class="hidden group-hover/btn:inline">Unfollow</span>
 								{/if}
 							</button>
 						</form>
@@ -196,7 +196,7 @@
 			</div>
 		{/snippet}
 
-		<!-- Kategori: Ikuti Balik (Followers you don't follow) -->
+		<!-- Category: Follow Back (Followers you don't follow) -->
 		{#if data.followersToFollowBack && data.followersToFollowBack.length > 0}
 			<section>
 				<h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
@@ -205,7 +205,7 @@
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
 						</svg>
 					</span>
-					Pengikut (Ikuti Balik)
+					Followers (Follow Back)
 				</h2>
 				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 					{#each data.followersToFollowBack as user}
@@ -215,7 +215,7 @@
 			</section>
 		{/if}
 
-		<!-- Kategori: Teman Mutual -->
+		<!-- Category: Mutual Friends -->
 		{#if data.mutualFriends && data.mutualFriends.length > 0}
 			<section>
 				<h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
@@ -224,7 +224,7 @@
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
 						</svg>
 					</span>
-					Teman (Mutual)
+					Friends (Mutual)
 				</h2>
 				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 					{#each data.mutualFriends as user}
@@ -234,7 +234,7 @@
 			</section>
 		{/if}
 
-		<!-- Kategori: Temukan Teman Lainnya -->
+		<!-- Category: Other Users -->
 		{#if data.otherUsers && data.otherUsers.length > 0}
 			<section>
 				<h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
@@ -243,7 +243,7 @@
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
 						</svg>
 					</span>
-					Pengguna Lainnya
+					Other Users
 				</h2>
 				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 					{#each data.otherUsers as user}
@@ -260,8 +260,8 @@
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
 					</svg>
 				</div>
-				<h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Belum ada pengguna lain</h3>
-				<p class="text-slate-500 dark:text-slate-400 text-lg max-w-md mx-auto">Saat ini belum ada pengguna lain yang terdaftar di sistem. Jadilah yang pertama mengajak teman Anda!</p>
+				<h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">No other users yet</h3>
+				<p class="text-slate-500 dark:text-slate-400 text-lg max-w-md mx-auto">There are currently no other users registered on the platform. Be the first to invite your friends!</p>
 			</div>
 		{/if}
 	</div>

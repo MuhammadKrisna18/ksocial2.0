@@ -14,7 +14,7 @@ if (!DATABASE_URL) throw new Error('Missing DATABASE_URL');
 const queryClient = postgres(DATABASE_URL);
 const db = drizzle(queryClient, { schema });
 
-// Domain penanda untuk akun dummy agar 100% aman dan mudah dihapus
+// Identifier domain for dummy accounts for 100% safe creation and cleanup
 export const DUMMY_EMAIL_DOMAIN = '@dummy.ksocial.test';
 
 export interface DummyUserData {
@@ -38,10 +38,10 @@ const DUMMY_USERS: DummyUserData[] = [
 		username: 'andi_pratama',
 		email: `andi${DUMMY_EMAIL_DOMAIN}`,
 		profilePictureUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
-		bio: 'Software engineer & tech enthusiast dari Jakarta.',
+		bio: 'Software engineer & tech enthusiast from Jakarta.',
 		posts: [
 			{
-				content: 'Halo teman-teman di K-Social! Baru pertama kali coba platform ini, tampilannya keren dan responsif banget 👍',
+				content: 'Hello friends on K-Social! First time trying out this platform, the interface looks awesome and super responsive 👍',
 				hoursAgo: 2,
 				likesCount: 5,
 				commentsCount: 2
@@ -53,10 +53,10 @@ const DUMMY_USERS: DummyUserData[] = [
 		username: 'siti_rahma',
 		email: `siti${DUMMY_EMAIL_DOMAIN}`,
 		profilePictureUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
-		bio: 'Pencinta alam, fotografi, dan kopi senja.',
+		bio: 'Nature lover, photography enthusiast, and sunset coffee fan.',
 		posts: [
 			{
-				content: 'Pemandangan pagi hari di pegunungan selalu bisa menenangkan pikiran sejenak dari hiruk pikuk kota.',
+				content: 'Morning views in the mountains always calm the mind away from the city hustle and bustle.',
 				media: [
 					{
 						url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=80',
@@ -68,7 +68,7 @@ const DUMMY_USERS: DummyUserData[] = [
 				commentsCount: 3
 			},
 			{
-				content: 'Jangan lupa luangkan waktu 15 menit hari ini untuk sekadar bersyukur dan istirahat sejenak ☕✨',
+				content: "Don't forget to take 15 minutes today just to be grateful and take a quick break ☕✨",
 				hoursAgo: 14,
 				likesCount: 8,
 				commentsCount: 1
@@ -83,7 +83,7 @@ const DUMMY_USERS: DummyUserData[] = [
 		bio: 'Fullstack Developer | SvelteKit & Postgres Fanatic',
 		posts: [
 			{
-				content: 'Setup meja kerja baru untuk minggu ini. Minimalis dan fokus!',
+				content: 'New workspace setup for this week. Minimalist and focused!',
 				media: [
 					{
 						url: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&auto=format&fit=crop&q=80',
@@ -95,7 +95,7 @@ const DUMMY_USERS: DummyUserData[] = [
 				commentsCount: 4
 			},
 			{
-				content: 'Video cuplikan animasi pendek yang sangat inspiratif!',
+				content: 'An inspiring short animated film clip!',
 				media: [
 					{
 						url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
@@ -107,7 +107,7 @@ const DUMMY_USERS: DummyUserData[] = [
 				commentsCount: 5
 			},
 			{
-				content: 'Tips Clean Architecture: pisahkan aturan bisnis murni (Domain) dari infrastruktur database. Sangat memudahkan saat unit testing.',
+				content: 'Clean Architecture tip: isolate pure business rules (Domain) from the database infrastructure. It makes unit testing so much easier.',
 				hoursAgo: 36,
 				likesCount: 22,
 				commentsCount: 7
@@ -122,7 +122,7 @@ const DUMMY_USERS: DummyUserData[] = [
 		bio: 'Food blogger & healthy lifestyle explorer.',
 		posts: [
 			{
-				content: 'Makan siang sehat hari ini: fresh salad bowl dengan dressing wijen sangrai. Segar dan bertenaga! 🥗',
+				content: 'Healthy lunch today: fresh salad bowl with roasted sesame dressing. Crisp and energizing! 🥗',
 				media: [
 					{
 						url: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&auto=format&fit=crop&q=80',
@@ -143,7 +143,7 @@ const DUMMY_USERS: DummyUserData[] = [
 		bio: 'Videographer & cat lover.',
 		posts: [
 			{
-				content: 'Kenalin si Oyen yang kerjaannya tidur seharian di atas keyboard 😹',
+				content: 'Meet Ginger who spends the entire day sleeping on the keyboard 😹',
 				media: [
 					{
 						url: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800&auto=format&fit=crop&q=80',
@@ -155,7 +155,7 @@ const DUMMY_USERS: DummyUserData[] = [
 				commentsCount: 9
 			},
 			{
-				content: 'Cuplikan video cinematic pemandangan dan api unggun.',
+				content: 'Cinematic video clip of scenery and a campfire.',
 				media: [
 					{
 						url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
@@ -167,13 +167,13 @@ const DUMMY_USERS: DummyUserData[] = [
 				commentsCount: 2
 			},
 			{
-				content: 'Sedang mencoba color grading baru di DaVinci Resolve. Ada yang punya rekomendasi LUT natural?',
+				content: 'Testing out new color grading in DaVinci Resolve. Does anyone have natural LUT recommendations?',
 				hoursAgo: 28,
 				likesCount: 6,
 				commentsCount: 4
 			},
 			{
-				content: 'Selamat berakhir pekan semuanya! Nikmati waktu bersama orang-orang tersayang.',
+				content: 'Have a wonderful weekend everyone! Enjoy quality time with loved ones.',
 				hoursAgo: 50,
 				likesCount: 9,
 				commentsCount: 0
@@ -185,16 +185,16 @@ const DUMMY_USERS: DummyUserData[] = [
 		username: 'dewi_anggraini',
 		email: `dewi${DUMMY_EMAIL_DOMAIN}`,
 		profilePictureUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
-		bio: 'UI/UX Designer | Seni & Estetika',
+		bio: 'UI/UX Designer | Art & Aesthetics',
 		posts: [
 			{
-				content: 'Desain yang baik bukan hanya tentang bagaimana tampilannya, tapi bagaimana cara kerjanya terasa natural bagi pengguna.',
+				content: 'Good design is not just how it looks, but how naturally it feels and works for users.',
 				hoursAgo: 9,
 				likesCount: 24,
 				commentsCount: 5
 			},
 			{
-				content: 'Video motion design untuk animasi loading interaktif.',
+				content: 'Motion design video for interactive loading animations.',
 				media: [
 					{
 						url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
@@ -215,7 +215,7 @@ const DUMMY_USERS: DummyUserData[] = [
 		bio: 'Digital nomad & travel enthusiast.',
 		posts: [
 			{
-				content: 'Menjelajahi pesisir pantai sore hari. Suasana hening dan suara deburan ombak bikin rileks.',
+				content: 'Exploring the coastline in the late afternoon. The calm ambiance and ocean waves are so relaxing.',
 				media: [
 					{
 						url: 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?w=800&auto=format&fit=crop&q=80',
@@ -227,7 +227,7 @@ const DUMMY_USERS: DummyUserData[] = [
 				commentsCount: 3
 			},
 			{
-				content: 'Pameran karya seni kontemporer di galeri lokal.',
+				content: 'Contemporary art exhibition at a local gallery.',
 				media: [
 					{
 						url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80',
@@ -239,7 +239,7 @@ const DUMMY_USERS: DummyUserData[] = [
 				commentsCount: 1
 			},
 			{
-				content: 'Bekerja secara remote mengajarkan kita tentang manajemen waktu dan disiplin diri yang nyata.',
+				content: 'Working remotely teaches us real time management and self-discipline.',
 				hoursAgo: 45,
 				likesCount: 16,
 				commentsCount: 4
@@ -254,7 +254,7 @@ const DUMMY_USERS: DummyUserData[] = [
 		bio: 'Videographer & storytelling enthusiast.',
 		posts: [
 			{
-				content: 'Klip pendek video keindahan alam liar.',
+				content: 'Short clip highlighting the beauty of wildlife.',
 				media: [
 					{
 						url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4',
@@ -275,7 +275,7 @@ const DUMMY_USERS: DummyUserData[] = [
 		bio: 'Dog trainer & animal advocate.',
 		posts: [
 			{
-				content: 'Teman setia yang selalu menyambut di depan pintu rumah dengan penuh semangat 🐶❤️',
+				content: 'A loyal buddy who always greets me at the door with excitement 🐶❤️',
 				media: [
 					{
 						url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&auto=format&fit=crop&q=80',
@@ -287,7 +287,7 @@ const DUMMY_USERS: DummyUserData[] = [
 				commentsCount: 5
 			},
 			{
-				content: 'Melatih anjing bukan soal kepatuhan buta, tapi soal membangun komunikasi dan rasa percaya dua arah.',
+				content: 'Dog training is not about blind obedience; it is about building two-way communication and trust.',
 				hoursAgo: 32,
 				likesCount: 10,
 				commentsCount: 2
@@ -302,7 +302,7 @@ const DUMMY_USERS: DummyUserData[] = [
 		bio: 'Product Manager | Tech Writer',
 		posts: [
 			{
-				content: 'Diskusi tim produk hari ini sangat produktif membahas roadmap kuartal depan!',
+				content: 'Great product team session today discussing the next quarterly roadmap!',
 				media: [
 					{
 						url: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&auto=format&fit=crop&q=80',
@@ -314,7 +314,7 @@ const DUMMY_USERS: DummyUserData[] = [
 				commentsCount: 8
 			},
 			{
-				content: 'Klip presentasi produk baru.',
+				content: 'New product presentation teaser clip.',
 				media: [
 					{
 						url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
@@ -326,19 +326,19 @@ const DUMMY_USERS: DummyUserData[] = [
 				commentsCount: 3
 			},
 			{
-				content: 'Prioritaskan fitur yang benar-benar memecahkan masalah pengguna, bukan hanya fitur yang terlihat keren di atas kertas.',
+				content: 'Prioritize features that genuinely solve user pain points, not just features that look cool on paper.',
 				hoursAgo: 25,
 				likesCount: 21,
 				commentsCount: 6
 			},
 			{
-				content: 'Buku bacaan minggu ini: Inspired oleh Marty Cagan. Sangat direkomendasikan untuk siapa pun yang membangun produk digital.',
+				content: 'Book recommendation of the week: Inspired by Marty Cagan. Highly recommended for anyone building digital products.',
 				hoursAgo: 40,
 				likesCount: 14,
 				commentsCount: 2
 			},
 			{
-				content: 'Selamat pagi dunia! Semangat untuk mencapai target mingguan kalian 🚀',
+				content: 'Good morning world! Wishing everyone energy to hit their weekly goals 🚀',
 				hoursAgo: 60,
 				likesCount: 9,
 				commentsCount: 1
@@ -353,7 +353,7 @@ const DUMMY_USERS: DummyUserData[] = [
 		bio: 'Musician & indie artist.',
 		posts: [
 			{
-				content: 'Suasana konser semalam sungguh luar biasa! Energi dari penonton benar-benar membakar semangat.',
+				content: 'The concert atmosphere last night was incredible! The energy from the crowd was truly electric.',
 				media: [
 					{
 						url: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80',
@@ -365,7 +365,7 @@ const DUMMY_USERS: DummyUserData[] = [
 				commentsCount: 11
 			},
 			{
-				content: 'Sedang menulis lagu baru dengan progresi akord minor. Musik adalah bahasa jiwa.',
+				content: 'Writing a new song with a minor chord progression. Music is the language of the soul.',
 				hoursAgo: 48,
 				likesCount: 19,
 				commentsCount: 4
@@ -380,7 +380,7 @@ const DUMMY_USERS: DummyUserData[] = [
 		bio: 'Coffee connoisseur & cafe hopper.',
 		posts: [
 			{
-				content: 'Menemukan kedai kopi tersembunyi dengan suasana super cozy di sudut kota.',
+				content: 'Discovered a hidden coffee shop with a super cozy ambiance tucked away in the city corner.',
 				media: [
 					{
 						url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80',
@@ -392,13 +392,13 @@ const DUMMY_USERS: DummyUserData[] = [
 				commentsCount: 4
 			},
 			{
-				content: 'V60 Ethiopian beans dengan rasa fruity dan aroma melati. Kopi terbaik hari ini!',
+				content: 'V60 Ethiopian beans with fruity notes and jasmine aroma. Best coffee of the day!',
 				hoursAgo: 35,
 				likesCount: 18,
 				commentsCount: 3
 			},
 			{
-				content: 'Ada yang punya rekomendasi kafe ramah laptop di daerah Jakarta Selatan?',
+				content: 'Does anyone have recommendations for laptop-friendly cafes around South Jakarta?',
 				hoursAgo: 72,
 				likesCount: 11,
 				commentsCount: 7
@@ -413,7 +413,7 @@ const DUMMY_USERS: DummyUserData[] = [
 		bio: 'Cybersecurity Analyst & Open Source Contributor.',
 		posts: [
 			{
-				content: 'Ingat untuk selalu mengaktifkan 2FA (Two-Factor Authentication) pada semua akun penting Anda. Keamanan digital dimulai dari kebiasaan kecil.',
+				content: 'Remember to always enable 2FA (Two-Factor Authentication) on all your critical accounts. Digital security starts with small daily habits.',
 				hoursAgo: 18,
 				likesCount: 33,
 				commentsCount: 5
@@ -428,7 +428,7 @@ const DUMMY_USERS: DummyUserData[] = [
 		bio: 'Student & aspiring data scientist.',
 		posts: [
 			{
-				content: 'Video pembelajaran interaktif yang bagus tentang visualisasi data.',
+				content: 'A great interactive learning video on data visualization.',
 				media: [
 					{
 						url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
@@ -440,7 +440,7 @@ const DUMMY_USERS: DummyUserData[] = [
 				commentsCount: 3
 			},
 			{
-				content: 'Akhirnya berhasil memahami cara kerja neural network dari dasar matematika matriks. Puas banget rasanya!',
+				content: 'Finally grasped how neural networks work from fundamental matrix mathematics. So rewarding!',
 				hoursAgo: 38,
 				likesCount: 20,
 				commentsCount: 4
@@ -455,13 +455,13 @@ const DUMMY_USERS: DummyUserData[] = [
 		bio: 'Calisthenics & Fitness enthusiast.',
 		posts: [
 			{
-				content: 'Konsistensi mengalahkan motivasi. Jangan tunggu mood datang untuk mulai berolahraga.',
+				content: 'Consistency beats motivation. Never wait for the mood to hit before you start working out.',
 				hoursAgo: 5,
 				likesCount: 29,
 				commentsCount: 4
 			},
 			{
-				content: 'Video latihan fisik outdoor hari ini.',
+				content: 'Outdoor workout clip from today.',
 				media: [
 					{
 						url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
@@ -473,13 +473,13 @@ const DUMMY_USERS: DummyUserData[] = [
 				commentsCount: 2
 			},
 			{
-				content: 'Target pull-up 20 reps tercapai tanpa jeda! Latihan keras tidak pernah mengkhianati hasil.',
+				content: 'Hit 20 consecutive pull-up reps unbroken! Hard work never betrays the results.',
 				hoursAgo: 42,
 				likesCount: 24,
 				commentsCount: 6
 			},
 			{
-				content: 'Menu pre-workout favorit: pisang + segelas americano tanpa gula. Praktis dan efektif.',
+				content: 'Favorite pre-workout: a banana + a cup of unsweetened americano. Simple and effective.',
 				hoursAgo: 65,
 				likesCount: 12,
 				commentsCount: 1
@@ -494,7 +494,7 @@ const DUMMY_USERS: DummyUserData[] = [
 		bio: 'Bibliophile & creative writer.',
 		posts: [
 			{
-				content: 'Sudut baca favorit di rumah. Tidak ada yang lebih menyenangkan daripada aroma buku baru.',
+				content: 'Favorite reading corner at home. Nothing beats the smell of new books.',
 				media: [
 					{
 						url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=80',
@@ -506,7 +506,7 @@ const DUMMY_USERS: DummyUserData[] = [
 				commentsCount: 3
 			},
 			{
-				content: '"Satu-satunya batasan untuk meraih mimpi kita adalah keraguan kita hari ini." - Franklin D. Roosevelt',
+				content: '"The only limit to our realization of tomorrow will be our doubts of today." - Franklin D. Roosevelt',
 				hoursAgo: 44,
 				likesCount: 16,
 				commentsCount: 1
@@ -521,7 +521,7 @@ const DUMMY_USERS: DummyUserData[] = [
 		bio: 'Automotive & landscape photographer.',
 		posts: [
 			{
-				content: 'Langit sore yang memancarkan spektrum warna alami aurora dan lembah pegunungan.',
+				content: 'Evening sky radiating natural colors above the mountain valley.',
 				media: [
 					{
 						url: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80',
@@ -542,13 +542,13 @@ const DUMMY_USERS: DummyUserData[] = [
 		bio: 'Mindfulness coach & meditation practitioner.',
 		posts: [
 			{
-				content: 'Tarik napas dalam-dalam, hembuskan perlahan. Apapun beban hari ini, kamu sudah berusaha sebaik mungkin.',
+				content: 'Take a deep breath in, exhale slowly. Whatever today held, you did your very best.',
 				hoursAgo: 8,
 				likesCount: 26,
 				commentsCount: 5
 			},
 			{
-				content: 'Ketenangan pemandangan danau saat fajar menyingsing.',
+				content: 'Tranquil lake view as dawn breaks.',
 				media: [
 					{
 						url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=80',
@@ -560,7 +560,7 @@ const DUMMY_USERS: DummyUserData[] = [
 				commentsCount: 4
 			},
 			{
-				content: 'Belajar untuk melepaskan hal-hal yang berada di luar kendali kita adalah kunci kedamaian sejati.',
+				content: 'Learning to let go of things beyond our control is the key to true inner peace.',
 				hoursAgo: 55,
 				likesCount: 19,
 				commentsCount: 2
@@ -575,7 +575,7 @@ const DUMMY_USERS: DummyUserData[] = [
 		bio: 'Hardware engineer & IoT builder.',
 		posts: [
 			{
-				content: 'Membangun prototype sensor cuaca mandiri dengan ESP32 dan solar panel mini.',
+				content: 'Building a standalone weather sensor prototype with ESP32 and mini solar panels.',
 				media: [
 					{
 						url: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&auto=format&fit=crop&q=80',
@@ -587,7 +587,7 @@ const DUMMY_USERS: DummyUserData[] = [
 				commentsCount: 5
 			},
 			{
-				content: 'Open source hardware berkembang sangat pesat belakangan ini. Era IoT semakin terjangkau bagi semua orang.',
+				content: 'Open-source hardware has grown tremendously lately. The IoT era is more accessible than ever.',
 				hoursAgo: 46,
 				likesCount: 14,
 				commentsCount: 2
@@ -599,10 +599,10 @@ const DUMMY_USERS: DummyUserData[] = [
 		username: 'nadia_utami',
 		email: `nadia${DUMMY_EMAIL_DOMAIN}`,
 		profilePictureUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
-		bio: 'Guru bahasa & penggiat literasi anak.',
+		bio: 'Language teacher & children literacy advocate.',
 		posts: [
 			{
-				content: 'Senang sekali melihat antusiasme anak-anak membaca buku cerita di perpustakaan keliling hari ini! Literasi adalah jendela masa depan 📚✨',
+				content: 'So heartwarming to see children enthusiastically reading storybooks at the mobile library today! Literacy is the window to the future 📚✨',
 				hoursAgo: 10,
 				likesCount: 34,
 				commentsCount: 6
@@ -612,7 +612,7 @@ const DUMMY_USERS: DummyUserData[] = [
 ];
 
 async function seedDummyUsers(): Promise<void> {
-	// Pastikan role default 'user' ada
+	// Ensure default 'user' role exists
 	const roleRows = await db
 		.select()
 		.from(schema.roles)
@@ -625,18 +625,18 @@ async function seedDummyUsers(): Promise<void> {
 	} else {
 		userRoleId = randomUUID();
 		await db.insert(schema.roles).values({ id: userRoleId, name: DEFAULT_USER_ROLE as RoleNameType });
-		console.log('Role default "user" dibuat.');
+		console.log('Default "user" role created.');
 	}
 
-	// Password hash seragam untuk semua dummy user (password: 'password123')
+	// Uniform password hash for all dummy users (password: 'password123')
 	const passwordHash = await bcrypt.hash('password123', BCRYPT_SALT_ROUNDS);
 
-	console.log(`Memproses seeding ${DUMMY_USERS.length} akun dummy...`);
+	console.log(`Processing seed for ${DUMMY_USERS.length} dummy accounts...`);
 	let userCount = 0;
 	let postCount = 0;
 
 	for (const dummy of DUMMY_USERS) {
-		// Periksa apakah user dummy sudah ada
+		// Check if dummy user already exists
 		const existing = await db
 			.select()
 			.from(schema.users)
@@ -662,13 +662,13 @@ async function seedDummyUsers(): Promise<void> {
 			});
 
 			userCount++;
-			console.log(`+ Akun dibuat: ${dummy.fullName} (@${dummy.username}) [${dummy.email}]`);
+			console.log(`+ Account created: ${dummy.fullName} (@${dummy.username}) [${dummy.email}]`);
 		} else {
 			userId = existing[0].id;
-			console.log(`= Akun sudah ada: ${dummy.fullName} (@${dummy.username}), memperbarui postingan...`);
+			console.log(`= Account already exists: ${dummy.fullName} (@${dummy.username}), updating posts...`);
 		}
 
-		// Tambahkan postingan untuk user ini
+		// Add posts for this user
 		for (const postData of dummy.posts) {
 			const postId = randomUUID();
 			const postCreatedAt = new Date(Date.now() - postData.hoursAgo * 60 * 60 * 1000);
@@ -689,16 +689,16 @@ async function seedDummyUsers(): Promise<void> {
 		}
 	}
 
-	console.log(`\nBerhasil menambahkan ${userCount} akun dummy baru dan ${postCount} postingan bervariasi!`);
-	console.log('Semua akun dummy memiliki password: "password123"');
-	console.log('Akun dummy dapat dihapus kapan saja dengan perintah: npm run db:clean-dummy');
+	console.log(`\nSuccessfully added ${userCount} new dummy accounts and ${postCount} varied posts!`);
+	console.log('All dummy accounts have password: "password123"');
+	console.log('Dummy accounts can be cleaned up anytime with command: npm run db:clean-dummy');
 }
 
 async function main(): Promise<void> {
 	try {
 		await seedDummyUsers();
 	} catch (err) {
-		console.error('Gagal melakukan seed dummy users:', err);
+		console.error('Failed to seed dummy users:', err);
 		process.exit(1);
 	} finally {
 		await queryClient.end();

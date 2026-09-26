@@ -35,7 +35,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		);
 
 		if (!verifyRes.ok) {
-			return json({ error: 'Token Firebase tidak valid atau sudah kedaluwarsa' }, { status: 401 });
+			return json({ error: 'Firebase token is invalid or expired' }, { status: 401 });
 		}
 
 		const payload = (await verifyRes.json()) as {
@@ -49,7 +49,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
 		const userRecord = payload.users?.[0];
 		if (!userRecord || !userRecord.email) {
-			return json({ error: 'Akun Google tidak menyediakan email' }, { status: 400 });
+			return json({ error: 'Google account did not provide an email' }, { status: 400 });
 		}
 
 		const result = await container.firebaseAuthUseCase.execute({

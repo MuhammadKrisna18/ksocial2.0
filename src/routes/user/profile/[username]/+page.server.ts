@@ -22,7 +22,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			profile.followStatus === 'following' ||
 			profile.followStatus === 'friends';
 
-		// Hanya muat postingan jika akun publik, pemilik akun, atau follower yang sudah diterima
+		// Only load posts if the account is public, current user is the owner, or an accepted follower
 		const userPosts = canViewPrivateContent
 			? await container.getUserPostsUseCase.execute(profile.id, locals.user?.sub)
 			: [];
@@ -32,9 +32,9 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 				id: profile.id,
 				fullName: profile.fullName,
 				username: profile.username,
-				// Lindungi PII: Email hanya untuk pemilik akun
+				// Protect PII: Email is only visible to the account owner
 				email: isCurrentUser ? profile.email : null,
-				// Tanggal lahir hanya jika diizinkan melihat konten pribadi
+				// Date of birth only if allowed to view private content
 				dateOfBirth:
 					(isCurrentUser || canViewPrivateContent) && profile.dateOfBirth
 						? profile.dateOfBirth.toISOString().split('T')[0]

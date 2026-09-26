@@ -26,7 +26,7 @@ export const actions: Actions = {
 			return fail(429, {
 				email: undefined,
 				incorrect: true,
-				message: `Terlalu banyak percobaan login gagal. Silakan coba lagi dalam ${initialCheck.resetInSeconds} detik.`
+				message: `Too many failed login attempts. Please try again in ${initialCheck.resetInSeconds} seconds.`
 			});
 		}
 
@@ -62,7 +62,7 @@ export const actions: Actions = {
 				return fail(429, {
 					email,
 					incorrect: true,
-					message: `Terlalu banyak percobaan login gagal. Akses sementara dibatasi selama ${failedResult.resetInSeconds} detik.`
+					message: `Too many failed login attempts. Access is temporarily restricted for ${failedResult.resetInSeconds} seconds.`
 				});
 			}
 

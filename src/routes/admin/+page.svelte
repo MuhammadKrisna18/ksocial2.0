@@ -8,39 +8,39 @@
 		const now = new Date();
 		const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-		if (diffInSeconds < 60) return 'Baru saja';
-		if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} menit yang lalu`;
-		if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} jam yang lalu`;
-		if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} hari yang lalu`;
-		return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+		if (diffInSeconds < 60) return 'Just now';
+		if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+		if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+		if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+		return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
 	}
 
 	const stats = $derived([
 		{
-			title: 'Total Pengguna',
+			title: 'Total Users',
 			value: data.dashboardStats.totalUsers.toLocaleString(),
-			subtext: 'Akun terdaftar di sistem',
+			subtext: 'Registered accounts',
 			iconBg: 'bg-blue-50 text-blue-600 group-hover:bg-blue-100',
 			icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z'
 		},
 		{
-			title: 'Total Postingan',
+			title: 'Total Posts',
 			value: data.dashboardStats.totalPosts.toLocaleString(),
-			subtext: 'Konten feed aktif',
+			subtext: 'Active feed content',
 			iconBg: 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100',
 			icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15M9 11l3 3L22 4'
 		},
 		{
-			title: 'Total Komentar',
+			title: 'Total Comments',
 			value: data.dashboardStats.totalComments.toLocaleString(),
-			subtext: 'Diskusi komunitas',
+			subtext: 'Community discussions',
 			iconBg: 'bg-purple-50 text-purple-600 group-hover:bg-purple-100',
 			icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z'
 		},
 		{
-			title: 'Total Pesan',
+			title: 'Total Messages',
 			value: data.dashboardStats.totalMessages.toLocaleString(),
-			subtext: 'Pesan obrolan terkirim',
+			subtext: 'Chat messages sent',
 			iconBg: 'bg-amber-50 text-amber-600 group-hover:bg-amber-100',
 			icon: 'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z'
 		}
@@ -66,7 +66,7 @@
 
 <div class="mb-8">
 	<h1 class="text-3xl font-extrabold tracking-tight text-slate-900">Dashboard Overview</h1>
-	<p class="mt-2 text-sm text-slate-500">Ringkasan aktivitas platform dan metrik data aktual K-Social.</p>
+	<p class="mt-2 text-sm text-slate-500">Overview of platform activities and real-time K-Social data metrics.</p>
 </div>
 
 <!-- Stats Grid -->
@@ -97,8 +97,8 @@
 <div class="rounded-2xl border border-slate-200/60 bg-white/70 shadow-sm backdrop-blur-md">
 	<div class="flex items-center justify-between border-b border-slate-200/60 px-6 py-5">
 		<div>
-			<h3 class="text-base font-semibold leading-6 text-slate-900">Aktivitas Terbaru</h3>
-			<p class="mt-1 text-xs text-slate-500">Log interaksi pengguna, postingan, dan komentar riil secara real-time.</p>
+			<h3 class="text-base font-semibold leading-6 text-slate-900">Recent Activity</h3>
+			<p class="mt-1 text-xs text-slate-500">Real-time log of user interactions, posts, and comments.</p>
 		</div>
 		<span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
 			<span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -113,8 +113,8 @@
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
 					</svg>
 				</div>
-				<h4 class="mt-3 text-sm font-semibold text-slate-900">Belum Ada Aktivitas</h4>
-				<p class="mt-1 text-xs text-slate-500">Aktivitas pengguna akan muncul di sini secara otomatis saat terjadi interaksi.</p>
+				<h4 class="mt-3 text-sm font-semibold text-slate-900">No Activity Yet</h4>
+				<p class="mt-1 text-xs text-slate-500">User activities will appear here automatically when interactions happen.</p>
 			</div>
 		{:else}
 			<div class="flow-root">
