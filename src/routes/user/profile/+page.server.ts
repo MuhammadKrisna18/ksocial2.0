@@ -7,37 +7,37 @@ import { validateImageFile, validatePostMediaFile } from '$lib/infrastructure/st
 import crypto from 'crypto';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	let profile;
 	try {
-		profile = await container.getUserProfileUseCase.execute({
-			targetUserId: locals.user!.sub,
-			currentUserId: locals.user!.sub
-		});
+		const [profile, posts] = await Promise.all([
+			container.getUserProfileUseCase.execute({
+				targetUserId: locals.user!.sub,
+				currentUserId: locals.user!.sub
+			}),
+			container.getUserPostsUseCase.execute(locals.user!.sub, locals.user!.sub)
+		]);
+
+		return {
+			user: locals.user,
+			profile: {
+				id: profile.id,
+				fullName: profile.fullName,
+				username: profile.username,
+				email: profile.email,
+				dateOfBirth: profile.dateOfBirth.toISOString().split('T')[0], // Format for input type="date"
+				location: profile.location,
+				relationshipStatus: profile.relationshipStatus,
+				isPrivate: profile.isPrivate,
+				profilePictureUrl: profile.profilePictureUrl,
+				coverPhotoUrl: profile.coverPhotoUrl,
+				followersCount: profile.followersCount,
+				followingCount: profile.followingCount
+			},
+			posts,
+			isCurrentUser: true
+		};
 	} catch {
 		throw redirect(302, '/auth/login');
 	}
-
-	const posts = await container.getUserPostsUseCase.execute(locals.user!.sub, locals.user!.sub);
-
-	return {
-		user: locals.user,
-		profile: {
-			id: profile.id,
-			fullName: profile.fullName,
-			username: profile.username,
-			email: profile.email,
-			dateOfBirth: profile.dateOfBirth.toISOString().split('T')[0], // Format for input type="date"
-			location: profile.location,
-			relationshipStatus: profile.relationshipStatus,
-			isPrivate: profile.isPrivate,
-			profilePictureUrl: profile.profilePictureUrl,
-			coverPhotoUrl: profile.coverPhotoUrl,
-			followersCount: profile.followersCount,
-			followingCount: profile.followingCount
-		},
-		posts,
-		isCurrentUser: true
-	};
 };
 
 export const actions: Actions = {

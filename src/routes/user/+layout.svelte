@@ -25,22 +25,68 @@
 	});
 
 	let eventSource: EventSource | null = null;
-	onMount(() => {
+	let sseReconnectTimer: ReturnType<typeof setTimeout> | null = null;
+	let reconnectAttempts = 0;
+
+	function setupEventSource() {
+		if (typeof window === 'undefined' || document.hidden) return;
+		if (eventSource) {
+			eventSource.close();
+			eventSource = null;
+		}
+
 		eventSource = new EventSource('/api/chat/stream');
 		eventSource.addEventListener('message', (event) => {
 			try {
 				const message = JSON.parse(event.data);
 				chatState.handleIncomingMessage(message, data.user?.sub ?? '');
+				reconnectAttempts = 0;
 			} catch (e) {
 				console.error('Invalid SSE chat event', e);
 			}
 		});
+
 		eventSource.onerror = () => {
-			// Browser automatically attempts reconnect on error
+			eventSource?.close();
+			eventSource = null;
+			if (!sseReconnectTimer && !document.hidden) {
+				reconnectAttempts++;
+				const delay = Math.min(3000 * Math.pow(1.5, reconnectAttempts), 30000);
+				sseReconnectTimer = setTimeout(() => {
+					sseReconnectTimer = null;
+					setupEventSource();
+				}, delay);
+			}
+		};
+	}
+
+	onMount(() => {
+		setupEventSource();
+		const handleVisibilityChange = () => {
+			if (document.hidden) {
+				if (sseReconnectTimer) {
+					clearTimeout(sseReconnectTimer);
+					sseReconnectTimer = null;
+				}
+				eventSource?.close();
+				eventSource = null;
+			} else {
+				reconnectAttempts = 0;
+				setupEventSource();
+			}
+		};
+		document.addEventListener('visibilitychange', handleVisibilityChange);
+
+		return () => {
+			document.removeEventListener('visibilitychange', handleVisibilityChange);
 		};
 	});
 
 	onDestroy(() => {
+		if (sseReconnectTimer) {
+			clearTimeout(sseReconnectTimer);
+			sseReconnectTimer = null;
+		}
 		eventSource?.close();
 	});
 

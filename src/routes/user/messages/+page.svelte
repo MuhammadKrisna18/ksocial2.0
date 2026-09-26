@@ -292,11 +292,26 @@
 	async function sendMessage() {
 		const content = newMessage.trim();
 		if (!content || !activeContactId || isSending) return;
+
+		const targetContactId = activeContactId;
+		const tempId = `temp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+		const optimisticMessage: ChatMessage = {
+			id: tempId,
+			senderId: currentUserId,
+			text: content,
+			createdAt: new Date().toISOString(),
+			isMine: true
+		};
+
+		// Instant optimistic update in UI
+		messages = [...messages, optimisticMessage];
 		newMessage = '';
 		errorText = '';
+		scrollToBottom();
 		isSending = true;
+
 		try {
-			const response = await fetch(`/api/chat/${encodeURIComponent(activeContactId)}`, {
+			const response = await fetch(`/api/chat/${encodeURIComponent(targetContactId)}`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ content })
@@ -304,10 +319,14 @@
 			const payload = await response.json();
 			if (!response.ok) throw new Error(payload.error ?? 'Failed to send message.');
 			const sent = mapMessage(payload.message);
-			if (!messages.some((message) => message.id === sent.id)) messages = [...messages, sent];
-			await fetchContacts();
+
+			// Replace optimistic message with confirmed server message
+			messages = messages.map((m) => (m.id === tempId ? sent : m));
+			void fetchContacts();
 			scrollToBottom();
 		} catch (error) {
+			// Rollback on failure
+			messages = messages.filter((m) => m.id !== tempId);
 			newMessage = content;
 			errorText = error instanceof Error ? error.message : 'Connection error.';
 		} finally {
