@@ -224,7 +224,8 @@
 						};
 					}}
 					class="space-y-6 max-w-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 md:p-8 shadow-sm"
-									<div>
+				>
+					<div>
 						<label for="oldPassword" class="block text-sm font-bold text-slate-700 dark:text-slate-300">Current Password</label>
 						<input type="password" id="oldPassword" name="oldPassword" required class="mt-1.5 block w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" />
 					</div>
