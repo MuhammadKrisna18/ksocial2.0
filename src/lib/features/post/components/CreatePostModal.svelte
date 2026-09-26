@@ -79,9 +79,17 @@
 					class="flex flex-col gap-4"
 					use:enhance={() => {
 						isPosting = true;
-						return async ({ update, formElement }) => {
-							await update();
+						return async ({ update, formElement, result }) => {
 							isPosting = false;
+							if (result.type === 'failure') {
+								alert(result.data?.error || result.data?.message || 'Failed to create post');
+								return;
+							}
+							if (result.type === 'error') {
+								alert('Server error occurred while creating post');
+								return;
+							}
+							await update();
 							isModalOpen = false;
 							formElement.reset();
 							mediaPreviews.forEach(p => URL.revokeObjectURL(p.url));

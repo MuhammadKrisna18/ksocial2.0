@@ -10,7 +10,11 @@
 	let profileLoading = $state(false);
 	let isEditProfileModalOpen = $state(false);
 
-	const profile = data.profile;
+	const profile = $derived(data.profile);
+
+	// Optimistic Preview for Photos
+	let previewAvatarUrl = $state<string | null>(null);
+	let previewCoverUrl = $state<string | null>(null);
 
 	// --- Photo Upload & Cropping State ---
 	let cropperModalOpen = $state(false);
@@ -96,7 +100,7 @@
 			cropperInstance.getCroppedCanvas({
 				width: targetType === 'profile' ? 400 : 1200,
 				height: targetType === 'profile' ? 400 : 675,
-			}).toBlob(resolve, 'image/png');
+			}).toBlob(resolve, 'image/jpeg', 0.85);
 		});
 	}
 
@@ -104,6 +108,12 @@
 		isUploading = true;
 		croppedBlob = await getCroppedBlob();
 		if (croppedBlob && uploadFormElement) {
+			const previewUrl = URL.createObjectURL(croppedBlob);
+			if (targetType === 'profile') {
+				previewAvatarUrl = previewUrl;
+			} else {
+				previewCoverUrl = previewUrl;
+			}
 			uploadFormElement.requestSubmit();
 		} else {
 			isUploading = false;
@@ -133,8 +143,8 @@
 <div class="min-h-full">
 	<div class="relative w-full group">
 		<!-- Cover Photo (Edge to edge) -->
-		{#if profile?.coverPhotoUrl}
-			<img src={profile.coverPhotoUrl} alt="Cover" class="h-64 w-full object-cover" />
+		{#if previewCoverUrl || profile?.coverPhotoUrl}
+			<img src={previewCoverUrl || profile?.coverPhotoUrl} alt="Cover" class="h-64 w-full object-cover" />
 		{:else}
 			<div class="h-64 w-full bg-gradient-to-tr from-cyan-500 via-blue-500 to-purple-600"></div>
 		{/if}
@@ -156,9 +166,13 @@
 		<div class="absolute top-44 left-1/2 -translate-x-1/2 group/avatar z-20">
 			<div class="relative h-40 w-40 rounded-full border-8 border-slate-50 dark:border-slate-900 bg-slate-100 shadow-lg overflow-hidden">
 				<img 
-					src={profile?.profilePictureUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile?.username || 'user'}`} 
+					src={previewAvatarUrl || profile?.profilePictureUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile?.username || 'user'}`} 
 					alt="Profile Avatar" 
 					class="w-full h-full object-cover" 
+					onerror={(e) => {
+						const target = e.currentTarget as HTMLImageElement;
+						target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile?.username || 'user'}`;
+					}}
 				/>
 				
 				<div class="absolute inset-0 bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
@@ -405,17 +419,31 @@
 <form
 	bind:this={uploadFormElement}
 	method="POST"
+	enctype="multipart/form-data"
 	action={targetType === 'profile' ? '?/uploadProfilePicture' : '?/uploadCoverPhoto'}
 	use:enhance={({ formData, cancel }) => {
 		if (!croppedBlob) {
 			cancel();
+			isUploading = false;
 			return;
 		}
-		formData.set('file', croppedBlob, 'cropped.png');
+		formData.set('file', croppedBlob, targetType === 'profile' ? 'avatar.jpg' : 'cover.jpg');
 		
-		return async ({ update }) => {
-			await update();
+		return async ({ update, result }) => {
 			isUploading = false;
+			if (result.type === 'failure') {
+				if (targetType === 'profile') previewAvatarUrl = null;
+				else previewCoverUrl = null;
+				alert(result.data?.message || result.data?.error || 'Failed to upload photo.');
+				return;
+			}
+			if (result.type === 'error') {
+				if (targetType === 'profile') previewAvatarUrl = null;
+				else previewCoverUrl = null;
+				alert('Server error while uploading photo.');
+				return;
+			}
+			await update();
 			cropperModalOpen = false;
 			croppedBlob = null;
 			if (imageToCrop) URL.revokeObjectURL(imageToCrop);

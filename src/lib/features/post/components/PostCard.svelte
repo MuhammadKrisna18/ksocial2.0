@@ -299,7 +299,16 @@
 				{#each post.media as m}
 					<div class="rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
 						{#if m.type === 'image'}
-							<img src={m.url} alt="Post media" class="w-full h-auto max-h-96 object-cover" loading="lazy" />
+							<img 
+								src={m.url} 
+								alt="Post media" 
+								class="w-full h-auto max-h-96 object-cover" 
+								loading="lazy" 
+								onerror={(e) => {
+									const container = (e.currentTarget as HTMLElement).closest('.rounded-xl') as HTMLElement;
+									if (container) container.style.display = 'none';
+								}}
+							/>
 						{:else}
 							<video src={m.url} controls class="w-full h-auto max-h-96 object-cover"></video>
 						{/if}

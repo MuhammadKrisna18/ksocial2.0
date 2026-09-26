@@ -4,7 +4,7 @@
 
 	let { data, form } = $props();
 	
-	const targetProfile = data.targetProfile;
+	const targetProfile = $derived(data.targetProfile);
 	let followStatus = $state(data.followStatus);
 	let isActionLoading = $state(false);
 
@@ -30,6 +30,10 @@
 					src={targetProfile.profilePictureUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${targetProfile.username || 'user'}`} 
 					alt="Profile Avatar" 
 					class="w-full h-full object-cover" 
+					onerror={(e) => {
+						const target = e.currentTarget as HTMLImageElement;
+						target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${targetProfile.username || 'user'}`;
+					}}
 				/>
 			</div>
 		</div>
